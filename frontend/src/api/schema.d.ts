@@ -227,10 +227,98 @@ export interface paths {
     patch?: never
     trace?: never
   }
+  '/api/v1/audit-logs': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** List audit records, newest first (FR-AUD-02) */
+    get: operations['list_audit_logs_api_v1_audit_logs_get']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
 }
 export type webhooks = Record<string, never>
 export interface components {
   schemas: {
+    /**
+     * ActorType
+     * @enum {string}
+     */
+    ActorType: 'user' | 'system' | 'anonymous'
+    /**
+     * AuditAction
+     * @enum {string}
+     */
+    AuditAction:
+      | 'auth.login'
+      | 'auth.login_failed'
+      | 'auth.logout'
+      | 'auth.refresh_token_reused'
+      | 'user.created'
+      | 'user.registered'
+      | 'user.updated'
+      | 'user.password_reset'
+      | 'user.deactivated'
+      | 'user.activated'
+    /** AuditActor */
+    AuditActor: {
+      /**
+       * Id
+       * Format: uuid
+       */
+      id: string
+      /** Full Name */
+      full_name: string
+      /** Email */
+      email: string
+    }
+    /**
+     * AuditLogRead
+     * @description One audit record (FR-AUD-02): who did what, to what, when, and what changed.
+     */
+    AuditLogRead: {
+      /**
+       * Id
+       * Format: uuid
+       */
+      id: string
+      /**
+       * Occurred At
+       * Format: date-time
+       */
+      occurred_at: string
+      actor_type: components['schemas']['ActorType']
+      /** @description The user who acted; null for system and anonymous actions. */
+      actor: components['schemas']['AuditActor'] | null
+      action: components['schemas']['AuditAction']
+      target_type: components['schemas']['TargetType']
+      /** Target Id */
+      target_id: string | null
+      /**
+       * Target Label
+       * @description The target's name when the action happened.
+       */
+      target_label: string | null
+      /**
+       * Changes
+       * @description Changed fields as {field: [old, new]}.
+       */
+      changes: {
+        [key: string]: unknown[]
+      } | null
+      /** Request Id */
+      request_id: string | null
+      /** Ip Address */
+      ip_address: string | null
+    }
     /** AuthOptions */
     AuthOptions: {
       /** Self Signup Enabled */
@@ -290,6 +378,17 @@ export interface components {
       /** Data Scopes */
       data_scopes: string[]
     }
+    /** Page[AuditLogRead] */
+    Page_AuditLogRead_: {
+      /** Items */
+      items: components['schemas']['AuditLogRead'][]
+      /** Page */
+      page: number
+      /** Page Size */
+      page_size: number
+      /** Total */
+      total: number
+    }
     /** Page[UserRead] */
     Page_UserRead_: {
       /** Items */
@@ -344,6 +443,11 @@ export interface components {
        */
       preferred_language: 'en' | 'ar'
     }
+    /**
+     * TargetType
+     * @enum {string}
+     */
+    TargetType: 'user'
     /** TokenResponse */
     TokenResponse: {
       /** Access Token */
@@ -878,6 +982,50 @@ export interface operations {
         }
         content: {
           'application/json': components['schemas']['RoleRead'][]
+        }
+      }
+    }
+  }
+  list_audit_logs_api_v1_audit_logs_get: {
+    parameters: {
+      query?: {
+        /** @description Search actor name/e-mail or target name. */
+        q?: string | null
+        action?: components['schemas']['AuditAction'] | null
+        target_type?: components['schemas']['TargetType'] | null
+        target_id?: string | null
+        actor_id?: string | null
+        /** @description Inclusive lower bound (ISO 8601). */
+        occurred_from?: string | null
+        /** @description Exclusive upper bound (ISO 8601). */
+        occurred_to?: string | null
+        /** @description 1-based page number. */
+        page?: number
+        /** @description Items per page (max 100). */
+        page_size?: number
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['Page_AuditLogRead_']
+        }
+      }
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['HTTPValidationError']
         }
       }
     }
