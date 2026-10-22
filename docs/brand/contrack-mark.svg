@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="256" height="256">
+  <title>ConTrack</title>
+  <path d="M48.85 17.86A22 22 0 1 0 48.85 46.14" fill="none" stroke="#1D4ED8" stroke-width="9" stroke-linecap="round"/>
+  <path d="M22 32.5l7 7 13.5-14.5" fill="none" stroke="#059669" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>

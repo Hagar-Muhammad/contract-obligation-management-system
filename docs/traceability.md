@@ -4,6 +4,8 @@ Maps every functional requirement and business rule to a use case, frontend work
 case (SRS section 12). **Updated in every module PR**: when a requirement is implemented, its row gets the real
 page/endpoint names and its status changes to ✅.
 
+**Where tests live:** backend `backend/tests/test_<area>.py`; frontend next to the feature (`features/<module>/*.test.tsx`).
+
 **Test naming:** test case `TC-CON-01` is the pytest function `test_TC_CON_01_<description>` (or a Vitest
 `describe('TC-CON-01 …')`), tagged `@pytest.mark.req("FR-CON-01")`. Search the code for the TC ID to find its tests.
 
@@ -32,13 +34,13 @@ UC-03, UC-04 and UC-05 are the workflows defined in SRS 9.1–9.3; the others ar
 
 | Requirement | Use case | Frontend | Backend | Test case | Module | Status |
 |---|---|---|---|---|---|---|
-| FR-AUTH-01 | UC-01 | Login page | `POST /auth/login` | TC-AUTH-01 | 1 auth-users-rbac | ⏳ |
-| FR-AUTH-02 | UC-01 | Route guard, 401 handling | Auth dependency on protected routes | TC-AUTH-02 | 1 auth-users-rbac | ⏳ |
-| FR-AUTH-03 | UC-01 | Permission-aware menus/actions | `require_permission()` + seeded matrix | TC-AUTH-03 | 1 auth-users-rbac | ⏳ |
-| FR-AUTH-04 | UC-01 | Logout action | `POST /auth/logout` (refresh token revoked) | TC-AUTH-04 | 1 auth-users-rbac | ⏳ |
-| FR-USER-01 | UC-02 | Users list / Create user form | `POST /users` | TC-USER-01 | 1 auth-users-rbac | ⏳ |
-| FR-USER-02 | UC-02 | Edit user form (roles) | `PATCH /users/{id}` | TC-USER-02 | 1 auth-users-rbac | ⏳ |
-| FR-USER-03 | UC-02 | Deactivate action | `POST /users/{id}/deactivate` | TC-USER-03 | 1 auth-users-rbac | ⏳ |
+| FR-AUTH-01 | UC-01 | Sign-in page (`features/auth/LoginPage.tsx`, design screen 1) incl. "Keep me signed in" | `POST /auth/login`, `POST /auth/refresh` | TC-AUTH-01 | 1 auth-users-rbac | ✅ |
+| FR-AUTH-02 | UC-01 | `RequireAuth` guard; token refresh + replay in `api/client.ts` | `get_current_user` on every non-public route | TC-AUTH-02 | 1 auth-users-rbac | ✅ |
+| FR-AUTH-03 | UC-01 | Permission-filtered sidebar (`components/nav.tsx`), `RequirePermission` (403 page), role matrix on Users & roles | `require_permission()` + seeded 3.2 matrix; `GET /roles` | TC-AUTH-03 | 1 auth-users-rbac | ✅ |
+| FR-AUTH-04 | UC-01 | Log out button | `POST /auth/logout` (session revoked, access token rejected at once) | TC-AUTH-04 | 1 auth-users-rbac | ✅ |
+| FR-USER-01 | UC-02 | Users & roles (design screen 8) → Add user | `POST /users`; `python -m app.cli create-admin` | TC-USER-01 | 1 auth-users-rbac | ✅ |
+| FR-USER-02 | UC-02 | Edit user form (info, roles, password reset) | `PATCH /users/{id}` | TC-USER-02 | 1 auth-users-rbac | ✅ |
+| FR-USER-03 | UC-02 | Deactivate on the edit page, Reactivate in the list | `POST /users/{id}/deactivate`, `/activate` (sessions revoked) | TC-USER-03 | 1 auth-users-rbac | ✅ |
 | FR-AUD-01 | UC-12 | — | Audit service called by state-changing services | TC-AUD-01 | 2 audit-trail | ⏳ |
 | FR-AUD-02 | UC-12 | Audit log page | `audit_logs` schema, `GET /audit-logs` | TC-AUD-02 | 2 audit-trail | ⏳ |
 | FR-AUD-03 | UC-12 | — (read-only UI) | No write endpoints + DB trigger blocking UPDATE/DELETE | TC-AUD-03 | 2 audit-trail | ⏳ |
@@ -85,6 +87,12 @@ UC-03, UC-04 and UC-05 are the workflows defined in SRS 9.1–9.3; the others ar
 | FR-REP-04 | UC-11 | Contract reports | `GET /reports/contracts?group_by=type,status` | TC-REP-04 | 10 dashboard-reports | ⏳ |
 | FR-REP-05 | UC-11 | Export button | CSV export endpoints | TC-REP-05 | 10 dashboard-reports | ⏳ |
 
+## Change requests
+
+| Request | Use case | Frontend | Backend | Test case | Module | Status |
+|---|---|---|---|---|---|---|
+| CR-01 self sign-up | UC-01 | Sign-up page (`features/auth/SignUpPage.tsx`), "Create an account" link on the login page | `POST /auth/register`, `GET /auth/options` | TC-CR-01 | 1 auth-users-rbac | ✅ |
+
 ## Business rules
 
 | Rule | Enforced in | Test case | Module | Status |
@@ -94,7 +102,7 @@ UC-03, UC-04 and UC-05 are the workflows defined in SRS 9.1–9.3; the others ar
 | BR-03 | Pydantic validator + DB `CHECK` | TC-BR-03 | 4 contracts | ⏳ |
 | BR-04 | Overdue status logic | TC-BR-04 | 6 obligations | ⏳ |
 | BR-05 | Extraction confirm flow (candidates separate) | TC-BR-05 | 9 extraction | ⏳ |
-| BR-06 | `require_permission()` on every write endpoint | TC-BR-06 | 1 auth-users-rbac (+ every module) | ⏳ |
+| BR-06 | `require_permission()` on every write endpoint | TC-BR-06 | 1 auth-users-rbac (+ every module) | 🚧 user management done; each module adds its endpoints |
 | BR-07 | Contract list default filter | TC-BR-07 | 4 contracts | ⏳ |
 | BR-08 | RRULE validation | TC-BR-08 | 6 obligations | ⏳ |
 | BR-09 | Document service + `NOT NULL` FK | TC-BR-09 | 5 documents | ⏳ |
@@ -105,8 +113,11 @@ UC-03, UC-04 and UC-05 are the workflows defined in SRS 9.1–9.3; the others ar
 |---|---|---|
 | NFR-MAIN-01 | `backend/tests/test_errors.py` (error envelope) | ✅ |
 | NFR-REL-02 | `backend/tests/test_errors.py::test_unhandled_errors_do_not_leak_implementation_details` | ✅ |
-| NFR-UX-02 | `backend/tests/test_errors.py::test_validation_errors_list_every_invalid_field` (API side) | 🚧 UI side with each form |
-| NFR-SEC-01..04 | Module 1 tests | ⏳ |
+| NFR-UX-02 | `backend/tests/test_errors.py::test_validation_errors_list_every_invalid_field`; `users.test.tsx` (server field errors shown on the form) | 🚧 each new form adds tests |
+| NFR-SEC-01 | `test_auth.py::test_TC_AUTH_02_every_non_public_endpoint_rejects_unauthenticated_requests` (walks every route in the OpenAPI document) | ✅ |
+| NFR-SEC-02 | `test_rbac.py` (seeded matrix = SRS 3.2, per-role permissions), `test_users.py::test_TC_BR_06_*` | ✅ |
+| NFR-SEC-03 | `test_auth.py::test_passwords_are_stored_as_argon2_hashes` | ✅ |
+| NFR-SEC-04 | `test_security.py` (HSTS + Secure cookies in production, weak JWT secret refused) | ✅ |
 | NFR-SEC-05, NFR-SEC-06 | Module 5 tests | ⏳ |
 | NFR-PERF-02 | Module 7 tests (page size cap, server-side filters) | ⏳ |
 | NFR-PERF-03, NFR-REL-03 | Module 9 tests | ⏳ |

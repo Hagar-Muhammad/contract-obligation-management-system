@@ -10,7 +10,7 @@ implementation details never reach the client.
 
 import logging
 from http import HTTPStatus
-from typing import Any
+from typing import Any, ClassVar
 
 from fastapi import FastAPI, Request
 from fastapi.exceptions import RequestValidationError
@@ -25,11 +25,27 @@ class AppError(Exception):
 
     status_code: int = HTTPStatus.BAD_REQUEST
     code: str = "bad_request"
+    headers: ClassVar[dict[str, str] | None] = None
 
     def __init__(self, message: str, *, details: Any = None) -> None:
         super().__init__(message)
         self.message = message
         self.details = details
+
+
+class UnauthorizedError(AppError):
+    """Missing, invalid or expired credentials (FR-AUTH-02)."""
+
+    status_code = HTTPStatus.UNAUTHORIZED
+    code = "unauthorized"
+    headers: ClassVar[dict[str, str] | None] = {"WWW-Authenticate": "Bearer"}
+
+
+class ForbiddenError(AppError):
+    """Authenticated, but the user's roles do not grant the permission (FR-AUTH-03)."""
+
+    status_code = HTTPStatus.FORBIDDEN
+    code = "forbidden"
 
 
 class NotFoundError(AppError):
@@ -57,7 +73,9 @@ def error_body(code: str, message: str, details: Any = None) -> dict[str, Any]:
 
 
 async def _app_error_handler(_: Request, exc: AppError) -> JSONResponse:
-    return JSONResponse(error_body(exc.code, exc.message, exc.details), status_code=exc.status_code)
+    return JSONResponse(
+        error_body(exc.code, exc.message, exc.details), status_code=exc.status_code, headers=exc.headers
+    )
 
 
 async def _http_error_handler(_: Request, exc: StarletteHTTPException) -> JSONResponse:

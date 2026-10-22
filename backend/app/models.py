@@ -2,3 +2,6 @@
 
 Each feature module adds its own line, e.g. ``from app.modules.contracts.models import *``.
 """
+
+from app.modules.auth.models import *  # noqa: F403
+from app.modules.users.models import *  # noqa: F403

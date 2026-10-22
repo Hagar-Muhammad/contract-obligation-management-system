@@ -5,7 +5,7 @@ Requirements are referenced by their SRS IDs (see [SRS.md](./SRS.md)).
 
 ## 1. Overview
 
-COMS is a web application made of a React single-page frontend and a Python REST API, backed by
+**ConTrack** (repository: COMS) is a web application made of a React single-page frontend and a Python REST API, backed by
 PostgreSQL, document storage, and background workers.
 
 ```mermaid

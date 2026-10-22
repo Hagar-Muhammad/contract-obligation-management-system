@@ -111,11 +111,22 @@ Response:
 
 ## 6. Authentication and authorization
 
-- `POST /auth/login` returns a short-lived access token in the body and sets a rotating refresh token in an
-  `httpOnly`, `Secure`, `SameSite=Strict` cookie.
-- Clients send `Authorization: Bearer <access token>`.
-- `POST /auth/refresh` exchanges the refresh cookie for a new access token (and rotates the cookie).
-- `POST /auth/logout` revokes the refresh token (FR-AUTH-04).
+| Endpoint | Purpose |
+|---|---|
+| `POST /auth/login` | `{email, password, remember_me}` → `{access_token, token_type: "bearer", expires_in, user}` and sets the refresh cookie (persistent only when `remember_me` is true). Wrong e-mail, wrong password and inactive account all return the same `401` ("Invalid email or password."). |
+| `POST /auth/register` | Self sign-up (CR-01): `{email, full_name, password, preferred_language}` → `201` with the same body as login, and signs the user in. `409` if the e-mail is taken, `403` if sign-up is disabled. |
+| `GET /auth/options` | Public: `{self_signup_enabled}`, so the login page knows whether to show "Create an account". |
+| `POST /auth/refresh` | Uses the refresh cookie; returns a new access token and rotates the cookie. |
+| `POST /auth/logout` | Ends the session (works with only the cookie, so an expired access token can still log out). Always `204`. |
+| `GET /auth/me` | Current user, roles, permission codes and data scopes; the frontend uses it to show or hide actions. |
+
+- **Access token:** JWT (HS256), 15 minutes (`ACCESS_TOKEN_TTL_MINUTES`), sent as `Authorization: Bearer <token>`.
+  It is bound to a server-side session, so it stops working as soon as the session is revoked.
+- **Refresh token:** random, single-use, 7 days (`REFRESH_TOKEN_TTL_DAYS`), stored only as a SHA-256 hash. Sent as the
+  `coms_refresh` cookie: `HttpOnly`, `SameSite=Strict`, `Path=/api/v1/auth`, and `Secure` in production.
+- **401 responses** include `WWW-Authenticate: Bearer`. The frontend refreshes once and replays the request; if that
+  fails the user is sent to the login page.
+- **Production** adds `Strict-Transport-Security` and refuses to start without a strong `JWT_SECRET` (NFR-SEC-04).
 - Authorization is applied by dependencies on each route (`require_permission(...)`) and by data scope in services.
   See [roles-and-permissions.md](./roles-and-permissions.md).
 

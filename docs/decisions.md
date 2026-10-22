@@ -9,7 +9,7 @@ confirms or changes an item, update this table and tick the issue.
 
 | ID | Question (13.2) | Default used | Where it lives / how to change |
 |---|---|---|---|
-| D-01 | Confirm final user roles and permissions. | The 6 roles of 2.3 and the 3.2 matrix. "Allowed" = granted but flagged for confirmation; "View" = read-only; "Limited" = restricted to own data. Property Managers are scoped to assigned properties, Employees to their assigned obligations. See [roles-and-permissions.md](./roles-and-permissions.md). | Seed data (`role_permissions`); changeable without code. |
+| D-01 | Confirm final user roles and permissions. | The 6 roles of 2.3 and the 3.2 matrix. "Allowed" = granted within the role's scope, shown as "Scoped", and flagged for confirmation; "View" = read-only; "Limited" = restricted to own data. Property Managers are scoped to assigned properties, Employees to their assigned obligations. See [roles-and-permissions.md](./roles-and-permissions.md). | Seed data (`role_permissions`); changeable without code. |
 | D-02 | One company or multi-tenant? | **Single company.** No tenant column. | Adding tenancy later means a `tenant_id` on top-level tables; IDs are UUIDs so data can be merged. |
 | D-03 | Final contract types. | The 10 types of 4.4. | `contract_types` lookup table (seed). |
 | D-04 | Can a contract be linked to multiple properties? | **Yes** (many-to-many), as FR-PROP-01 says "one or more". | `contract_properties` table. Restricting to one is a validation rule. |
@@ -29,6 +29,17 @@ confirms or changes an item, update this table and tick the issue.
 | D-18 | Expected volumes? | Planned for up to ~200 users, ~50,000 contracts, ~500,000 obligations, ~200,000 documents. Server-side pagination and indexes from day one. | Revisit with real numbers before production sizing. |
 | D-19 | Backup and document retention? | Daily database backups kept 30 days; document storage included in backups; documents retained indefinitely while their contract exists. No automatic deletion. | Deployment/infrastructure configuration (not application code). |
 
+## Change requests
+
+Changes the project owner asked for that go beyond the SRS v0.1 text.
+
+| ID | Change | Decided | Where it lives / how to change |
+|---|---|---|---|
+| CR-01 | **Open self sign-up.** Anyone can create an account from the login page and is signed in at once. New accounts get only the **Employee** role, whose data scope is "assigned obligations", so a new account sees no contract data until someone assigns it work. Administrators still create accounts with other roles (FR-USER-01) and can change roles or deactivate. | 2026-10-22, project owner (chosen over "request access" and "contact administrator") | Settings `SELF_SIGNUP_ENABLED` (default `true`) and `SELF_SIGNUP_ROLE` (default `employee`). With sign-up off, the link disappears and `POST /auth/register` returns `403`. |
+
+Known follow-ups for CR-01: e-mail address verification and sign-up rate limiting (with module 8, which adds
+e-mail delivery). Until then an address is not proven to belong to the person who registered it.
+
 ## Technical decisions
 
 | ID | Decision | Reason |
@@ -40,3 +51,13 @@ confirms or changes an item, update this table and tick the issue.
 | T-05 | Tests use a separate `coms_test` database. | Tests never touch development data. |
 | T-06 | Background jobs with Celery + Redis (added in the modules that need them). | Mature scheduling (Beat) and separate queues so extraction scales independently (NFR-SCALE-02). |
 | T-07 | UUID primary keys. | IDs in URLs do not reveal record counts; easier future data merging. |
+| T-08 | Access token in memory + single-use refresh token in an httpOnly cookie, both bound to a server-side session. | Scripts cannot read the refresh token; logout and deactivation take effect immediately instead of when a token expires (FR-AUTH-04, FR-USER-03). |
+| T-09 | Password policy: 8–128 characters, no composition rules. | Follows current NIST guidance (length over complexity). Change `PASSWORD_MIN_LENGTH` in `users/schemas.py` and `UserFormPage.tsx`. |
+| T-10 | E-mail addresses are validated strictly; reserved domains such as `.local` are rejected. | Avoids accounts that can never receive notification e-mails (module 8). If the company uses an internal domain, relax the check in `users/schemas.py`. |
+| T-11 | Frontend API types generated with `openapi-typescript`, run through `npx` with TypeScript 5. | `openapi-typescript` does not yet support TypeScript 6 as a peer; the generated file is committed, so CI does not need it. |
+| T-12 | Product name **ConTrack** (not translated); logo = open "C" track closing on a check. | Requested by the project owner. Brand assets and colours: [brand/README.md](./brand/README.md). |
+| T-13 | Administrators cannot deactivate themselves or remove their own Administrator role. | Prevents locking the system out of its only administrator. |
+| T-14 | **UI follows [design/ConTrack-UI.pdf](./design/ConTrack-UI.pdf)** (8 screens). Each module builds its screen from it; sidebar links to pages of later modules show a "coming soon" page until then. | Design supplied by the project owner on 2026-10-22. Fonts: Manrope + IBM Plex Sans Arabic (self-hosted via @fontsource, no external font requests). |
+| T-15 | "Keep me signed in on this device": unticked (default) = browser-session cookie and a 12-hour session; ticked = 7-day cookie. | Shared or public computers do not stay signed in by accident. `UNREMEMBERED_SESSION_HOURS`, `REFRESH_TOKEN_TTL_DAYS`. |
+| T-16 | "Forgot password?" explains that an administrator resets passwords until e-mail delivery exists (module 8). | Self-service reset needs e-mail. |
+| T-17 | Top-bar search and notification bell from the design are added with modules 7 (search) and 8 (notifications). | They would do nothing yet; showing dead controls misleads users. |

@@ -65,7 +65,9 @@ Example: `feat(contracts): reject end date earlier than start date (BR-03)`
 
 - **Backend:** ruff (lint + format), mypy in strict mode. Routers stay thin; business logic lives in services.
 - **Frontend:** oxlint, Prettier, TypeScript strict. API types are generated from the backend's OpenAPI
-  document; do not hand-write request/response types.
+  document (`npm run api:generate`); do not hand-write request/response types.
+- **Text:** every user-facing string goes through i18next, in both `en.json` and `ar.json`. The product name
+  **ConTrack** is not translated (see `docs/brand/`).
 - Follow [docs/api-standards.md](docs/api-standards.md) for every endpoint.
 
 ## Running checks locally
