@@ -20,11 +20,14 @@
   },
   "login": {
     "title": "Sign in",
+    "subtitle": "Welcome back. Sign in to continue.",
     "email": "Email",
     "password": "Password",
     "submit": "Sign in",
     "invalid": "Invalid email or password.",
-    "failed": "Sign-in failed. Please try again."
+    "failed": "Sign-in failed. Please try again.",
+    "noAccount": "New to ConTrack?",
+    "createAccount": "Create an account"
   },
   "users": {
     "title": "Users",
@@ -74,5 +77,33 @@
     "notFound": "Page not found.",
     "generic": "Something went wrong. Please try again.",
     "backHome": "Back to home"
+  },
+  "auth": {
+    "heroTitle": "Every contract. Every obligation. On time.",
+    "heroText": "Keep contracts, parties and documents in one place, and never miss a deadline again.",
+    "features": {
+      "track": "Track obligations, owners and due dates",
+      "extract": "Pull key terms out of contract documents",
+      "remind": "Get reminded before anything is due",
+      "bilingual": "Arabic and English, built in"
+    },
+    "rights": "© {{year}} ConTrack"
+  },
+  "signup": {
+    "title": "Create your account",
+    "subtitle": "It takes less than a minute.",
+    "name": "Full name",
+    "email": "Work email",
+    "password": "Password",
+    "confirm": "Confirm password",
+    "language": "Preferred language",
+    "submit": "Create account",
+    "haveAccount": "Already have an account?",
+    "signIn": "Sign in",
+    "mismatch": "The passwords do not match.",
+    "emailTaken": "This email is already registered. Sign in instead.",
+    "disabled": "Sign-up is turned off. Ask an administrator for an account.",
+    "failed": "Could not create the account. Please try again.",
+    "roleNote": "New accounts start with the Employee role. An administrator can give you more access."
   }
 }

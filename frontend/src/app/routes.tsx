@@ -3,6 +3,7 @@ import { PERMISSIONS } from '../auth/context'
 import { RequireAuth, RequirePermission } from '../auth/guards'
 import { AppLayout } from '../components/AppLayout'
 import { LoginPage } from '../features/auth/LoginPage'
+import { SignUpPage } from '../features/auth/SignUpPage'
 import { HomePage } from '../features/home/HomePage'
 import { NotFoundPage } from '../features/home/NotFoundPage'
 import { UserFormPage } from '../features/users/UserFormPage'
@@ -12,6 +13,7 @@ export function AppRoutes() {
   return (
     <Routes>
       <Route path="/login" element={<LoginPage />} />
+      <Route path="/signup" element={<SignUpPage />} />
       <Route
         element={
           <RequireAuth>

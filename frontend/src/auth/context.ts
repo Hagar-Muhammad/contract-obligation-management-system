@@ -1,10 +1,14 @@
 import { createContext, useContext } from 'react'
 import type { Me } from '../api/client'
+import type { components } from '../api/schema'
+
+export type SignUpData = components['schemas']['SignUpRequest']
 
 export interface AuthState {
   status: 'loading' | 'authenticated' | 'anonymous'
   user: Me | null
   login: (email: string, password: string) => Promise<void>
+  register: (data: SignUpData) => Promise<void>
   logout: () => Promise<void>
   /** UI convenience only; the backend enforces every permission (Appendix B). */
   can: (permission: string) => boolean

@@ -35,27 +35,21 @@ body {
   text-overflow: ellipsis;
 }
 
+/* The logo follows the page direction, so in Arabic the mark sits on the outer (right) edge. */
 .logo {
   display: inline-flex;
   flex: none;
   align-items: center;
   gap: 8px;
-  /* The brand name reads left-to-right in both languages. */
-  direction: ltr;
 }
 
 .logo-wordmark {
+  /* "ConTrack" itself always reads left-to-right. */
+  direction: ltr;
+  unicode-bidi: isolate;
   font-weight: 700;
   letter-spacing: -0.02em;
   line-height: 1;
-}
-
-.login-brand {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 8px;
-  margin-bottom: 24px;
 }
 
 .app-user.ant-typography {
@@ -82,24 +76,152 @@ body {
   max-width: 640px;
 }
 
-.login-page {
+/* ---- Sign-in / sign-up (full screen) ---- */
+
+.auth-page {
+  display: grid;
+  grid-template-columns: minmax(0, 5fr) minmax(0, 6fr);
   min-height: 100vh;
+  min-height: 100dvh;
+  background: #fff;
+}
+
+.auth-hero {
+  /* Stays in view while a long form (sign-up) scrolls beside it. */
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  height: 100dvh;
   display: flex;
   flex-direction: column;
+  justify-content: space-between;
+  gap: 32px;
+  overflow: hidden;
+  padding: 48px 56px;
+  color: #fff;
+  background: radial-gradient(120% 90% at 0% 0%, #163a6b 0%, #0b2545 55%, #071a33 100%);
+}
+
+.auth-hero-body {
+  position: relative;
+  z-index: 1;
+  max-width: 460px;
+}
+
+.auth-hero-title {
+  margin: 0 0 16px;
+  font-size: clamp(28px, 3.2vw, 40px);
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.auth-hero-text {
+  margin: 0 0 32px;
+  color: rgba(255, 255, 255, 0.75);
+  font-size: 16px;
+  line-height: 1.6;
+}
+
+.auth-features {
+  display: grid;
+  gap: 14px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-size: 15px;
+}
+
+.auth-features li {
+  display: flex;
   align-items: center;
-  justify-content: center;
-  gap: 16px;
-  padding: 16px;
-  background: #f5f5f5;
+  gap: 12px;
 }
 
-.login-card {
+.auth-feature-icon {
+  color: #34d399;
+  font-size: 18px;
+}
+
+.auth-hero-footer {
+  position: relative;
+  z-index: 1;
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.auth-hero-watermark {
+  position: absolute;
+  inset-block-end: -110px;
+  inset-inline-end: -110px;
+  opacity: 0.07;
+  pointer-events: none;
+}
+
+.auth-main {
+  display: flex;
+  flex-direction: column;
+  padding: 24px 32px;
+}
+
+.auth-toolbar {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.auth-form {
   width: 100%;
-  max-width: 400px;
+  max-width: 420px;
+  margin: auto;
+  padding-block: 32px;
 }
 
-.login-error {
+.auth-title.ant-typography {
+  margin-bottom: 4px;
+}
+
+.auth-form .ant-form-item {
   margin-bottom: 16px;
+}
+
+.auth-error {
+  margin-bottom: 16px;
+}
+
+.auth-note.ant-typography {
+  font-size: 13px;
+}
+
+.auth-switch.ant-typography {
+  margin-top: 24px;
+  text-align: center;
+}
+
+@media (max-width: 900px) {
+  .auth-page {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto 1fr;
+  }
+
+  /* On small screens the brand panel shrinks to a header band. */
+  .auth-hero {
+    position: relative;
+    height: auto;
+    padding: 20px 24px;
+  }
+
+  .auth-hero-body,
+  .auth-hero-footer,
+  .auth-hero-watermark {
+    display: none;
+  }
+
+  .auth-main {
+    padding: 16px 24px;
+  }
+
+  .auth-form {
+    margin-top: 8px;
+    padding-block: 16px;
+  }
 }
 
 @media (max-width: 576px) {

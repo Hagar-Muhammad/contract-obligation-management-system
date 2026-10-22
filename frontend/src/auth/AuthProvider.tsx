@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useState, type ReactNode } from 'react'
 import { api, onSessionChange, refreshSession, setSession, type Me } from '../api/client'
 import { unwrap } from '../api/errors'
-import { AuthContext, type AuthState } from './context'
+import { AuthContext, type AuthState, type SignUpData } from './context'
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<Me | null>(null)
@@ -21,6 +21,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setSession(unwrap(await api.POST('/api/v1/auth/login', { body: { email, password } })))
   }, [])
 
+  const register = useCallback(async (data: SignUpData) => {
+    setSession(unwrap(await api.POST('/api/v1/auth/register', { body: data })))
+  }, [])
+
   const logout = useCallback(async () => {
     try {
       await api.POST('/api/v1/auth/logout')
@@ -34,10 +38,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       status,
       user,
       login,
+      register,
       logout,
       can: (permission: string) => user?.permissions.includes(permission) ?? false,
     }),
-    [status, user, login, logout],
+    [status, user, login, register, logout],
   )
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>
