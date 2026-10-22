@@ -1,0 +1,22 @@
+name: Business decision
+description: A question the business owner must answer (see SRS 13.2 and docs/decisions.md).
+title: "Decision: "
+labels: ["docs"]
+body:
+  - type: textarea
+    id: question
+    attributes:
+      label: Question
+    validations:
+      required: true
+  - type: textarea
+    id: default
+    attributes:
+      label: Default used until decided
+    validations:
+      required: true
+  - type: textarea
+    id: impact
+    attributes:
+      label: Impact of changing it
+      description: Which modules, tables, settings or tests are affected.
