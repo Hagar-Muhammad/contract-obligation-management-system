@@ -7,25 +7,11 @@ import { useAuth } from '../../auth/context'
 import { ROLE_CODES, ROLE_TAG_CLASS, scopeKey, type RoleCodeName } from '../../auth/roles'
 import { PageHeader } from '../../components/PageHeader'
 import { UserAvatar } from '../../components/UserAvatar'
-import { useLanguage } from '../../i18n/useLanguage'
+import { useRelativeTime } from '../../i18n/useRelativeTime'
 import { useRoles, useSetUserActive, useUsers, type Role, type User } from './api'
 import { RolePermissions } from './RolePermissions'
 
 const PAGE_SIZE = 25
-
-function useRelativeTime() {
-  const { language } = useLanguage()
-  const { t } = useTranslation()
-  const format = new Intl.RelativeTimeFormat(language, { numeric: 'auto' })
-  return (iso: string | null) => {
-    if (!iso) return t('users.never')
-    const minutes = Math.round((new Date(iso).getTime() - Date.now()) / 60000)
-    if (Math.abs(minutes) < 60) return format.format(minutes, 'minute')
-    const hours = Math.round(minutes / 60)
-    if (Math.abs(hours) < 24) return format.format(hours, 'hour')
-    return format.format(Math.round(hours / 24), 'day')
-  }
-}
 
 function sortedRoles(codes: string[]): RoleCodeName[] {
   return ROLE_CODES.filter((code) => codes.includes(code))
@@ -107,7 +93,7 @@ export function UsersPage() {
     {
       title: t('users.colLastActive'),
       dataIndex: 'last_login_at',
-      render: (value: string | null) => relativeTime(value),
+      render: (value: string | null) => (value ? relativeTime(value) : t('users.never')),
     },
     {
       title: t('users.colActions'),
