@@ -1,0 +1,41 @@
+name: Module
+description: A feature module delivered as one branch and one pull request.
+title: "Module: "
+labels: ["enhancement"]
+body:
+  - type: input
+    id: branch
+    attributes:
+      label: Branch
+      placeholder: feature/contracts
+    validations:
+      required: true
+  - type: textarea
+    id: requirements
+    attributes:
+      label: Requirement IDs
+      description: SRS IDs covered by this module (FR-*, NFR-*, BR-*, sections).
+      placeholder: "- FR-CON-01 – create contracts"
+    validations:
+      required: true
+  - type: textarea
+    id: tasks
+    attributes:
+      label: Tasks
+      value: |
+        - [ ] Database models and migration
+        - [ ] Services (business rules, permissions, audit)
+        - [ ] API endpoints and OpenAPI schemas
+        - [ ] Backend tests (named by TC ID)
+        - [ ] Frontend pages and components (EN + AR)
+        - [ ] Frontend tests
+        - [ ] Update docs/traceability.md
+    validations:
+      required: true
+  - type: textarea
+    id: acceptance
+    attributes:
+      label: Acceptance criteria
+      description: Copied from the SRS for each requirement.
+    validations:
+      required: true

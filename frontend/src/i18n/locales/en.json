@@ -1,0 +1,12 @@
+{
+  "app": {
+    "title": "Contract & Obligation Management",
+    "welcome": "Welcome",
+    "placeholder": "The application shell is ready. Modules are delivered incrementally."
+  },
+  "language": {
+    "label": "Language",
+    "en": "English",
+    "ar": "العربية"
+  }
+}
