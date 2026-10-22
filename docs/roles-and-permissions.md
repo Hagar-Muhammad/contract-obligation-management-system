@@ -18,6 +18,11 @@ code change.
 A user can hold more than one role; their permissions are the union of their roles, and their data scope is the
 widest scope among their roles.
 
+### Self-registered accounts (CR-01)
+
+Accounts created through **Create an account** get exactly one role, `employee` by default
+(`SELF_SIGNUP_ROLE`). The visitor cannot choose or send a role. An administrator can change it later.
+
 ## Permission matrix (SRS 3.2)
 
 | Capability | Permission code | Admin | Contract Manager | Legal | Property Manager | Employee | Management |

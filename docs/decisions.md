@@ -29,6 +29,17 @@ confirms or changes an item, update this table and tick the issue.
 | D-18 | Expected volumes? | Planned for up to ~200 users, ~50,000 contracts, ~500,000 obligations, ~200,000 documents. Server-side pagination and indexes from day one. | Revisit with real numbers before production sizing. |
 | D-19 | Backup and document retention? | Daily database backups kept 30 days; document storage included in backups; documents retained indefinitely while their contract exists. No automatic deletion. | Deployment/infrastructure configuration (not application code). |
 
+## Change requests
+
+Changes the project owner asked for that go beyond the SRS v0.1 text.
+
+| ID | Change | Decided | Where it lives / how to change |
+|---|---|---|---|
+| CR-01 | **Open self sign-up.** Anyone can create an account from the login page and is signed in at once. New accounts get only the **Employee** role, whose data scope is "assigned obligations", so a new account sees no contract data until someone assigns it work. Administrators still create accounts with other roles (FR-USER-01) and can change roles or deactivate. | 2026-10-22, project owner (chosen over "request access" and "contact administrator") | Settings `SELF_SIGNUP_ENABLED` (default `true`) and `SELF_SIGNUP_ROLE` (default `employee`). With sign-up off, the link disappears and `POST /auth/register` returns `403`. |
+
+Known follow-ups for CR-01: e-mail address verification and sign-up rate limiting (with module 8, which adds
+e-mail delivery). Until then an address is not proven to belong to the person who registered it.
+
 ## Technical decisions
 
 | ID | Decision | Reason |

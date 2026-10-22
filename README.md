@@ -62,7 +62,8 @@ uvicorn app.main:app --reload
 ```
 
 `create-admin` asks for a password (or reads `COMS_ADMIN_PASSWORD`). Sign in with that account, then create other
-users from **Users** in the app.
+users from **Users** in the app. People can also register themselves with **Create an account** on the login page;
+they start with the Employee role (`SELF_SIGNUP_ENABLED` / `SELF_SIGNUP_ROLE` in `.env`).
 
 - API: http://localhost:8000/api/v1
 - Swagger UI: http://localhost:8000/api/docs

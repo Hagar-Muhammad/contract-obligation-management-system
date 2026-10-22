@@ -87,6 +87,12 @@ UC-03, UC-04 and UC-05 are the workflows defined in SRS 9.1–9.3; the others ar
 | FR-REP-04 | UC-11 | Contract reports | `GET /reports/contracts?group_by=type,status` | TC-REP-04 | 10 dashboard-reports | ⏳ |
 | FR-REP-05 | UC-11 | Export button | CSV export endpoints | TC-REP-05 | 10 dashboard-reports | ⏳ |
 
+## Change requests
+
+| Request | Use case | Frontend | Backend | Test case | Module | Status |
+|---|---|---|---|---|---|---|
+| CR-01 self sign-up | UC-01 | Sign-up page (`features/auth/SignUpPage.tsx`), "Create an account" link on the login page | `POST /auth/register`, `GET /auth/options` | TC-CR-01 | 1 auth-users-rbac | ✅ |
+
 ## Business rules
 
 | Rule | Enforced in | Test case | Module | Status |

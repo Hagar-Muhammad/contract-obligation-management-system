@@ -114,6 +114,8 @@ Response:
 | Endpoint | Purpose |
 |---|---|
 | `POST /auth/login` | `{email, password}` → `{access_token, token_type: "bearer", expires_in, user}` and sets the refresh cookie. Wrong e-mail, wrong password and inactive account all return the same `401` ("Invalid email or password."). |
+| `POST /auth/register` | Self sign-up (CR-01): `{email, full_name, password, preferred_language}` → `201` with the same body as login, and signs the user in. `409` if the e-mail is taken, `403` if sign-up is disabled. |
+| `GET /auth/options` | Public: `{self_signup_enabled}`, so the login page knows whether to show "Create an account". |
 | `POST /auth/refresh` | Uses the refresh cookie; returns a new access token and rotates the cookie. |
 | `POST /auth/logout` | Ends the session (works with only the cookie, so an expired access token can still log out). Always `204`. |
 | `GET /auth/me` | Current user, roles, permission codes and data scopes; the frontend uses it to show or hide actions. |
