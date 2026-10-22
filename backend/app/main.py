@@ -3,13 +3,14 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from app import __version__
 from app.api.router import API_PREFIX, api_router
-from app.core.config import get_settings
+from app.core.config import Settings, get_settings
 from app.core.errors import register_error_handlers
 from app.core.logging import configure_logging
+from app.core.middleware import add_security_headers
 
 
-def create_app() -> FastAPI:
-    settings = get_settings()
+def create_app(settings: Settings | None = None) -> FastAPI:
+    settings = settings or get_settings()
     configure_logging(settings.log_level)
 
     app = FastAPI(
@@ -26,6 +27,7 @@ def create_app() -> FastAPI:
         allow_methods=["*"],
         allow_headers=["*"],
     )
+    add_security_headers(app, settings)
     register_error_handlers(app)
     app.include_router(api_router)
     return app
