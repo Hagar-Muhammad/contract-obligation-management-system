@@ -12,6 +12,7 @@ from fastapi.testclient import TestClient
 from sqlalchemy.orm import Session
 
 from app.core.config import get_settings
+from app.modules.auth import service as auth_service
 from app.modules.auth.models import UserSession
 from tests.factories import DEFAULT_PASSWORD, UserFactory
 
@@ -182,7 +183,10 @@ def test_refresh_rotates_the_token_and_issues_a_working_access_token(
 
 
 @pytest.mark.req("FR-AUTH-04", "NFR-SEC-02")
-def test_reusing_a_rotated_refresh_token_ends_the_session(client: TestClient, users: UserFactory) -> None:
+def test_reusing_a_rotated_refresh_token_ends_the_session(
+    client: TestClient, users: UserFactory, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    monkeypatch.setattr(auth_service, "REUSE_GRACE_PERIOD", timedelta(0))
     user = users.create()
     _login(client, user.email)
     stolen = client.cookies.get("coms_refresh")
@@ -195,6 +199,22 @@ def test_reusing_a_rotated_refresh_token_ends_the_session(client: TestClient, us
 
     # The legitimate holder is logged out too: the whole session was revoked.
     assert client.get(ME, headers=_bearer(fresh_access)).status_code == 401
+
+
+def test_simultaneous_refresh_from_two_tabs_does_not_end_the_session(
+    client: TestClient, users: UserFactory
+) -> None:
+    user = users.create()
+    _login(client, user.email)
+    shared_cookie = client.cookies.get("coms_refresh")
+    assert shared_cookie
+    tab_a_access = client.post(REFRESH).json()["access_token"]
+
+    client.cookies.clear()
+    client.cookies.set("coms_refresh", shared_cookie, path="/api/v1/auth")
+    assert client.post(REFRESH).status_code == 401  # tab B lost the race; it retries with the new cookie
+
+    assert client.get(ME, headers=_bearer(tab_a_access)).status_code == 200
 
 
 @pytest.mark.req("FR-AUTH-01")

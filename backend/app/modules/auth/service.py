@@ -21,6 +21,7 @@ from app.modules.auth.models import RefreshToken, UserSession
 from app.modules.users.models import User
 
 INVALID_CREDENTIALS = "Invalid email or password."
+REUSE_GRACE_PERIOD = timedelta(seconds=10)
 
 
 @dataclass(frozen=True)
@@ -88,7 +89,10 @@ def refresh(db: Session, raw_refresh_token: str | None) -> IssuedTokens:
     if session is None or session.revoked_at is not None:
         raise UnauthorizedError("Session has ended. Please log in again.")
     if token.used_at is not None:
-        # A rotated token came back: it was probably stolen. Kill the session for everyone holding it.
+        if _now() - token.used_at < REUSE_GRACE_PERIOD:
+            # Two tabs refreshing at the same moment: the other tab already holds the new cookie.
+            raise UnauthorizedError("Refresh token was just rotated; retry with the current cookie.")
+        # A rotated token came back later: it was probably stolen. Kill the session for everyone holding it.
         session.revoked_at = _now()
         db.commit()
         raise UnauthorizedError("Session has ended. Please log in again.")
