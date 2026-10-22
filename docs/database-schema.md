@@ -71,7 +71,7 @@ erDiagram
 
 **`user_roles`**: `user_id FK`, `role_id FK`, PK (`user_id`, `role_id`). A user's permissions are the union of their roles.
 
-**`user_sessions`**: `id`, `user_id FK`, `created_at`, `expires_at`, `revoked_at`, `user_agent`, `ip_address`. One row per login.
+**`user_sessions`**: `id`, `user_id FK`, `created_at`, `expires_at`, `revoked_at`, `remember` ("Keep me signed in"), `user_agent`, `ip_address`. One row per login.
 Access tokens carry the session id and every request checks `revoked_at`, so logout, deactivation and password reset
 take effect immediately (FR-AUTH-04, FR-USER-03).
 

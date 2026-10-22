@@ -34,13 +34,13 @@ UC-03, UC-04 and UC-05 are the workflows defined in SRS 9.1–9.3; the others ar
 
 | Requirement | Use case | Frontend | Backend | Test case | Module | Status |
 |---|---|---|---|---|---|---|
-| FR-AUTH-01 | UC-01 | Login page (`features/auth/LoginPage.tsx`) | `POST /auth/login`, `POST /auth/refresh` | TC-AUTH-01 | 1 auth-users-rbac | ✅ |
+| FR-AUTH-01 | UC-01 | Sign-in page (`features/auth/LoginPage.tsx`, design screen 1) incl. "Keep me signed in" | `POST /auth/login`, `POST /auth/refresh` | TC-AUTH-01 | 1 auth-users-rbac | ✅ |
 | FR-AUTH-02 | UC-01 | `RequireAuth` guard; token refresh + replay in `api/client.ts` | `get_current_user` on every non-public route | TC-AUTH-02 | 1 auth-users-rbac | ✅ |
-| FR-AUTH-03 | UC-01 | Permission-filtered menu, `RequirePermission` (403 page) | `require_permission()` + seeded 3.2 matrix | TC-AUTH-03 | 1 auth-users-rbac | ✅ |
+| FR-AUTH-03 | UC-01 | Permission-filtered sidebar (`components/nav.tsx`), `RequirePermission` (403 page), role matrix on Users & roles | `require_permission()` + seeded 3.2 matrix; `GET /roles` | TC-AUTH-03 | 1 auth-users-rbac | ✅ |
 | FR-AUTH-04 | UC-01 | Log out button | `POST /auth/logout` (session revoked, access token rejected at once) | TC-AUTH-04 | 1 auth-users-rbac | ✅ |
-| FR-USER-01 | UC-02 | Users list → New user form | `POST /users`; `python -m app.cli create-admin` | TC-USER-01 | 1 auth-users-rbac | ✅ |
+| FR-USER-01 | UC-02 | Users & roles (design screen 8) → Add user | `POST /users`; `python -m app.cli create-admin` | TC-USER-01 | 1 auth-users-rbac | ✅ |
 | FR-USER-02 | UC-02 | Edit user form (info, roles, password reset) | `PATCH /users/{id}` | TC-USER-02 | 1 auth-users-rbac | ✅ |
-| FR-USER-03 | UC-02 | Deactivate / Activate actions | `POST /users/{id}/deactivate`, `/activate` (sessions revoked) | TC-USER-03 | 1 auth-users-rbac | ✅ |
+| FR-USER-03 | UC-02 | Deactivate on the edit page, Reactivate in the list | `POST /users/{id}/deactivate`, `/activate` (sessions revoked) | TC-USER-03 | 1 auth-users-rbac | ✅ |
 | FR-AUD-01 | UC-12 | — | Audit service called by state-changing services | TC-AUD-01 | 2 audit-trail | ⏳ |
 | FR-AUD-02 | UC-12 | Audit log page | `audit_logs` schema, `GET /audit-logs` | TC-AUD-02 | 2 audit-trail | ⏳ |
 | FR-AUD-03 | UC-12 | — (read-only UI) | No write endpoints + DB trigger blocking UPDATE/DELETE | TC-AUD-03 | 2 audit-trail | ⏳ |

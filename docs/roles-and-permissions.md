@@ -42,7 +42,7 @@ Accounts created through **Create an account** get exactly one role, `employee` 
 | Cell value | Meaning in the system |
 |---|---|
 | **Yes** | Permission granted. |
-| **Allowed** | Permission granted, **flagged for business confirmation**. It is seeded exactly like "Yes"; the seed file marks it so it can be revoked in one place. |
+| **Allowed** | Permission granted **within the role's data scope**, and flagged for business confirmation. Shown as **Scoped** in the UI (as in the design). Listed in `PENDING_CONFIRMATION` in `users/rbac.py` and returned by `GET /roles` as `scoped_permissions`. |
 | **No** | Permission not granted. Requests are rejected with `403 Forbidden`. |
 | **View** | Read-only: Management can see obligations but not change them (`obligation:view` only). |
 | **Limited** | Granted, restricted to the user's data scope: an Employee's reports only count their own obligations. |

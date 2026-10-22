@@ -9,7 +9,7 @@ confirms or changes an item, update this table and tick the issue.
 
 | ID | Question (13.2) | Default used | Where it lives / how to change |
 |---|---|---|---|
-| D-01 | Confirm final user roles and permissions. | The 6 roles of 2.3 and the 3.2 matrix. "Allowed" = granted but flagged for confirmation; "View" = read-only; "Limited" = restricted to own data. Property Managers are scoped to assigned properties, Employees to their assigned obligations. See [roles-and-permissions.md](./roles-and-permissions.md). | Seed data (`role_permissions`); changeable without code. |
+| D-01 | Confirm final user roles and permissions. | The 6 roles of 2.3 and the 3.2 matrix. "Allowed" = granted within the role's scope, shown as "Scoped", and flagged for confirmation; "View" = read-only; "Limited" = restricted to own data. Property Managers are scoped to assigned properties, Employees to their assigned obligations. See [roles-and-permissions.md](./roles-and-permissions.md). | Seed data (`role_permissions`); changeable without code. |
 | D-02 | One company or multi-tenant? | **Single company.** No tenant column. | Adding tenancy later means a `tenant_id` on top-level tables; IDs are UUIDs so data can be merged. |
 | D-03 | Final contract types. | The 10 types of 4.4. | `contract_types` lookup table (seed). |
 | D-04 | Can a contract be linked to multiple properties? | **Yes** (many-to-many), as FR-PROP-01 says "one or more". | `contract_properties` table. Restricting to one is a validation rule. |
@@ -57,3 +57,7 @@ e-mail delivery). Until then an address is not proven to belong to the person wh
 | T-11 | Frontend API types generated with `openapi-typescript`, run through `npx` with TypeScript 5. | `openapi-typescript` does not yet support TypeScript 6 as a peer; the generated file is committed, so CI does not need it. |
 | T-12 | Product name **ConTrack** (not translated); logo = open "C" track closing on a check. | Requested by the project owner. Brand assets and colours: [brand/README.md](./brand/README.md). |
 | T-13 | Administrators cannot deactivate themselves or remove their own Administrator role. | Prevents locking the system out of its only administrator. |
+| T-14 | **UI follows [design/ConTrack-UI.pdf](./design/ConTrack-UI.pdf)** (8 screens). Each module builds its screen from it; sidebar links to pages of later modules show a "coming soon" page until then. | Design supplied by the project owner on 2026-10-22. Fonts: Manrope + IBM Plex Sans Arabic (self-hosted via @fontsource, no external font requests). |
+| T-15 | "Keep me signed in on this device": unticked (default) = browser-session cookie and a 12-hour session; ticked = 7-day cookie. | Shared or public computers do not stay signed in by accident. `UNREMEMBERED_SESSION_HOURS`, `REFRESH_TOKEN_TTL_DAYS`. |
+| T-16 | "Forgot password?" explains that an administrator resets passwords until e-mail delivery exists (module 8). | Self-service reset needs e-mail. |
+| T-17 | Top-bar search and notification bell from the design are added with modules 7 (search) and 8 (notifications). | They would do nothing yet; showing dead controls misleads users. |

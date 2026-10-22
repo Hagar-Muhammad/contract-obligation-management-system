@@ -20,11 +20,15 @@ The mark is two strokes only, so it stays recognisable at 16 px (browser tab).
 
 | Token | Hex | Used for |
 |---|---|---|
-| Navy | `#0B2545` | Header background, "Con" on light backgrounds |
-| Blue | `#1D4ED8` | The C on light backgrounds; primary buttons and links (Ant Design `colorPrimary`) |
-| Light blue | `#60A5FA` | The C on dark backgrounds |
+| Navy | `#0F1B2D` | Sidebar and sign-in brand panel (from the UI design) |
+| Ink | `#0B2545` | "Con" on light backgrounds |
+| Primary blue | `#2563EB` | Buttons, links, active tabs (Ant Design `colorPrimary`) |
+| Blue | `#1D4ED8` / `#3B82F6` | The C on light / dark backgrounds |
 | Green | `#059669` / `#047857` | The check and "Track" on light backgrounds (contrast-safe) |
-| Light green | `#34D399` | The check and "Track" on dark backgrounds |
+| Brand green | `#4ADE80` | The check and "Track" on dark backgrounds |
+| Page background | `#F4F6FA` | Behind panels |
+
+Fonts: **Manrope** (Latin) and **IBM Plex Sans Arabic** (Arabic), self-hosted.
 
 ## Name in Arabic
 

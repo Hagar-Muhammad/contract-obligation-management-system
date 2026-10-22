@@ -27,6 +27,7 @@ backend/     FastAPI application, migrations and tests
 frontend/    React single-page application
 docs/        SRS, architecture, database schema, roles, API standards, traceability, decisions
 docs/brand/  ConTrack logo files and colours
+docs/design/ UI design (ConTrack-UI.pdf) — the visual spec for every screen
 infra/       Local infrastructure helpers (Postgres init scripts)
 .github/     CI workflow, PR and issue templates
 docker-compose.yml   Local infrastructure (Postgres)
