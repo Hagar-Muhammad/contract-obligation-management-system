@@ -18,6 +18,10 @@ class AuditAction(StrEnum):
     USER_PASSWORD_RESET = "user.password_reset"  # noqa: S105 (action name, not a secret)
     USER_DEACTIVATED = "user.deactivated"
     USER_ACTIVATED = "user.activated"
+    PARTY_CREATED = "party.created"
+    PARTY_UPDATED = "party.updated"
+    PROPERTY_CREATED = "property.created"
+    PROPERTY_UPDATED = "property.updated"
 
 
 class ActorType(StrEnum):
@@ -30,3 +34,5 @@ class ActorType(StrEnum):
 
 class TargetType(StrEnum):
     USER = "user"
+    PARTY = "party"
+    PROPERTY = "property"
