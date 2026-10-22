@@ -1,4 +1,5 @@
-import { Alert, Button, Form, Input, Typography } from 'antd'
+import { InfoCircleOutlined } from '@ant-design/icons'
+import { Alert, App, Button, Checkbox, Form, Input } from 'antd'
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Link, Navigate, useLocation, useNavigate } from 'react-router-dom'
@@ -10,10 +11,12 @@ import { useAuthOptions } from './useAuthOptions'
 interface LoginForm {
   email: string
   password: string
+  remember: boolean
 }
 
 export function LoginPage() {
   const { t } = useTranslation()
+  const { modal } = App.useApp()
   const { status, login } = useAuth()
   const options = useAuthOptions()
   const navigate = useNavigate()
@@ -21,16 +24,17 @@ export function LoginPage() {
   const [error, setError] = useState<string | null>(null)
   const [submitting, setSubmitting] = useState(false)
   const returnTo = (location.state as { from?: string } | null)?.from ?? '/'
+  const signupEnabled = options.data?.self_signup_enabled ?? false
 
   if (status === 'authenticated') {
     return <Navigate to={returnTo} replace />
   }
 
-  const onFinish = async ({ email, password }: LoginForm) => {
+  const onFinish = async ({ email, password, remember }: LoginForm) => {
     setError(null)
     setSubmitting(true)
     try {
-      await login(email, password)
+      await login(email, password, remember)
       navigate(returnTo, { replace: true })
     } catch (err) {
       setError(err instanceof ApiError && err.status === 401 ? t('login.invalid') : t('login.failed'))
@@ -39,12 +43,13 @@ export function LoginPage() {
     }
   }
 
+  const showForgotPassword = () =>
+    modal.info({ title: t('login.forgotTitle'), content: t('login.forgotText'), okText: 'OK' })
+
   return (
     <AuthLayout>
-      <Typography.Title level={2} className="auth-title">
-        {t('login.title')}
-      </Typography.Title>
-      <Typography.Paragraph type="secondary">{t('login.subtitle')}</Typography.Paragraph>
+      <h2 className="auth-title">{t('login.title')}</h2>
+      <p className="auth-subtitle">{signupEnabled ? t('login.subtitle') : t('login.subtitleAdminOnly')}</p>
       {error && <Alert type="error" title={error} showIcon className="auth-error" role="alert" />}
       <Form<LoginForm>
         layout="vertical"
@@ -52,30 +57,48 @@ export function LoginPage() {
         onFinish={onFinish}
         requiredMark={false}
         disabled={submitting}
+        initialValues={{ remember: false }}
       >
         <Form.Item
           label={t('login.email')}
           name="email"
           rules={[{ required: true, message: t('validation.required') }]}
         >
-          <Input type="email" autoComplete="username" autoFocus />
+          <Input type="email" autoComplete="username" placeholder={t('login.emailPlaceholder')} autoFocus />
         </Form.Item>
-        <Form.Item
-          label={t('login.password')}
-          name="password"
-          rules={[{ required: true, message: t('validation.required') }]}
-        >
-          <Input.Password autoComplete="current-password" />
+        <div className="auth-label-row">
+          <label htmlFor="password">{t('login.password')}</label>
+          <button type="button" className="link-button" onClick={showForgotPassword}>
+            {t('login.forgot')}
+          </button>
+        </div>
+        <Form.Item name="password" rules={[{ required: true, message: t('validation.required') }]}>
+          <Input.Password
+            id="password"
+            autoComplete="current-password"
+            aria-label={t('login.password')}
+            iconRender={(visible) => (
+              <span className="password-toggle">{visible ? t('login.hide') : t('login.show')}</span>
+            )}
+          />
         </Form.Item>
-        <Button type="primary" htmlType="submit" block loading={submitting}>
+        <Form.Item name="remember" valuePropName="checked" className="auth-remember">
+          <Checkbox>{t('login.remember')}</Checkbox>
+        </Form.Item>
+        <Button type="primary" htmlType="submit" block loading={submitting} className="auth-submit">
           {t('login.submit')}
         </Button>
       </Form>
-      {options.data?.self_signup_enabled && (
-        <Typography.Paragraph className="auth-switch">
-          {t('login.noAccount')} <Link to="/signup">{t('login.createAccount')}</Link>
-        </Typography.Paragraph>
-      )}
+      <div className="auth-info" role="note">
+        <InfoCircleOutlined className="auth-info-icon" />
+        {signupEnabled ? (
+          <span>
+            {t('login.noAccount')} <Link to="/signup">{t('login.createAccount')}</Link>
+          </span>
+        ) : (
+          <span>{t('login.adminOnly')}</span>
+        )}
+      </div>
     </AuthLayout>
   )
 }

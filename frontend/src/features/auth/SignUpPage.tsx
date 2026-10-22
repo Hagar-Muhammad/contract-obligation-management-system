@@ -56,10 +56,8 @@ export function SignUpPage() {
 
   return (
     <AuthLayout>
-      <Typography.Title level={2} className="auth-title">
-        {t('signup.title')}
-      </Typography.Title>
-      <Typography.Paragraph type="secondary">{t('signup.subtitle')}</Typography.Paragraph>
+      <h2 className="auth-title">{t('signup.title')}</h2>
+      <p className="auth-subtitle">{t('signup.subtitle')}</p>
       {error && <Alert type="error" title={error} showIcon className="auth-error" role="alert" />}
       <Form<SignUpForm>
         form={form}
@@ -98,7 +96,13 @@ export function SignUpPage() {
             },
           ]}
         >
-          <Input.Password autoComplete="new-password" maxLength={128} />
+          <Input.Password
+            autoComplete="new-password"
+            maxLength={128}
+            iconRender={(visible) => (
+              <span className="password-toggle">{visible ? t('login.hide') : t('login.show')}</span>
+            )}
+          />
         </Form.Item>
         <Form.Item
           label={t('signup.confirm')}
@@ -114,7 +118,13 @@ export function SignUpPage() {
             }),
           ]}
         >
-          <Input.Password autoComplete="new-password" maxLength={128} />
+          <Input.Password
+            autoComplete="new-password"
+            maxLength={128}
+            iconRender={(visible) => (
+              <span className="password-toggle">{visible ? t('login.hide') : t('login.show')}</span>
+            )}
+          />
         </Form.Item>
         <Form.Item label={t('signup.language')} name="preferred_language">
           <Select
@@ -127,13 +137,13 @@ export function SignUpPage() {
         <Typography.Paragraph type="secondary" className="auth-note">
           {t('signup.roleNote')}
         </Typography.Paragraph>
-        <Button type="primary" htmlType="submit" block loading={submitting}>
+        <Button type="primary" htmlType="submit" block loading={submitting} className="auth-submit">
           {t('signup.submit')}
         </Button>
       </Form>
-      <Typography.Paragraph className="auth-switch">
+      <p className="auth-switch">
         {t('signup.haveAccount')} <Link to="/login">{t('signup.signIn')}</Link>
-      </Typography.Paragraph>
+      </p>
     </AuthLayout>
   )
 }
