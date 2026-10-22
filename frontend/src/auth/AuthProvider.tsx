@@ -17,8 +17,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return unsubscribe
   }, [])
 
-  const login = useCallback(async (email: string, password: string) => {
-    setSession(unwrap(await api.POST('/api/v1/auth/login', { body: { email, password } })))
+  const login = useCallback(async (email: string, password: string, remember = true) => {
+    setSession(
+      unwrap(await api.POST('/api/v1/auth/login', { body: { email, password, remember_me: remember } })),
+    )
   }, [])
 
   const register = useCallback(async (data: SignUpData) => {

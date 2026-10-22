@@ -5,7 +5,7 @@
  */
 const PALETTE = {
   light: { track: '#1D4ED8', check: '#059669', con: '#0B2545', word: '#047857' },
-  dark: { track: '#60A5FA', check: '#34D399', con: '#FFFFFF', word: '#34D399' },
+  dark: { track: '#3B82F6', check: '#4ADE80', con: '#FFFFFF', word: '#4ADE80' },
 } as const
 
 interface LogoProps {

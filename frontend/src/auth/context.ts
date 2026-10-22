@@ -7,7 +7,7 @@ export type SignUpData = components['schemas']['SignUpRequest']
 export interface AuthState {
   status: 'loading' | 'authenticated' | 'anonymous'
   user: Me | null
-  login: (email: string, password: string) => Promise<void>
+  login: (email: string, password: string, remember?: boolean) => Promise<void>
   register: (data: SignUpData) => Promise<void>
   logout: () => Promise<void>
   /** UI convenience only; the backend enforces every permission (Appendix B). */
@@ -24,5 +24,12 @@ export function useAuth(): AuthState {
 
 /** Permission codes, mirroring backend/app/modules/users/rbac.py. */
 export const PERMISSIONS = {
+  contractView: 'contract:view',
+  obligationView: 'obligation:view',
+  extractionConfirm: 'extraction:confirm',
+  partyManage: 'party:manage',
+  reportView: 'report:view',
+  auditView: 'audit:view',
   userManage: 'user:manage',
+  roleManage: 'role:manage',
 } as const
