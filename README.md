@@ -1,6 +1,8 @@
-# Contract & Obligation Management System
+<p align="center"><img src="docs/brand/contrack-logo.svg" alt="ConTrack" width="280"></p>
 
-A web platform for managing real estate contracts and tracking contractual obligations: contracts, parties,
+# ConTrack — Contract & Obligation Management System
+
+**ConTrack** is a web platform for managing real estate contracts and tracking contractual obligations: contracts, parties,
 properties, contract documents, extraction of key information from existing documents (with human review),
 obligations with deadlines and recurrence, reminders, dashboards, reports, audit trail and role-based access control.
 
@@ -24,6 +26,7 @@ Why these choices: [docs/architecture.md](docs/architecture.md) and [docs/decisi
 backend/     FastAPI application, migrations and tests
 frontend/    React single-page application
 docs/        SRS, architecture, database schema, roles, API standards, traceability, decisions
+docs/brand/  ConTrack logo files and colours
 infra/       Local infrastructure helpers (Postgres init scripts)
 .github/     CI workflow, PR and issue templates
 docker-compose.yml   Local infrastructure (Postgres)
@@ -54,8 +57,12 @@ python -m venv .venv
 # Windows: .venv\Scripts\activate    macOS/Linux: source .venv/bin/activate
 pip install -e ".[dev]"
 alembic upgrade head
+python -m app.cli create-admin --email you@example.com --name "Your Name"   # first administrator
 uvicorn app.main:app --reload
 ```
+
+`create-admin` asks for a password (or reads `COMS_ADMIN_PASSWORD`). Sign in with that account, then create other
+users from **Users** in the app.
 
 - API: http://localhost:8000/api/v1
 - Swagger UI: http://localhost:8000/api/docs
@@ -70,6 +77,18 @@ npm run dev
 ```
 
 Open http://localhost:5173. Requests to `/api` are proxied to the backend on port 8000.
+
+### API types for the frontend
+
+The frontend's request/response types are generated from the backend's OpenAPI document. After changing an endpoint
+or schema, run (with the backend virtual environment active):
+
+```bash
+cd frontend
+npm run api:generate   # writes src/api/openapi.json and src/api/schema.d.ts
+```
+
+A backend test fails if the committed `openapi.json` no longer matches the API.
 
 ## Running checks
 
@@ -102,7 +121,7 @@ Work is delivered module by module, each in its own branch and pull request into
 | # | Module | Requirements | Status |
 |---|---|---|---|
 | 0 | Repository foundation | — | ✅ |
-| 1 | Auth, users & RBAC | FR-AUTH-*, FR-USER-*, 3.2, NFR-SEC-01..04 | ⏳ |
+| 1 | Auth, users & RBAC | FR-AUTH-*, FR-USER-*, 3.2, NFR-SEC-01..04 | 🚧 in review |
 | 2 | Audit trail | FR-AUD-* | ⏳ |
 | 3 | Parties & properties | FR-PARTY-*, FR-PROP-* | ⏳ |
 | 4 | Contracts | FR-CON-*, 4.4, BR-02, BR-03, BR-06, BR-07 | ⏳ |

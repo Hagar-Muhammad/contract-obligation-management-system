@@ -40,3 +40,9 @@ confirms or changes an item, update this table and tick the issue.
 | T-05 | Tests use a separate `coms_test` database. | Tests never touch development data. |
 | T-06 | Background jobs with Celery + Redis (added in the modules that need them). | Mature scheduling (Beat) and separate queues so extraction scales independently (NFR-SCALE-02). |
 | T-07 | UUID primary keys. | IDs in URLs do not reveal record counts; easier future data merging. |
+| T-08 | Access token in memory + single-use refresh token in an httpOnly cookie, both bound to a server-side session. | Scripts cannot read the refresh token; logout and deactivation take effect immediately instead of when a token expires (FR-AUTH-04, FR-USER-03). |
+| T-09 | Password policy: 8–128 characters, no composition rules. | Follows current NIST guidance (length over complexity). Change `PASSWORD_MIN_LENGTH` in `users/schemas.py` and `UserFormPage.tsx`. |
+| T-10 | E-mail addresses are validated strictly; reserved domains such as `.local` are rejected. | Avoids accounts that can never receive notification e-mails (module 8). If the company uses an internal domain, relax the check in `users/schemas.py`. |
+| T-11 | Frontend API types generated with `openapi-typescript`, run through `npx` with TypeScript 5. | `openapi-typescript` does not yet support TypeScript 6 as a peer; the generated file is committed, so CI does not need it. |
+| T-12 | Product name **ConTrack** (not translated); logo = open "C" track closing on a check. | Requested by the project owner. Brand assets and colours: [brand/README.md](./brand/README.md). |
+| T-13 | Administrators cannot deactivate themselves or remove their own Administrator role. | Prevents locking the system out of its only administrator. |

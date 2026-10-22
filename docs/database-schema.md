@@ -21,7 +21,8 @@ and this file is updated in that module's PR if the design changes.
 erDiagram
     users }o--o{ roles : "user_roles"
     roles }o--o{ permissions : "role_permissions"
-    users ||--o{ refresh_tokens : has
+    users ||--o{ user_sessions : has
+    user_sessions ||--o{ refresh_tokens : has
     users }o--o{ properties : "property_assignments"
 
     contracts }o--|| contract_types : "is of"
@@ -54,15 +55,15 @@ erDiagram
 | Column | Type | Notes |
 |---|---|---|
 | id | UUID PK | |
-| email | CITEXT UNIQUE NOT NULL | Login identifier (case-insensitive). |
+| email | VARCHAR(320) UNIQUE NOT NULL | Login identifier. Stored lower-cased (`CHECK email = lower(email)`), so uniqueness is case-insensitive. |
 | full_name | VARCHAR(200) NOT NULL | |
 | password_hash | VARCHAR(255) NOT NULL | Argon2 hash; never plain text (NFR-SEC-03). |
-| preferred_language | VARCHAR(5) NOT NULL DEFAULT 'en' | `en` or `ar`. |
+| preferred_language | VARCHAR(5) NOT NULL DEFAULT 'en' | `en` or `ar` (CHECK). |
 | is_active | BOOLEAN NOT NULL DEFAULT true | Deactivated users cannot log in (FR-USER-03). |
 | last_login_at | TIMESTAMPTZ | |
 | created/updated metadata | | |
 
-**`roles`** (7.1 Role): `id`, `code UNIQUE` (`admin`, `contract_manager`, `legal`, `property_manager`, `employee`, `management`), `name`, `description`.
+**`roles`** (7.1 Role): `id`, `code UNIQUE` (`admin`, `contract_manager`, `legal`, `property_manager`, `employee`, `management`), `name`, `description`, `data_scope` (`all`, `assigned_properties`, `assigned_obligations`).
 
 **`permissions`**: `id`, `code UNIQUE` (e.g. `contract:create`), `description`.
 
@@ -70,7 +71,13 @@ erDiagram
 
 **`user_roles`**: `user_id FK`, `role_id FK`, PK (`user_id`, `role_id`). A user's permissions are the union of their roles.
 
-**`refresh_tokens`**: `id`, `user_id FK`, `token_hash`, `expires_at`, `revoked_at`, `replaced_by_id`. Revoked on logout (FR-AUTH-04) and on rotation.
+**`user_sessions`**: `id`, `user_id FK`, `created_at`, `expires_at`, `revoked_at`, `user_agent`, `ip_address`. One row per login.
+Access tokens carry the session id and every request checks `revoked_at`, so logout, deactivation and password reset
+take effect immediately (FR-AUTH-04, FR-USER-03).
+
+**`refresh_tokens`**: `id`, `session_id FK`, `token_hash` (SHA-256, UNIQUE), `created_at`, `expires_at`, `used_at`.
+Single-use: refreshing marks the token used and issues a new one. Presenting a used token more than 10 seconds later
+revokes the whole session (token theft); within 10 seconds it is just rejected (two tabs refreshing together).
 
 ### Audit — module 2 (`audit-trail`)
 
