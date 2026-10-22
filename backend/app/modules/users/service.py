@@ -13,6 +13,8 @@ from app.core.config import get_settings
 from app.core.errors import BusinessRuleError, ConflictError, ForbiddenError, NotFoundError
 from app.core.pagination import PageParams, paginate
 from app.core.security import hash_password
+from app.modules.audit import service as audit
+from app.modules.audit.actions import ActorType, AuditAction, TargetType
 from app.modules.auth.service import revoke_all_sessions
 from app.modules.users.models import Role, User
 from app.modules.users.rbac import RoleCode
@@ -26,6 +28,37 @@ def _roles_by_code(db: Session, codes: Sequence[RoleCode]) -> list[Role]:
     if missing:
         raise BusinessRuleError("Unknown role(s).", details=sorted(missing))
     return roles
+
+
+def _audit_user(
+    db: Session,
+    action: AuditAction,
+    user: User,
+    *,
+    actor_id: uuid.UUID | None,
+    actor_type: ActorType | None = None,
+    changes: dict[str, list[object]] | None = None,
+) -> None:
+    audit.record(
+        db,
+        action,
+        target_type=TargetType.USER,
+        target_id=user.id,
+        target_label=user.full_name,
+        actor_id=actor_id,
+        actor_type=actor_type,
+        changes=changes,
+    )
+
+
+def _audited_fields(user: User) -> dict[str, object]:
+    """The user fields whose changes the audit trail records (never the password hash)."""
+    return {
+        "email": user.email,
+        "full_name": user.full_name,
+        "preferred_language": user.preferred_language,
+        "roles": user.role_codes,
+    }
 
 
 def _ensure_email_free(db: Session, email: str, *, except_id: uuid.UUID | None = None) -> None:
@@ -55,9 +88,13 @@ def list_users(
     return paginate(db, stmt, params)
 
 
-def create_user(db: Session, data: UserCreate, *, actor_id: uuid.UUID) -> User:
+def create_user(
+    db: Session, data: UserCreate, *, actor_id: uuid.UUID | None, actor_type: ActorType | None = None
+) -> User:
+    """Administrator creates an account; `actor_id=None` with `ActorType.SYSTEM` for operational commands."""
     _ensure_email_free(db, data.email)
     user = User(
+        id=uuid.uuid4(),
         email=data.email,
         full_name=data.full_name,
         password_hash=hash_password(data.password),
@@ -67,6 +104,14 @@ def create_user(db: Session, data: UserCreate, *, actor_id: uuid.UUID) -> User:
         updated_by_id=actor_id,
     )
     db.add(user)
+    _audit_user(
+        db,
+        AuditAction.USER_CREATED,
+        user,
+        actor_id=actor_id,
+        actor_type=actor_type,
+        changes={field: [None, value] for field, value in _audited_fields(user).items()},
+    )
     db.commit()
     db.refresh(user)
     return user
@@ -79,6 +124,7 @@ def register_self(db: Session, data: SignUpRequest) -> User:
         raise ForbiddenError("Self sign-up is disabled. Ask an administrator for an account.")
     _ensure_email_free(db, data.email)
     user = User(
+        id=uuid.uuid4(),
         email=data.email,
         full_name=data.full_name,
         password_hash=hash_password(data.password),
@@ -86,6 +132,15 @@ def register_self(db: Session, data: SignUpRequest) -> User:
         roles=_roles_by_code(db, [RoleCode(settings.self_signup_role)]),
     )
     db.add(user)
+    # Flush first: the audit record references the new user as its actor.
+    db.flush()
+    _audit_user(
+        db,
+        AuditAction.USER_REGISTERED,
+        user,
+        actor_id=user.id,
+        changes={field: [None, value] for field, value in _audited_fields(user).items()},
+    )
     db.commit()
     db.refresh(user)
     return user
@@ -93,6 +148,7 @@ def register_self(db: Session, data: SignUpRequest) -> User:
 
 def update_user(db: Session, user_id: uuid.UUID, data: UserUpdate, *, actor_id: uuid.UUID) -> User:
     user = get_user(db, user_id)
+    before = _audited_fields(user)
     if data.email is not None and data.email != user.email:
         _ensure_email_free(db, data.email, except_id=user.id)
         user.email = data.email
@@ -111,6 +167,9 @@ def update_user(db: Session, user_id: uuid.UUID, data: UserUpdate, *, actor_id: 
     if data.password is not None:
         user.password_hash = hash_password(data.password)
         revoke_all_sessions(db, user.id)
+        _audit_user(db, AuditAction.USER_PASSWORD_RESET, user, actor_id=actor_id)
+    if changes := audit.changes_between(before, _audited_fields(user)):
+        _audit_user(db, AuditAction.USER_UPDATED, user, actor_id=actor_id, changes=changes)
     user.updated_by_id = actor_id
     db.commit()
     db.refresh(user)
@@ -121,6 +180,14 @@ def set_active(db: Session, user_id: uuid.UUID, active: bool, *, actor_id: uuid.
     user = get_user(db, user_id)
     if not active and user.id == actor_id:
         raise BusinessRuleError("You cannot deactivate your own account.")
+    if user.is_active != active:
+        _audit_user(
+            db,
+            AuditAction.USER_ACTIVATED if active else AuditAction.USER_DEACTIVATED,
+            user,
+            actor_id=actor_id,
+            changes={"is_active": [user.is_active, active]},
+        )
     user.is_active = active
     user.updated_by_id = actor_id
     if not active:

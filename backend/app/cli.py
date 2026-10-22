@@ -17,7 +17,8 @@ from pydantic import ValidationError
 from sqlalchemy import select
 
 from app.core.db import SessionLocal
-from app.core.security import hash_password
+from app.modules.audit.actions import ActorType
+from app.modules.users import service as users_service
 from app.modules.users.models import Role, User
 from app.modules.users.rbac import RoleCode
 from app.modules.users.schemas import UserCreate
@@ -40,15 +41,7 @@ def create_admin(email: str, name: str) -> int:
         if admin_role is None:
             print("Roles are not seeded. Run `alembic upgrade head` first.", file=sys.stderr)
             return 1
-        db.add(
-            User(
-                email=data.email,
-                full_name=data.full_name,
-                password_hash=hash_password(data.password),
-                roles=[admin_role],
-            )
-        )
-        db.commit()
+        users_service.create_user(db, data, actor_id=None, actor_type=ActorType.SYSTEM)
     print(f"Administrator {data.email} created.")
     return 0
 
