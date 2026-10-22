@@ -1,12 +1,78 @@
 {
   "app": {
-    "title": "Contract & Obligation Management",
-    "welcome": "Welcome",
-    "placeholder": "The application shell is ready. Modules are delivered incrementally."
+    "name": "ConTrack",
+    "tagline": "Contract & Obligation Management"
   },
   "language": {
     "label": "Language",
     "en": "English",
     "ar": "العربية"
+  },
+  "nav": {
+    "home": "Home",
+    "users": "Users",
+    "logout": "Log out"
+  },
+  "home": {
+    "welcome": "Welcome, {{name}}",
+    "yourRoles": "Your roles",
+    "placeholder": "Contracts, obligations and reports will appear here as modules are delivered."
+  },
+  "login": {
+    "title": "Sign in",
+    "email": "Email",
+    "password": "Password",
+    "submit": "Sign in",
+    "invalid": "Invalid email or password.",
+    "failed": "Sign-in failed. Please try again."
+  },
+  "users": {
+    "title": "Users",
+    "new": "New user",
+    "edit": "Edit user",
+    "search": "Search by name or email",
+    "name": "Full name",
+    "email": "Email",
+    "password": "Password",
+    "newPassword": "New password",
+    "newPasswordHelp": "Leave empty to keep the current password. Setting one signs the user out everywhere.",
+    "roles": "Roles",
+    "language": "Preferred language",
+    "status": "Status",
+    "active": "Active",
+    "inactive": "Inactive",
+    "lastLogin": "Last login",
+    "never": "Never",
+    "actions": "Actions",
+    "deactivate": "Deactivate",
+    "activate": "Activate",
+    "deactivateConfirm": "Deactivate this user? They will be signed out immediately.",
+    "save": "Save",
+    "cancel": "Cancel",
+    "created": "User created.",
+    "saved": "Changes saved.",
+    "deactivated": "User deactivated.",
+    "activated": "User activated.",
+    "emailTaken": "A user with this email already exists.",
+    "rolesRequired": "Select at least one role."
+  },
+  "roles": {
+    "admin": "Administrator",
+    "contract_manager": "Contract Manager",
+    "legal": "Legal User",
+    "property_manager": "Property Manager",
+    "employee": "Employee",
+    "management": "Management"
+  },
+  "validation": {
+    "required": "This field is required.",
+    "email": "Enter a valid email address.",
+    "passwordLength": "Use at least {{min}} characters."
+  },
+  "errors": {
+    "forbidden": "You do not have permission to view this page.",
+    "notFound": "Page not found.",
+    "generic": "Something went wrong. Please try again.",
+    "backHome": "Back to home"
   }
 }
