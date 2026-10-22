@@ -86,17 +86,18 @@ revokes the whole session (token theft); within 10 seconds it is just rejected (
 | Column | Type | Notes |
 |---|---|---|
 | id | UUID PK | |
-| occurred_at | TIMESTAMPTZ NOT NULL | Timestamp. |
-| actor_user_id | UUID FK → users NULL | NULL for system actions (e.g. scheduled jobs). |
-| actor_type | VARCHAR(20) NOT NULL | `user` or `system`. |
-| action | VARCHAR(100) NOT NULL | e.g. `contract.created`, `obligation.status_changed`. |
-| target_type | VARCHAR(50) NOT NULL | e.g. `contract`. |
-| target_id | UUID | |
-| changes | JSONB | `{field: [old, new]}` where applicable (FR-AUD-02). |
-| request_id / ip_address | VARCHAR | Correlation with application logs. |
+| occurred_at | TIMESTAMPTZ NOT NULL DEFAULT clock_timestamp() | Timestamp. `clock_timestamp()`, not `now()`, so records written in one transaction keep their order. Indexed. |
+| actor_user_id | UUID FK → users NULL, ON DELETE RESTRICT | The acting user. NULL for system and anonymous actions. Indexed. |
+| actor_type | VARCHAR(20) NOT NULL | `user`, `system` (scheduled jobs, operational commands, automatic security responses) or `anonymous` (failed sign-in). CHECK, plus CHECK that `actor_user_id` is set exactly when `actor_type = 'user'`. |
+| action | VARCHAR(100) NOT NULL | `<target>.<verb>`, e.g. `user.created`, `contract.created`, `obligation.status_changed`. No CHECK: new modules add actions without a migration. Indexed. |
+| target_type | VARCHAR(50) NOT NULL | e.g. `user`, `contract`. |
+| target_id | UUID | Index on (`target_type`, `target_id`) for a record's history. |
+| target_label | VARCHAR(300) | The target's name when the action happened, so the log stays readable after renames. |
+| changes | JSONB | `{field: [old, new]}` where applicable (FR-AUD-02). Never secrets. |
+| request_id / ip_address | VARCHAR(64) / VARCHAR(45) | Correlation with application logs (`X-Request-ID`). |
 
-A database trigger rejects `UPDATE` and `DELETE` on this table, so audit records cannot be altered even by
-application bugs (FR-AUD-03).
+Triggers reject `UPDATE`, `DELETE` and `TRUNCATE` on this table, so audit records cannot be altered even by
+application bugs (FR-AUD-03). Users are never deleted (only deactivated), hence `RESTRICT` on the actor key.
 
 ### Parties and properties — module 3 (`parties-properties`)
 

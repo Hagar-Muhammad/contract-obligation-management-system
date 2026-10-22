@@ -41,9 +41,9 @@ UC-03, UC-04 and UC-05 are the workflows defined in SRS 9.1–9.3; the others ar
 | FR-USER-01 | UC-02 | Users & roles (design screen 8) → Add user | `POST /users`; `python -m app.cli create-admin` | TC-USER-01 | 1 auth-users-rbac | ✅ |
 | FR-USER-02 | UC-02 | Edit user form (info, roles, password reset) | `PATCH /users/{id}` | TC-USER-02 | 1 auth-users-rbac | ✅ |
 | FR-USER-03 | UC-02 | Deactivate on the edit page, Reactivate in the list | `POST /users/{id}/deactivate`, `/activate` (sessions revoked) | TC-USER-03 | 1 auth-users-rbac | ✅ |
-| FR-AUD-01 | UC-12 | — | Audit service called by state-changing services | TC-AUD-01 | 2 audit-trail | ⏳ |
-| FR-AUD-02 | UC-12 | Audit log page | `audit_logs` schema, `GET /audit-logs` | TC-AUD-02 | 2 audit-trail | ⏳ |
-| FR-AUD-03 | UC-12 | — (read-only UI) | No write endpoints + DB trigger blocking UPDATE/DELETE | TC-AUD-03 | 2 audit-trail | ⏳ |
+| FR-AUD-01 | UC-12 | — | `audit.record()` (`app/modules/audit/service.py`) in the same transaction as each change; module 1 records sign-in, failed sign-in, sign-out, stolen refresh token, user created/registered/updated/password reset/deactivated/activated | TC-AUD-01 | 2 audit-trail | ✅ |
+| FR-AUD-02 | UC-12 | Audit log page (`features/audit/AuditLogPage.tsx`): search, action and date filters, expandable changes | `audit_logs` (actor, action, target, timestamp, `{field: [old, new]}` changes, request id, IP); `GET /audit-logs` (`audit:view`) | TC-AUD-02 | 2 audit-trail | ✅ |
+| FR-AUD-03 | UC-12 | Read-only page; hidden and blocked without `audit:view` | No write endpoints; triggers reject UPDATE, DELETE and TRUNCATE on `audit_logs` | TC-AUD-03 | 2 audit-trail | ✅ |
 | FR-PARTY-01 | UC-06 | Parties list / Party form | `/parties` CRUD | TC-PARTY-01 | 3 parties-properties | ⏳ |
 | FR-PARTY-02 | UC-06 | Party form (type-specific fields) | Party type validation | TC-PARTY-02 | 3 parties-properties | ⏳ |
 | FR-PARTY-03 | UC-03 | Contract form: parties section | `contract_parties`, `/contracts/{id}/parties` | TC-PARTY-03 | 3 parties-properties / 4 contracts | ⏳ |
@@ -118,6 +118,7 @@ UC-03, UC-04 and UC-05 are the workflows defined in SRS 9.1–9.3; the others ar
 | NFR-SEC-02 | `test_rbac.py` (seeded matrix = SRS 3.2, per-role permissions), `test_users.py::test_TC_BR_06_*` | ✅ |
 | NFR-SEC-03 | `test_auth.py::test_passwords_are_stored_as_argon2_hashes` | ✅ |
 | NFR-SEC-04 | `test_security.py` (HSTS + Secure cookies in production, weak JWT secret refused) | ✅ |
+| NFR-MAIN-03 | `test_request_context.py` (`X-Request-ID` on every response and in every log line); `test_audit.py` (important actions recorded) | ✅ |
 | NFR-SEC-05, NFR-SEC-06 | Module 5 tests | ⏳ |
 | NFR-PERF-02 | Module 7 tests (page size cap, server-side filters) | ⏳ |
 | NFR-PERF-03, NFR-REL-03 | Module 9 tests | ⏳ |

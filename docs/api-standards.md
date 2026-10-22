@@ -140,6 +140,12 @@ Response:
 ## 8. Auditing and logging
 
 - State-changing endpoints write an audit record (FR-AUD-01) through the audit service, in the same transaction as
-  the change.
-- Every request gets an `X-Request-ID` (generated if absent) that is included in logs and audit records
-  (NFR-MAIN-03).
+  the change: call `audit.record(db, AuditAction.X, target_type=…, target_id=…, target_label=…, actor_id=…,
+  changes=…)` before the service commits. `record()` never commits, so a rolled-back change leaves no record.
+- Actions are named `<target>.<verb>` (`contract.created`, `obligation.status_changed`) and listed in
+  `app/modules/audit/actions.py`; a module adds its own. `changes` is `{field: [old, new]}`, built with
+  `audit.changes_between(before, after)`; never put secrets or password hashes in it. `target_label` is the
+  target's human name at that moment (e.g. the contract number).
+- Not audited: reads, and token refresh (every 15 minutes per user; it changes nothing a person did).
+- Every request gets an `X-Request-ID` (the caller's if it is 1–64 characters of `A–Z a–z 0–9 . _ -`, otherwise
+  generated) that is returned in the response and included in every log line and audit record (NFR-MAIN-03).
