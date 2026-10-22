@@ -4,6 +4,7 @@ This catalog is the reference the seed migration was written from, and the test 
 database matches it. The database is authoritative at runtime; change both via a new migration.
 """
 
+from collections.abc import Iterable
 from enum import StrEnum
 
 
@@ -56,6 +57,15 @@ class DataScope(StrEnum):
     ALL = "all"
     ASSIGNED_PROPERTIES = "assigned_properties"
     ASSIGNED_OBLIGATIONS = "assigned_obligations"
+
+
+# Widest first. A user holding several roles gets the widest scope among them.
+_SCOPE_ORDER = (DataScope.ALL, DataScope.ASSIGNED_PROPERTIES, DataScope.ASSIGNED_OBLIGATIONS)
+
+
+def widest_scope(scopes: Iterable[str]) -> DataScope:
+    present = set(scopes)
+    return next((scope for scope in _SCOPE_ORDER if scope in present), DataScope.ASSIGNED_OBLIGATIONS)
 
 
 class RoleCode(StrEnum):

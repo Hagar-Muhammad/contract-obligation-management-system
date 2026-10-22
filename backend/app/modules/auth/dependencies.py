@@ -14,7 +14,7 @@ from app.core.errors import ForbiddenError, UnauthorizedError
 from app.core.security import InvalidTokenError, decode_access_token
 from app.modules.auth.models import UserSession
 from app.modules.users.models import User
-from app.modules.users.rbac import Perm
+from app.modules.users.rbac import DataScope, Perm, widest_scope
 
 bearer_scheme = HTTPBearer(
     auto_error=False, description="Access token from POST /auth/login or /auth/refresh."
@@ -36,6 +36,11 @@ class CurrentUser:
 
     def has(self, permission: Perm) -> bool:
         return permission in self.permissions
+
+    @property
+    def data_scope(self) -> DataScope:
+        """Which records this user may see; services filter by it (docs/roles-and-permissions.md)."""
+        return widest_scope(self.user.data_scopes)
 
 
 def get_current_user(
