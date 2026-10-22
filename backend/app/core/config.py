@@ -14,7 +14,7 @@ class Settings(BaseSettings):
     # One .env at the repository root serves docker compose and the API; backend/.env can override locally.
     model_config = SettingsConfigDict(env_file=("../.env", ".env"), env_file_encoding="utf-8", extra="ignore")
 
-    app_name: str = "Contract & Obligation Management System"
+    app_name: str = "ConTrack API"
     app_env: Literal["development", "test", "production"] = "development"
     log_level: str = "INFO"
 

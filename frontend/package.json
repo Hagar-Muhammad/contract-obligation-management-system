@@ -12,14 +12,20 @@
     "format:check": "prettier --check .",
     "typecheck": "tsc -b",
     "test": "vitest run",
-    "test:watch": "vitest"
+    "test:watch": "vitest",
+    "api:openapi": "cd ../backend && python -m app.cli export-openapi ../frontend/src/api/openapi.json",
+    "api:types": "npx --yes -p typescript@5 -p openapi-typescript@7 openapi-typescript src/api/openapi.json -o src/api/schema.d.ts",
+    "api:generate": "npm run api:openapi && npm run api:types && prettier --write src/api/schema.d.ts"
   },
   "dependencies": {
+    "@tanstack/react-query": "^5.104.5",
     "antd": "^6.6.7",
     "i18next": "^26.5.4",
+    "openapi-fetch": "^0.17.0",
     "react": "^19.3.1",
     "react-dom": "^19.3.1",
-    "react-i18next": "^17.1.0"
+    "react-i18next": "^17.1.0",
+    "react-router-dom": "^7.18.4"
   },
   "devDependencies": {
     "@testing-library/jest-dom": "^7.0.1",
