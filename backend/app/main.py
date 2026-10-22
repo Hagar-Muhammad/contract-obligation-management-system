@@ -7,6 +7,7 @@ from app.core.config import Settings, get_settings
 from app.core.errors import register_error_handlers
 from app.core.logging import configure_logging
 from app.core.middleware import add_security_headers
+from app.core.request_context import REQUEST_ID_HEADER, RequestContextMiddleware
 
 
 def create_app(settings: Settings | None = None) -> FastAPI:
@@ -26,8 +27,11 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         allow_credentials=True,
         allow_methods=["*"],
         allow_headers=["*"],
+        expose_headers=[REQUEST_ID_HEADER],
     )
     add_security_headers(app, settings)
+    # Added last so it runs first: every response, including CORS and error responses, carries the request id.
+    app.add_middleware(RequestContextMiddleware)
     register_error_handlers(app)
     app.include_router(api_router)
     return app

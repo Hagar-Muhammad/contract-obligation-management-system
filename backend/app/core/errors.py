@@ -17,6 +17,8 @@ from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
 from starlette.exceptions import HTTPException as StarletteHTTPException
 
+from app.core.request_context import REQUEST_ID_HEADER, current_request_id
+
 logger = logging.getLogger(__name__)
 
 
@@ -98,9 +100,12 @@ async def _validation_error_handler(_: Request, exc: RequestValidationError) -> 
 
 async def _unhandled_error_handler(request: Request, exc: Exception) -> JSONResponse:
     logger.exception("Unhandled error on %s %s", request.method, request.url.path, exc_info=exc)
+    # This handler runs outside the request-context middleware, so it adds the id header itself.
+    request_id = current_request_id()
     return JSONResponse(
         error_body("internal_error", "An unexpected error occurred."),
         status_code=HTTPStatus.INTERNAL_SERVER_ERROR,
+        headers={REQUEST_ID_HEADER: request_id} if request_id else None,
     )
 
 
