@@ -31,6 +31,17 @@ class UserCreate(BaseModel):
     preferred_language: Language = "en"
 
 
+class SignUpRequest(BaseModel):
+    """Self sign-up. The role is not chosen by the user; the server assigns the configured default."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    email: Email
+    full_name: FullName
+    password: Password
+    preferred_language: Language = "en"
+
+
 class UserUpdate(BaseModel):
     """Partial update. Setting `password` is an administrator reset and ends the user's sessions."""
 

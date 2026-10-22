@@ -29,6 +29,12 @@ class Settings(BaseSettings):
     refresh_token_ttl_days: int = Field(default=7, ge=1, le=90)
     refresh_cookie_name: str = "coms_refresh"
 
+    # Self sign-up (change request CR-01, docs/decisions.md D-20). New accounts get this single role.
+    self_signup_enabled: bool = True
+    self_signup_role: Literal[
+        "admin", "contract_manager", "legal", "property_manager", "employee", "management"
+    ] = "employee"
+
     @property
     def is_production(self) -> bool:
         return self.app_env == "production"

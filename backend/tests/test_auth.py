@@ -27,6 +27,8 @@ PUBLIC_ROUTES = {
     ("POST", LOGIN),
     ("POST", REFRESH),
     ("POST", LOGOUT),
+    ("POST", "/api/v1/auth/register"),
+    ("GET", "/api/v1/auth/options"),
 }
 
 

@@ -1,4 +1,7 @@
-"""User administration (FR-USER-01..03). Callers have already been checked for `user:manage`."""
+"""User administration (FR-USER-01..03) and self sign-up (CR-01).
+
+Administration functions assume the caller was already checked for `user:manage`.
+"""
 
 import uuid
 from collections.abc import Sequence
@@ -6,13 +9,14 @@ from collections.abc import Sequence
 from sqlalchemy import or_, select
 from sqlalchemy.orm import Session
 
-from app.core.errors import BusinessRuleError, ConflictError, NotFoundError
+from app.core.config import get_settings
+from app.core.errors import BusinessRuleError, ConflictError, ForbiddenError, NotFoundError
 from app.core.pagination import PageParams, paginate
 from app.core.security import hash_password
 from app.modules.auth.service import revoke_all_sessions
 from app.modules.users.models import Role, User
 from app.modules.users.rbac import RoleCode
-from app.modules.users.schemas import UserCreate, UserUpdate
+from app.modules.users.schemas import SignUpRequest, UserCreate, UserUpdate
 
 
 def _roles_by_code(db: Session, codes: Sequence[RoleCode]) -> list[Role]:
@@ -61,6 +65,25 @@ def create_user(db: Session, data: UserCreate, *, actor_id: uuid.UUID) -> User:
         roles=_roles_by_code(db, data.role_codes),
         created_by_id=actor_id,
         updated_by_id=actor_id,
+    )
+    db.add(user)
+    db.commit()
+    db.refresh(user)
+    return user
+
+
+def register_self(db: Session, data: SignUpRequest) -> User:
+    """Self sign-up (CR-01): the new account gets only the configured low-privilege role."""
+    settings = get_settings()
+    if not settings.self_signup_enabled:
+        raise ForbiddenError("Self sign-up is disabled. Ask an administrator for an account.")
+    _ensure_email_free(db, data.email)
+    user = User(
+        email=data.email,
+        full_name=data.full_name,
+        password_hash=hash_password(data.password),
+        preferred_language=data.preferred_language,
+        roles=_roles_by_code(db, [RoleCode(settings.self_signup_role)]),
     )
     db.add(user)
     db.commit()

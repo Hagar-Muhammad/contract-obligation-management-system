@@ -7,7 +7,9 @@ from app.core.db import get_db
 from app.core.security import InvalidTokenError, decode_access_token
 from app.modules.auth import service
 from app.modules.auth.dependencies import CurrentUser, bearer_scheme, get_current_user
-from app.modules.auth.schemas import LoginRequest, MeResponse, TokenResponse
+from app.modules.auth.schemas import AuthOptions, LoginRequest, MeResponse, TokenResponse
+from app.modules.users import service as users_service
+from app.modules.users.schemas import SignUpRequest
 
 router = APIRouter(prefix="/auth", tags=["auth"])
 
@@ -57,6 +59,41 @@ def login(
         db,
         payload.email,
         payload.password,
+        user_agent=request.headers.get("user-agent"),
+        ip_address=request.client.host if request.client else None,
+    )
+    _set_refresh_cookie(response, issued.refresh_token, settings)
+    return TokenResponse(
+        access_token=issued.access_token, expires_in=issued.expires_in, user=MeResponse.from_user(issued.user)
+    )
+
+
+@router.get("/options", response_model=AuthOptions, summary="Public sign-in options for the login page")
+def options(settings: Settings = Depends(get_settings)) -> AuthOptions:
+    return AuthOptions(self_signup_enabled=settings.self_signup_enabled)
+
+
+@router.post(
+    "/register",
+    response_model=TokenResponse,
+    status_code=status.HTTP_201_CREATED,
+    summary="Create your own account and sign in (CR-01)",
+    responses={
+        403: {"description": "Self sign-up is disabled"},
+        409: {"description": "E-mail already registered"},
+    },
+)
+def register(
+    payload: SignUpRequest,
+    request: Request,
+    response: Response,
+    db: Session = Depends(get_db),
+    settings: Settings = Depends(get_settings),
+) -> TokenResponse:
+    user = users_service.register_self(db, payload)
+    issued = service.start_session(
+        db,
+        user,
         user_agent=request.headers.get("user-agent"),
         ip_address=request.client.host if request.client else None,
     )

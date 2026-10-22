@@ -60,6 +60,11 @@ def login(
     db: Session, email: str, password: str, *, user_agent: str | None, ip_address: str | None
 ) -> IssuedTokens:
     user = authenticate(db, email, password)
+    return start_session(db, user, user_agent=user_agent, ip_address=ip_address)
+
+
+def start_session(db: Session, user: User, *, user_agent: str | None, ip_address: str | None) -> IssuedTokens:
+    """Open a new session for an already-authenticated user (login, or straight after sign-up)."""
     settings = get_settings()
     session = UserSession(
         id=uuid.uuid4(),
