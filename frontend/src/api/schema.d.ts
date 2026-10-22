@@ -244,6 +244,95 @@ export interface paths {
     patch?: never
     trace?: never
   }
+  '/api/v1/parties': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** List the parties visible to you */
+    get: operations['list_parties_api_v1_parties_get']
+    put?: never
+    /** Create a party (FR-PARTY-01, FR-PARTY-02) */
+    post: operations['create_party_api_v1_parties_post']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/api/v1/parties/{party_id}': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Get a party */
+    get: operations['get_party_api_v1_parties__party_id__get']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    /** Update a party (FR-PARTY-01) */
+    patch: operations['update_party_api_v1_parties__party_id__patch']
+    trace?: never
+  }
+  '/api/v1/properties': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** List the properties visible to you */
+    get: operations['list_properties_api_v1_properties_get']
+    put?: never
+    /** Create a property and assign its managers */
+    post: operations['create_property_api_v1_properties_post']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/api/v1/properties/assignable-managers': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Active Property Managers who can be assigned to a property */
+    get: operations['list_assignable_managers_api_v1_properties_assignable_managers_get']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/api/v1/properties/{property_id}': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Get a property */
+    get: operations['get_property_api_v1_properties__property_id__get']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    /** Update a property or its assigned managers */
+    patch: operations['update_property_api_v1_properties__property_id__patch']
+    trace?: never
+  }
 }
 export type webhooks = Record<string, never>
 export interface components {
@@ -268,6 +357,10 @@ export interface components {
       | 'user.password_reset'
       | 'user.deactivated'
       | 'user.activated'
+      | 'party.created'
+      | 'party.updated'
+      | 'property.created'
+      | 'property.updated'
     /** AuditActor */
     AuditActor: {
       /**
@@ -389,6 +482,28 @@ export interface components {
       /** Total */
       total: number
     }
+    /** Page[PartyRead] */
+    Page_PartyRead_: {
+      /** Items */
+      items: components['schemas']['PartyRead'][]
+      /** Page */
+      page: number
+      /** Page Size */
+      page_size: number
+      /** Total */
+      total: number
+    }
+    /** Page[PropertyRead] */
+    Page_PropertyRead_: {
+      /** Items */
+      items: components['schemas']['PropertyRead'][]
+      /** Page */
+      page: number
+      /** Page Size */
+      page_size: number
+      /** Total */
+      total: number
+    }
     /** Page[UserRead] */
     Page_UserRead_: {
       /** Items */
@@ -399,6 +514,231 @@ export interface components {
       page_size: number
       /** Total */
       total: number
+    }
+    /** PartyCreate */
+    PartyCreate: {
+      /**
+       * National Id
+       * @description Individuals only.
+       */
+      national_id?: string | null
+      /**
+       * Passport No
+       * @description Individuals only.
+       */
+      passport_no?: string | null
+      /**
+       * Registration No
+       * @description Organizations only (commercial registration).
+       */
+      registration_no?: string | null
+      /**
+       * Tax No
+       * @description Organizations only.
+       */
+      tax_no?: string | null
+      /** Email */
+      email?: string | null
+      /** Phone */
+      phone?: string | null
+      /** Address */
+      address?: string | null
+      /** Notes */
+      notes?: string | null
+      party_type: components['schemas']['PartyType']
+      /**
+       * Display Name
+       * @description Full name of a person, or the company name.
+       */
+      display_name: string
+    }
+    /** PartyRead */
+    PartyRead: {
+      /**
+       * Id
+       * Format: uuid
+       */
+      id: string
+      party_type: components['schemas']['PartyType']
+      /** Display Name */
+      display_name: string
+      /** National Id */
+      national_id: string | null
+      /** Passport No */
+      passport_no: string | null
+      /** Registration No */
+      registration_no: string | null
+      /** Tax No */
+      tax_no: string | null
+      /** Email */
+      email: string | null
+      /** Phone */
+      phone: string | null
+      /** Address */
+      address: string | null
+      /** Notes */
+      notes: string | null
+      /**
+       * Created At
+       * Format: date-time
+       */
+      created_at: string
+      /**
+       * Updated At
+       * Format: date-time
+       */
+      updated_at: string
+    }
+    /**
+     * PartyType
+     * @enum {string}
+     */
+    PartyType: 'individual' | 'organization'
+    /**
+     * PartyUpdate
+     * @description Partial update: only the fields sent change; send null to clear one. The party type cannot change.
+     */
+    PartyUpdate: {
+      /**
+       * National Id
+       * @description Individuals only.
+       */
+      national_id?: string | null
+      /**
+       * Passport No
+       * @description Individuals only.
+       */
+      passport_no?: string | null
+      /**
+       * Registration No
+       * @description Organizations only (commercial registration).
+       */
+      registration_no?: string | null
+      /**
+       * Tax No
+       * @description Organizations only.
+       */
+      tax_no?: string | null
+      /** Email */
+      email?: string | null
+      /** Phone */
+      phone?: string | null
+      /** Address */
+      address?: string | null
+      /** Notes */
+      notes?: string | null
+      /** Display Name */
+      display_name?: string | null
+    }
+    /** PropertyCreate */
+    PropertyCreate: {
+      /** Address */
+      address?: string | null
+      /** City */
+      city?: string | null
+      /** Country */
+      country?: string | null
+      /**
+       * Area Sqm
+       * @description Floor or land area in square metres.
+       */
+      area_sqm?: number | string | null
+      /** Notes */
+      notes?: string | null
+      /**
+       * Code
+       * @description Business reference, e.g. "WM-G14". Stored upper-cased; unique.
+       */
+      code: string
+      /** Name */
+      name: string
+      property_type: components['schemas']['PropertyType']
+      /**
+       * Manager Ids
+       * @description Property Managers assigned to this property (their data scope).
+       */
+      manager_ids?: string[]
+    }
+    /** PropertyManagerRead */
+    PropertyManagerRead: {
+      /**
+       * Id
+       * Format: uuid
+       */
+      id: string
+      /** Full Name */
+      full_name: string
+      /** Email */
+      email: string
+    }
+    /** PropertyRead */
+    PropertyRead: {
+      /**
+       * Id
+       * Format: uuid
+       */
+      id: string
+      /** Code */
+      code: string
+      /** Name */
+      name: string
+      property_type: components['schemas']['PropertyType']
+      /** Address */
+      address: string | null
+      /** City */
+      city: string | null
+      /** Country */
+      country: string | null
+      /** Area Sqm */
+      area_sqm: string | null
+      /** Notes */
+      notes: string | null
+      /** Managers */
+      managers: components['schemas']['PropertyManagerRead'][]
+      /**
+       * Created At
+       * Format: date-time
+       */
+      created_at: string
+      /**
+       * Updated At
+       * Format: date-time
+       */
+      updated_at: string
+    }
+    /**
+     * PropertyType
+     * @enum {string}
+     */
+    PropertyType: 'residential' | 'retail' | 'office' | 'industrial' | 'land' | 'mixed_use' | 'other'
+    /**
+     * PropertyUpdate
+     * @description Partial update: only the fields sent change; send null to clear an optional one.
+     */
+    PropertyUpdate: {
+      /** Address */
+      address?: string | null
+      /** City */
+      city?: string | null
+      /** Country */
+      country?: string | null
+      /**
+       * Area Sqm
+       * @description Floor or land area in square metres.
+       */
+      area_sqm?: number | string | null
+      /** Notes */
+      notes?: string | null
+      /** Code */
+      code?: string | null
+      /** Name */
+      name?: string | null
+      property_type?: components['schemas']['PropertyType'] | null
+      /**
+       * Manager Ids
+       * @description Replaces the whole list of assigned managers.
+       */
+      manager_ids?: string[] | null
     }
     /**
      * RoleCode
@@ -447,7 +787,7 @@ export interface components {
      * TargetType
      * @enum {string}
      */
-    TargetType: 'user'
+    TargetType: 'user' | 'party' | 'property'
     /** TokenResponse */
     TokenResponse: {
       /** Access Token */
@@ -1018,6 +1358,340 @@ export interface operations {
         content: {
           'application/json': components['schemas']['Page_AuditLogRead_']
         }
+      }
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['HTTPValidationError']
+        }
+      }
+    }
+  }
+  list_parties_api_v1_parties_get: {
+    parameters: {
+      query?: {
+        /** @description Name, e-mail, phone, or an exact ID number. */
+        q?: string | null
+        party_type?: components['schemas']['PartyType'] | null
+        /** @description 1-based page number. */
+        page?: number
+        /** @description Items per page (max 100). */
+        page_size?: number
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['Page_PartyRead_']
+        }
+      }
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['HTTPValidationError']
+        }
+      }
+    }
+  }
+  create_party_api_v1_parties_post: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['PartyCreate']
+      }
+    }
+    responses: {
+      /** @description Successful Response */
+      201: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['PartyRead']
+        }
+      }
+      /** @description Another party already has this ID or registration number */
+      409: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['HTTPValidationError']
+        }
+      }
+    }
+  }
+  get_party_api_v1_parties__party_id__get: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        party_id: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['PartyRead']
+        }
+      }
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['HTTPValidationError']
+        }
+      }
+    }
+  }
+  update_party_api_v1_parties__party_id__patch: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        party_id: string
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['PartyUpdate']
+      }
+    }
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['PartyRead']
+        }
+      }
+      /** @description Another party already has this ID or registration number */
+      409: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['HTTPValidationError']
+        }
+      }
+    }
+  }
+  list_properties_api_v1_properties_get: {
+    parameters: {
+      query?: {
+        /** @description Code, name, city or address. */
+        q?: string | null
+        property_type?: components['schemas']['PropertyType'] | null
+        /** @description Only properties assigned to this user. */
+        manager_id?: string | null
+        /** @description 1-based page number. */
+        page?: number
+        /** @description Items per page (max 100). */
+        page_size?: number
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['Page_PropertyRead_']
+        }
+      }
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['HTTPValidationError']
+        }
+      }
+    }
+  }
+  create_property_api_v1_properties_post: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['PropertyCreate']
+      }
+    }
+    responses: {
+      /** @description Successful Response */
+      201: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['PropertyRead']
+        }
+      }
+      /** @description Another property already uses this code */
+      409: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['HTTPValidationError']
+        }
+      }
+    }
+  }
+  list_assignable_managers_api_v1_properties_assignable_managers_get: {
+    parameters: {
+      query?: {
+        /** @description Name or e-mail. */
+        q?: string | null
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['PropertyManagerRead'][]
+        }
+      }
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['HTTPValidationError']
+        }
+      }
+    }
+  }
+  get_property_api_v1_properties__property_id__get: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        property_id: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['PropertyRead']
+        }
+      }
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['HTTPValidationError']
+        }
+      }
+    }
+  }
+  update_property_api_v1_properties__property_id__patch: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        property_id: string
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['PropertyUpdate']
+      }
+    }
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['PropertyRead']
+        }
+      }
+      /** @description Another property already uses this code */
+      409: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
       }
       /** @description Validation Error */
       422: {
