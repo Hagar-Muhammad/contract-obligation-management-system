@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 296 80" width="296" height="80">
+  <title>ConTrack</title>
+  <rect width="296" height="80" rx="12" fill="#0B2545"/>
+  <g transform="translate(8 8)">
+    <path d="M48.85 17.86A22 22 0 1 0 48.85 46.14" fill="none" stroke="#60A5FA" stroke-width="9" stroke-linecap="round"/>
+    <path d="M22 32.5l7 7 13.5-14.5" fill="none" stroke="#34D399" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>
+    <text x="68" y="44" font-family="Segoe UI, Inter, Helvetica, Arial, sans-serif" font-size="38" font-weight="700" letter-spacing="-0.5" fill="#FFFFFF">Con<tspan fill="#34D399">Track</tspan></text>
+  </g>
+</svg>
