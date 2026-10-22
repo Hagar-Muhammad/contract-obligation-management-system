@@ -106,12 +106,16 @@ export const EMPLOYEE: Me = {
   full_name: 'Eve Employee',
   preferred_language: 'en',
   roles: ['employee'],
+  // Same as the seeded Employee role (backend/app/modules/users/rbac.py).
   permissions: [
     'contract:view',
     'document:upload',
     'document:view',
+    'extraction:run',
     'obligation:create',
     'obligation:update',
+    'obligation:view',
+    'report:view',
   ],
   data_scopes: ['assigned_obligations'],
 }

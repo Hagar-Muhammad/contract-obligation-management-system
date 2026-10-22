@@ -1,8 +1,11 @@
 import '@testing-library/jest-dom/vitest'
-import { cleanup } from '@testing-library/react'
+import { cleanup, configure } from '@testing-library/react'
 import { afterEach, beforeEach, vi } from 'vitest'
 import { setSession } from '../api/client'
 import i18n from '../i18n'
+
+// Ant Design in jsdom is slow; give findBy*/waitFor enough time on a loaded CI machine.
+configure({ asyncUtilTimeout: 5000 })
 
 beforeEach(async () => {
   await i18n.changeLanguage('en')

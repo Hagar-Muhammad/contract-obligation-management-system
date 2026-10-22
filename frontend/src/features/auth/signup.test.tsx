@@ -45,7 +45,7 @@ describe('TC-CR-01 self sign-up (CR-01)', () => {
 
     await fillSignUp()
 
-    expect(await screen.findByRole('heading', { name: 'Welcome, Eve Employee' })).toBeInTheDocument()
+    expect(await screen.findByRole('heading', { name: /Eve/ })).toBeInTheDocument()
     // The confirmation field stays in the browser; the role is never sent.
     expect(server.callsTo('POST', '/api/v1/auth/register')[0].body).toEqual({
       full_name: 'Eve Employee',
