@@ -498,6 +498,109 @@ p {
   font-size: 13px;
 }
 
+/* ---- Audit log ---- */
+
+.audit-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.audit-filter {
+  min-width: 220px;
+}
+
+/* Coloured dot before the action, as in the design's Activity panel. */
+.audit-action {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 600;
+}
+
+.audit-action::before {
+  flex: none;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--audit-dot);
+  content: '';
+}
+
+.tone-dot-blue {
+  --audit-dot: var(--ct-blue);
+}
+
+.tone-dot-green {
+  --audit-dot: var(--ct-green);
+}
+
+.tone-dot-amber {
+  --audit-dot: #d97706;
+}
+
+.tone-dot-red {
+  --audit-dot: var(--ct-red);
+}
+
+.tone-dot-grey {
+  --audit-dot: var(--ct-subtle);
+}
+
+.audit-details {
+  display: grid;
+  gap: 12px;
+  padding: 4px 8px;
+}
+
+.audit-changes {
+  width: 100%;
+  max-width: 720px;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+
+.audit-changes th,
+.audit-changes td {
+  padding: 6px 12px;
+  border-bottom: 1px solid var(--ct-border);
+  text-align: start;
+}
+
+.audit-changes th {
+  color: var(--ct-muted);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.audit-changes td:first-child {
+  font-weight: 600;
+}
+
+.audit-empty {
+  color: var(--ct-subtle);
+}
+
+.audit-meta {
+  display: grid;
+  grid-template-columns: max-content 1fr;
+  gap: 4px 16px;
+  margin: 0;
+  color: var(--ct-muted);
+  font-size: 12px;
+}
+
+.audit-meta dd {
+  margin: 0;
+  font-family: ui-monospace, 'SFMono-Regular', Consolas, monospace;
+}
+
+.audit-note {
+  margin-top: 12px;
+  color: var(--ct-muted);
+  font-size: 13px;
+}
+
 /* ---- Forms ---- */
 
 .form-section {

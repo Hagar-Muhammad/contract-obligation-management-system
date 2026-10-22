@@ -144,6 +144,57 @@
     "rolesRequired": "Select at least one role.",
     "permissionCount": "{{count}} permissions"
   },
+  "audit": {
+    "title": "Audit log",
+    "subtitle": "Every important action in ConTrack: who did it, to which record, and when.",
+    "search": "Search by person or record",
+    "actionFilter": "Filter by action",
+    "allActions": "All actions",
+    "dateFilter": "Filter by date",
+    "colWhen": "When",
+    "colActor": "Who",
+    "colAction": "Action",
+    "colTarget": "Record",
+    "system": "System",
+    "anonymous": "Not signed in",
+    "empty": "No audit records match these filters.",
+    "field": "Field",
+    "before": "Before",
+    "after": "After",
+    "requestId": "Request ID",
+    "ipAddress": "IP address",
+    "readOnlyNote": "Audit records are read-only. Nobody, administrators included, can edit or delete them.",
+    "groups": {
+      "auth": "Sign-in & sessions",
+      "user": "Users"
+    },
+    "actions": {
+      "auth": {
+        "login": "Signed in",
+        "login_failed": "Failed sign-in",
+        "logout": "Signed out",
+        "refresh_token_reused": "Session ended: stolen sign-in token suspected"
+      },
+      "user": {
+        "created": "Created user",
+        "registered": "Created own account",
+        "updated": "Edited user",
+        "password_reset": "Reset password",
+        "deactivated": "Deactivated user",
+        "activated": "Reactivated user"
+      }
+    },
+    "targets": {
+      "user": "User"
+    },
+    "fields": {
+      "email": "Email",
+      "full_name": "Full name",
+      "preferred_language": "Preferred language",
+      "roles": "Roles",
+      "is_active": "Status"
+    }
+  },
   "scope": {
     "all": "All contracts",
     "assigned_properties": "Assigned properties",

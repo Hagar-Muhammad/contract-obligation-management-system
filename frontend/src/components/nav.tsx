@@ -86,7 +86,6 @@ export const NAV_SECTIONS: NavSection[] = [
         labelKey: 'nav.auditLog',
         icon: <AuditOutlined />,
         permission: PERMISSIONS.auditView,
-        module: 2,
       },
     ],
   },

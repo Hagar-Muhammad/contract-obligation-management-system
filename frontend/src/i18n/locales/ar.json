@@ -144,6 +144,57 @@
     "rolesRequired": "اختر دورًا واحدًا على الأقل.",
     "permissionCount": "{{count}} صلاحية"
   },
+  "audit": {
+    "title": "سجل التدقيق",
+    "subtitle": "كل إجراء مهم في ConTrack: من قام به، وعلى أي سجل، ومتى.",
+    "search": "ابحث باسم الشخص أو السجل",
+    "actionFilter": "تصفية حسب الإجراء",
+    "allActions": "كل الإجراءات",
+    "dateFilter": "تصفية حسب التاريخ",
+    "colWhen": "الوقت",
+    "colActor": "المنفّذ",
+    "colAction": "الإجراء",
+    "colTarget": "السجل",
+    "system": "النظام",
+    "anonymous": "غير مسجّل الدخول",
+    "empty": "لا توجد سجلات تدقيق تطابق عوامل التصفية هذه.",
+    "field": "الحقل",
+    "before": "قبل",
+    "after": "بعد",
+    "requestId": "معرّف الطلب",
+    "ipAddress": "عنوان IP",
+    "readOnlyNote": "سجلات التدقيق للقراءة فقط. لا يمكن لأحد، بمن فيهم مديرو النظام، تعديلها أو حذفها.",
+    "groups": {
+      "auth": "تسجيل الدخول والجلسات",
+      "user": "المستخدمون"
+    },
+    "actions": {
+      "auth": {
+        "login": "تسجيل الدخول",
+        "login_failed": "محاولة دخول فاشلة",
+        "logout": "تسجيل الخروج",
+        "refresh_token_reused": "إنهاء الجلسة: يُشتبه في سرقة رمز الدخول"
+      },
+      "user": {
+        "created": "إنشاء مستخدم",
+        "registered": "إنشاء حساب ذاتيًا",
+        "updated": "تعديل مستخدم",
+        "password_reset": "إعادة تعيين كلمة المرور",
+        "deactivated": "إيقاف مستخدم",
+        "activated": "إعادة تفعيل مستخدم"
+      }
+    },
+    "targets": {
+      "user": "مستخدم"
+    },
+    "fields": {
+      "email": "البريد الإلكتروني",
+      "full_name": "الاسم الكامل",
+      "preferred_language": "اللغة المفضلة",
+      "roles": "الأدوار",
+      "is_active": "الحالة"
+    }
+  },
   "scope": {
     "all": "كل العقود",
     "assigned_properties": "العقارات المسندة",

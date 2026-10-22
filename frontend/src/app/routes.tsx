@@ -7,6 +7,7 @@ import { UPCOMING_PAGES } from '../components/nav'
 import { LoginPage } from '../features/auth/LoginPage'
 import { SignUpPage } from '../features/auth/SignUpPage'
 import { DashboardPage } from '../features/dashboard/DashboardPage'
+import { AuditLogPage } from '../features/audit/AuditLogPage'
 import { ComingSoonPage } from '../features/placeholder/ComingSoonPage'
 import { NotFoundPage } from '../features/placeholder/NotFoundPage'
 import { UserFormPage } from '../features/users/UserFormPage'
@@ -32,6 +33,14 @@ export function AppRoutes() {
         <Route path="users" element={adminOnly(<UsersPage />)} />
         <Route path="users/new" element={adminOnly(<UserFormPage />)} />
         <Route path="users/:id" element={adminOnly(<UserFormPage />)} />
+        <Route
+          path="audit-log"
+          element={
+            <RequirePermission permission={PERMISSIONS.auditView}>
+              <AuditLogPage />
+            </RequirePermission>
+          }
+        />
         {UPCOMING_PAGES.map((page) => (
           <Route
             key={page.path}
