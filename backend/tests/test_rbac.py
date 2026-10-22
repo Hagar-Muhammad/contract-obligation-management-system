@@ -84,3 +84,16 @@ def test_roles_endpoint_lists_roles_with_permissions(
     assert set(by_code) == {str(r) for r in RoleCode}
     assert by_code["property_manager"]["data_scope"] == "assigned_properties"
     assert "contract:view" in by_code["employee"]["permissions"]
+
+
+def test_roles_endpoint_marks_scoped_permissions(
+    client: TestClient, auth_headers: Callable[..., dict[str, str]]
+) -> None:
+    by_code = {r["code"]: r for r in client.get("/api/v1/roles", headers=auth_headers("admin")).json()}
+
+    assert by_code["employee"]["scoped_permissions"] == [
+        "contract:view",
+        "document:upload",
+        "obligation:create",
+    ]
+    assert by_code["admin"]["scoped_permissions"] == []

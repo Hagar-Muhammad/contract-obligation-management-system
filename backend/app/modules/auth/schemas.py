@@ -12,6 +12,7 @@ class LoginRequest(BaseModel):
     # Not EmailStr: a malformed address is simply a failed login, not a validation hint for attackers.
     email: str = Field(min_length=1, max_length=320)
     password: str = Field(min_length=1, max_length=128)
+    remember_me: bool = Field(default=True, description="Keep me signed in on this device.")
 
 
 class MeResponse(BaseModel):

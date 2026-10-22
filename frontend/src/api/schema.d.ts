@@ -263,6 +263,12 @@ export interface components {
       email: string
       /** Password */
       password: string
+      /**
+       * Remember Me
+       * @description Keep me signed in on this device.
+       * @default true
+       */
+      remember_me: boolean
     }
     /** MeResponse */
     MeResponse: {
@@ -311,6 +317,11 @@ export interface components {
       data_scope: components['schemas']['DataScope']
       /** Permissions */
       permissions: string[]
+      /**
+       * Scoped Permissions
+       * @description Granted only within the role's data scope ("Allowed" in SRS 3.2, shown as Scoped).
+       */
+      scoped_permissions: string[]
     }
     /**
      * SignUpRequest

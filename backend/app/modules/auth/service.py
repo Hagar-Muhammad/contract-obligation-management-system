@@ -30,6 +30,7 @@ class IssuedTokens:
     expires_in: int
     refresh_token: str
     user: User
+    remember: bool = True
 
 
 def _now() -> datetime:
@@ -57,19 +58,38 @@ def _issue_refresh_token(db: Session, session: UserSession) -> str:
 
 
 def login(
-    db: Session, email: str, password: str, *, user_agent: str | None, ip_address: str | None
+    db: Session,
+    email: str,
+    password: str,
+    *,
+    remember: bool = True,
+    user_agent: str | None,
+    ip_address: str | None,
 ) -> IssuedTokens:
     user = authenticate(db, email, password)
-    return start_session(db, user, user_agent=user_agent, ip_address=ip_address)
+    return start_session(db, user, remember=remember, user_agent=user_agent, ip_address=ip_address)
 
 
-def start_session(db: Session, user: User, *, user_agent: str | None, ip_address: str | None) -> IssuedTokens:
+def start_session(
+    db: Session,
+    user: User,
+    *,
+    remember: bool = True,
+    user_agent: str | None,
+    ip_address: str | None,
+) -> IssuedTokens:
     """Open a new session for an already-authenticated user (login, or straight after sign-up)."""
     settings = get_settings()
+    lifetime = (
+        timedelta(days=settings.refresh_token_ttl_days)
+        if remember
+        else timedelta(hours=settings.unremembered_session_hours)
+    )
     session = UserSession(
         id=uuid.uuid4(),
         user_id=user.id,
-        expires_at=_now() + timedelta(days=settings.refresh_token_ttl_days),
+        expires_at=_now() + lifetime,
+        remember=remember,
         user_agent=(user_agent or "")[:300] or None,
         ip_address=ip_address,
     )
@@ -78,7 +98,7 @@ def start_session(db: Session, user: User, *, user_agent: str | None, ip_address
     refresh = _issue_refresh_token(db, session)
     access, expires_in = create_access_token(user.id, session.id)
     db.commit()
-    return IssuedTokens(access, expires_in, refresh, user)
+    return IssuedTokens(access, expires_in, refresh, user, remember)
 
 
 def refresh(db: Session, raw_refresh_token: str | None) -> IssuedTokens:
@@ -111,7 +131,7 @@ def refresh(db: Session, raw_refresh_token: str | None) -> IssuedTokens:
     new_refresh = _issue_refresh_token(db, session)
     access, expires_in = create_access_token(user.id, session.id)
     db.commit()
-    return IssuedTokens(access, expires_in, new_refresh, user)
+    return IssuedTokens(access, expires_in, new_refresh, user, session.remember)
 
 
 def logout(db: Session, *, session_id: uuid.UUID | None, raw_refresh_token: str | None) -> None:

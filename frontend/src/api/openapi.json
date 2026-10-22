@@ -673,6 +673,12 @@
             "maxLength": 128,
             "minLength": 1,
             "title": "Password"
+          },
+          "remember_me": {
+            "type": "boolean",
+            "title": "Remember Me",
+            "description": "Keep me signed in on this device.",
+            "default": true
           }
         },
         "additionalProperties": false,
@@ -802,6 +808,14 @@
             },
             "type": "array",
             "title": "Permissions"
+          },
+          "scoped_permissions": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Scoped Permissions",
+            "description": "Granted only within the role's data scope (\"Allowed\" in SRS 3.2, shown as Scoped)."
           }
         },
         "type": "object",
@@ -810,7 +824,8 @@
           "name",
           "description",
           "data_scope",
-          "permissions"
+          "permissions",
+          "scoped_permissions"
         ],
         "title": "RoleRead"
       },

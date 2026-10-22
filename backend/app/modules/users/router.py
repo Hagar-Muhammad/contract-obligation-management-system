@@ -7,7 +7,7 @@ from app.core.db import get_db
 from app.core.pagination import Page, PageParams, page_params
 from app.modules.auth.dependencies import CurrentUser, require_permission
 from app.modules.users import service
-from app.modules.users.rbac import DataScope, Perm
+from app.modules.users.rbac import PENDING_CONFIRMATION, DataScope, Perm, RoleCode
 from app.modules.users.schemas import RoleRead, UserCreate, UserRead, UserUpdate
 
 router = APIRouter(tags=["users"])
@@ -91,6 +91,7 @@ def list_roles(db: Session = Depends(get_db), _: CurrentUser = Depends(can_manag
             description=r.description,
             data_scope=DataScope(r.data_scope),
             permissions=sorted(p.code for p in r.permissions),
+            scoped_permissions=sorted(PENDING_CONFIRMATION.get(RoleCode(r.code), frozenset())),
         )
         for r in service.list_roles(db)
     ]

@@ -247,3 +247,24 @@ def test_passwords_are_stored_as_argon2_hashes(
     assert stored.password_hash.startswith("$argon2id$")
     assert "Plain-Text-123" not in stored.password_hash
     assert "password" not in response.text
+
+
+@pytest.mark.req("FR-AUTH-01")
+def test_keep_me_signed_in_controls_cookie_lifetime(
+    client: TestClient, users: UserFactory, db: Session
+) -> None:
+    user = users.create()
+
+    remembered = client.post(LOGIN, json={"email": user.email, "password": DEFAULT_PASSWORD})
+    assert "max-age=" in remembered.headers["set-cookie"].lower()
+
+    client.cookies.clear()
+    browser_only = client.post(
+        LOGIN, json={"email": user.email, "password": DEFAULT_PASSWORD, "remember_me": False}
+    )
+    assert browser_only.status_code == 200
+    assert "max-age" not in browser_only.headers["set-cookie"].lower()  # session cookie
+    # Refreshing keeps it a browser-session cookie.
+    refreshed = client.post(REFRESH)
+    assert refreshed.status_code == 200
+    assert "max-age" not in refreshed.headers["set-cookie"].lower()

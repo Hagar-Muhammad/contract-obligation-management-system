@@ -16,11 +16,12 @@ router = APIRouter(prefix="/auth", tags=["auth"])
 COOKIE_PATH = "/api/v1/auth"
 
 
-def _set_refresh_cookie(response: Response, token: str, settings: Settings) -> None:
+def _set_refresh_cookie(response: Response, issued: service.IssuedTokens, settings: Settings) -> None:
     response.set_cookie(
         settings.refresh_cookie_name,
-        token,
-        max_age=settings.refresh_token_ttl_days * 24 * 3600,
+        issued.refresh_token,
+        # No max-age for an unremembered session: the browser drops the cookie when it closes.
+        max_age=settings.refresh_token_ttl_days * 24 * 3600 if issued.remember else None,
         httponly=True,
         secure=settings.cookie_secure,
         samesite="strict",
@@ -59,10 +60,11 @@ def login(
         db,
         payload.email,
         payload.password,
+        remember=payload.remember_me,
         user_agent=request.headers.get("user-agent"),
         ip_address=request.client.host if request.client else None,
     )
-    _set_refresh_cookie(response, issued.refresh_token, settings)
+    _set_refresh_cookie(response, issued, settings)
     return TokenResponse(
         access_token=issued.access_token, expires_in=issued.expires_in, user=MeResponse.from_user(issued.user)
     )
@@ -97,7 +99,7 @@ def register(
         user_agent=request.headers.get("user-agent"),
         ip_address=request.client.host if request.client else None,
     )
-    _set_refresh_cookie(response, issued.refresh_token, settings)
+    _set_refresh_cookie(response, issued, settings)
     return TokenResponse(
         access_token=issued.access_token, expires_in=issued.expires_in, user=MeResponse.from_user(issued.user)
     )
@@ -116,7 +118,7 @@ def refresh(
     settings: Settings = Depends(get_settings),
 ) -> TokenResponse:
     issued = service.refresh(db, _refresh_cookie(request, settings))
-    _set_refresh_cookie(response, issued.refresh_token, settings)
+    _set_refresh_cookie(response, issued, settings)
     return TokenResponse(
         access_token=issued.access_token, expires_in=issued.expires_in, user=MeResponse.from_user(issued.user)
     )

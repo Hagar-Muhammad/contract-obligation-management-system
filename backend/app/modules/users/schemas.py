@@ -74,3 +74,6 @@ class RoleRead(BaseModel):
     description: str
     data_scope: DataScope
     permissions: list[str]
+    scoped_permissions: list[str] = Field(
+        description='Granted only within the role\'s data scope ("Allowed" in SRS 3.2, shown as Scoped).'
+    )

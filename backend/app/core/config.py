@@ -27,6 +27,8 @@ class Settings(BaseSettings):
     jwt_algorithm: str = "HS256"
     access_token_ttl_minutes: int = Field(default=15, ge=1, le=120)
     refresh_token_ttl_days: int = Field(default=7, ge=1, le=90)
+    # Session length when "Keep me signed in" is not ticked (the cookie also ends when the browser closes).
+    unremembered_session_hours: int = Field(default=12, ge=1, le=72)
     refresh_cookie_name: str = "coms_refresh"
 
     # Self sign-up (change request CR-01, docs/decisions.md D-20). New accounts get this single role.
