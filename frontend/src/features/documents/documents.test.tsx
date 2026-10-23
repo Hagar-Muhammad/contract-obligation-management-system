@@ -37,11 +37,13 @@ const CONTRACT: Contract = {
   updated_at: '2026-10-18T10:00:00Z',
   created_by: null,
   updated_by: null,
+  obligations: { open: 0, overdue: 0 },
 }
 
 const LEASE_PDF: ContractDocument = {
   id: 'd0000000-0000-0000-0000-000000000001',
   contract_id: CONTRACT.id,
+  obligation_id: null,
   kind: 'contract',
   original_filename: 'Lease_G14_signed.pdf',
   file_type: 'pdf',

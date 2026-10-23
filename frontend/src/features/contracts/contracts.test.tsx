@@ -58,6 +58,7 @@ const contract = (overrides: Partial<Contract>): Contract => ({
   updated_at: '2026-10-18T10:00:00Z',
   created_by: { id: ADMIN.id, full_name: 'Hagar Muhammad' },
   updated_by: null,
+  obligations: { open: 0, overdue: 0 },
   ...overrides,
 })
 
