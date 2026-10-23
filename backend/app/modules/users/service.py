@@ -88,6 +88,15 @@ def list_users(
     return paginate(db, stmt, params)
 
 
+def directory(db: Session, *, q: str | None = None, limit: int = 50) -> list[User]:
+    """Active users by name, for choosing who follows up an obligation."""
+    stmt = select(User).where(User.is_active.is_(True)).order_by(User.full_name, User.email)
+    if q:
+        pattern = f"%{q.strip()}%"
+        stmt = stmt.where(or_(User.full_name.ilike(pattern), User.email.ilike(pattern)))
+    return list(db.scalars(stmt.limit(limit)))
+
+
 def create_user(
     db: Session, data: UserCreate, *, actor_id: uuid.UUID | None, actor_type: ActorType | None = None
 ) -> User:

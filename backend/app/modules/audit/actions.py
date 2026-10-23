@@ -29,6 +29,11 @@ class AuditAction(StrEnum):
     CONTRACT_RESTORED = "contract.restored"
     CONTRACT_DOCUMENT_UPLOADED = "contract.document_uploaded"
     DOCUMENT_DOWNLOADED = "document.downloaded"
+    OBLIGATION_CREATED = "obligation.created"
+    OBLIGATION_UPDATED = "obligation.updated"
+    OBLIGATION_STATUS_CHANGED = "obligation.status_changed"
+    OBLIGATION_OVERDUE = "obligation.overdue"
+    OBLIGATION_EVIDENCE_ADDED = "obligation.evidence_added"
 
 
 class ActorType(StrEnum):
@@ -45,3 +50,4 @@ class TargetType(StrEnum):
     PROPERTY = "property"
     CONTRACT = "contract"
     DOCUMENT = "document"
+    OBLIGATION = "obligation"

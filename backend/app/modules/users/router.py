@@ -5,10 +5,10 @@ from sqlalchemy.orm import Session
 
 from app.core.db import get_db
 from app.core.pagination import Page, PageParams, page_params
-from app.modules.auth.dependencies import CurrentUser, require_permission
+from app.modules.auth.dependencies import CurrentUser, require_any_permission, require_permission
 from app.modules.users import service
 from app.modules.users.rbac import PENDING_CONFIRMATION, DataScope, Perm, RoleCode
-from app.modules.users.schemas import RoleRead, UserCreate, UserRead, UserUpdate
+from app.modules.users.schemas import RoleRead, UserCreate, UserRead, UserSummary, UserUpdate
 
 router = APIRouter(tags=["users"])
 
@@ -30,6 +30,19 @@ def list_users(
         page_size=params.page_size,
         total=total,
     )
+
+
+@router.get(
+    "/users/directory",
+    response_model=list[UserSummary],
+    summary="Active users to choose as responsible for an obligation (FR-OBL-03)",
+)
+def user_directory(
+    q: str | None = Query(None, max_length=200, description="Name or e-mail."),
+    db: Session = Depends(get_db),
+    _: CurrentUser = Depends(require_any_permission(Perm.OBLIGATION_CREATE, Perm.OBLIGATION_UPDATE)),
+) -> list[UserSummary]:
+    return [UserSummary.model_validate(u) for u in service.directory(db, q=q)]
 
 
 @router.post(

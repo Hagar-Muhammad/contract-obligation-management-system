@@ -3,6 +3,7 @@ from datetime import date
 from typing import Any
 
 from fastapi import APIRouter, Depends, Query, Response, status
+from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from app.core.config import get_settings
@@ -27,9 +28,13 @@ from app.modules.contracts.schemas import (
     ContractUpdate,
     ContractView,
     LookupRead,
+    ObligationSummary,
     PersonRef,
     StatusCode,
 )
+from app.modules.contracts.scope import obligation_in_scope
+from app.modules.obligations import service as obligations_service
+from app.modules.obligations.models import Obligation
 from app.modules.users.rbac import Perm
 
 router = APIRouter(tags=["contracts"])
@@ -41,6 +46,10 @@ can_archive = require_permission(Perm.CONTRACT_ARCHIVE)
 DUPLICATE: dict[int | str, dict[str, Any]] = {409: {"description": "The contract number is already used"}}
 
 
+def _read_one(db: Session, current: CurrentUser, contract: Contract) -> ContractRead:
+    return _read(contract, obligations_service.contract_summaries(db, current, [contract.id])[contract.id])
+
+
 def _status(row: ContractStatus) -> ContractStatusRead:
     return ContractStatusRead(
         code=row.code,
@@ -50,7 +59,7 @@ def _status(row: ContractStatus) -> ContractStatusRead:
     )
 
 
-def _read(contract: Contract) -> ContractRead:
+def _read(contract: Contract, summary: ObligationSummary) -> ContractRead:
     return ContractRead(
         id=contract.id,
         contract_number=contract.contract_number,
@@ -78,6 +87,7 @@ def _read(contract: Contract) -> ContractRead:
         updated_at=contract.updated_at,
         created_by=PersonRef.model_validate(contract.created_by) if contract.created_by else None,
         updated_by=PersonRef.model_validate(contract.updated_by) if contract.updated_by else None,
+        obligations=summary,
     )
 
 
@@ -130,8 +140,12 @@ def list_contracts(
         term_to=term_to,
         sort=sort,
     )
+    summaries = obligations_service.contract_summaries(db, current, [c.id for c in contracts])
     return Page[ContractRead](
-        items=[_read(c) for c in contracts], page=params.page, page_size=params.page_size, total=total
+        items=[_read(c, summaries[c.id]) for c in contracts],
+        page=params.page,
+        page_size=params.page_size,
+        total=total,
     )
 
 
@@ -169,14 +183,14 @@ def create_contract(
 ) -> ContractRead:
     contract = service.create_contract(db, current, payload)
     response.headers["Location"] = f"/api/v1/contracts/{contract.id}"
-    return _read(contract)
+    return _read_one(db, current, contract)
 
 
 @router.get("/contracts/{contract_id}", response_model=ContractRead, summary="Contract details (FR-CON-03)")
 def get_contract(
     contract_id: uuid.UUID, db: Session = Depends(get_db), current: CurrentUser = Depends(can_view)
 ) -> ContractRead:
-    return _read(service.get_contract(db, current, contract_id))
+    return _read_one(db, current, service.get_contract(db, current, contract_id))
 
 
 @router.patch(
@@ -191,7 +205,7 @@ def update_contract(
     db: Session = Depends(get_db),
     current: CurrentUser = Depends(can_edit),
 ) -> ContractRead:
-    return _read(service.update_contract(db, current, contract_id, payload))
+    return _read_one(db, current, service.update_contract(db, current, contract_id, payload))
 
 
 @router.post(
@@ -200,7 +214,7 @@ def update_contract(
 def archive_contract(
     contract_id: uuid.UUID, db: Session = Depends(get_db), current: CurrentUser = Depends(can_archive)
 ) -> ContractRead:
-    return _read(service.set_archived(db, current, contract_id, True))
+    return _read_one(db, current, service.set_archived(db, current, contract_id, True))
 
 
 @router.post(
@@ -209,7 +223,7 @@ def archive_contract(
 def restore_contract(
     contract_id: uuid.UUID, db: Session = Depends(get_db), current: CurrentUser = Depends(can_archive)
 ) -> ContractRead:
-    return _read(service.set_archived(db, current, contract_id, False))
+    return _read_one(db, current, service.set_archived(db, current, contract_id, False))
 
 
 @router.get(
@@ -221,5 +235,10 @@ def contract_activity(
     contract_id: uuid.UUID, db: Session = Depends(get_db), current: CurrentUser = Depends(can_view)
 ) -> list[ActivityRead]:
     contract = service.get_contract(db, current, contract_id)
-    entries = audit_service.list_activity(db, TargetType.CONTRACT, contract.id)
+    obligation_ids = select(Obligation.id).where(
+        Obligation.contract_id == contract.id, obligation_in_scope(current)
+    )
+    entries = audit_service.list_activity(
+        db, TargetType.CONTRACT, contract.id, related=(TargetType.OBLIGATION, obligation_ids)
+    )
     return [ActivityRead.model_validate(e) for e in entries]

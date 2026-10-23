@@ -79,3 +79,14 @@ def require_permission(*permissions: Perm) -> Callable[..., CurrentUser]:
         return current
 
     return dependency
+
+
+def require_any_permission(*permissions: Perm) -> Callable[..., CurrentUser]:
+    """Dependency factory: the caller must hold at least one of the listed permissions, otherwise 403."""
+
+    def dependency(current: CurrentUser = Depends(get_current_user)) -> CurrentUser:
+        if not any(current.has(p) for p in permissions):
+            raise ForbiddenError("You do not have permission to perform this action.")
+        return current
+
+    return dependency

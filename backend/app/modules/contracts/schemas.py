@@ -161,6 +161,13 @@ class PersonRef(BaseModel):
     full_name: str
 
 
+class ObligationSummary(BaseModel):
+    """A contract's open and overdue obligations, counting only those the user can see."""
+
+    open: int
+    overdue: int
+
+
 class ContractRead(BaseModel):
     id: uuid.UUID
     contract_number: str
@@ -180,6 +187,7 @@ class ContractRead(BaseModel):
     updated_at: datetime
     created_by: PersonRef | None
     updated_by: PersonRef | None
+    obligations: ObligationSummary = Field(description="Open and overdue obligations you can see.")
 
 
 class ContractCounts(BaseModel):

@@ -158,6 +158,23 @@ export interface paths {
     patch?: never
     trace?: never
   }
+  '/api/v1/users/directory': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Active users to choose as responsible for an obligation (FR-OBL-03) */
+    get: operations['user_directory_api_v1_users_directory_get']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
   '/api/v1/users/{user_id}': {
     parameters: {
       query?: never
@@ -557,6 +574,111 @@ export interface paths {
     patch?: never
     trace?: never
   }
+  '/api/v1/obligations': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** List obligations (FR-OBL-07) */
+    get: operations['list_obligations_api_v1_obligations_get']
+    put?: never
+    /** Create an obligation on a contract (FR-OBL-01..03, BR-01) */
+    post: operations['create_obligation_api_v1_obligations_post']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/api/v1/obligations/counts': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Number of obligations per status chip */
+    get: operations['count_obligations_api_v1_obligations_counts_get']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/api/v1/obligations/{obligation_id}': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Get an obligation */
+    get: operations['get_obligation_api_v1_obligations__obligation_id__get']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    /** Edit an obligation's details */
+    patch: operations['update_obligation_api_v1_obligations__obligation_id__patch']
+    trace?: never
+  }
+  '/api/v1/obligations/{obligation_id}/status': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /** Change an obligation's status, with an optional note (FR-OBL-04) */
+    post: operations['change_status_api_v1_obligations__obligation_id__status_post']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/api/v1/obligations/{obligation_id}/activity': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Latest changes to an obligation */
+    get: operations['obligation_activity_api_v1_obligations__obligation_id__activity_get']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/api/v1/obligations/{obligation_id}/evidence': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Evidence attached to an obligation (SRS 7.3) */
+    get: operations['list_evidence_api_v1_obligations__obligation_id__evidence_get']
+    put?: never
+    /** Attach evidence to an obligation, e.g. a certificate (SRS 7.3) */
+    post: operations['add_evidence_api_v1_obligations__obligation_id__evidence_post']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
 }
 export type webhooks = Record<string, never>
 export interface components {
@@ -574,6 +696,9 @@ export interface components {
       actor_type: components['schemas']['ActorType']
       actor: components['schemas']['AuditActor'] | null
       action: components['schemas']['AuditAction']
+      target_type: components['schemas']['TargetType']
+      /** Target Label */
+      target_label: string | null
       /** Changes */
       changes: {
         [key: string]: unknown[]
@@ -610,6 +735,11 @@ export interface components {
       | 'contract.restored'
       | 'contract.document_uploaded'
       | 'document.downloaded'
+      | 'obligation.created'
+      | 'obligation.updated'
+      | 'obligation.status_changed'
+      | 'obligation.overdue'
+      | 'obligation.evidence_added'
     /** AuditActor */
     AuditActor: {
       /**
@@ -665,6 +795,14 @@ export interface components {
     AuthOptions: {
       /** Self Signup Enabled */
       self_signup_enabled: boolean
+    }
+    /** Body_add_evidence_api_v1_obligations__obligation_id__evidence_post */
+    Body_add_evidence_api_v1_obligations__obligation_id__evidence_post: {
+      /**
+       * File
+       * @description PDF, DOCX, PNG or JPG (decision D-12).
+       */
+      file: string
     }
     /** Body_upload_document_api_v1_contracts__contract_id__documents_post */
     Body_upload_document_api_v1_contracts__contract_id__documents_post: {
@@ -838,6 +976,20 @@ export interface components {
       updated_at: string
       created_by: components['schemas']['PersonRef'] | null
       updated_by: components['schemas']['PersonRef'] | null
+      /** @description Open and overdue obligations you can see. */
+      obligations: components['schemas']['ObligationSummary']
+    }
+    /** ContractRef */
+    ContractRef: {
+      /**
+       * Id
+       * Format: uuid
+       */
+      id: string
+      /** Contract Number */
+      contract_number: string
+      /** Title */
+      title: string
     }
     /**
      * ContractSort
@@ -914,7 +1066,7 @@ export interface components {
      * DocumentKind
      * @enum {string}
      */
-    DocumentKind: 'contract' | 'amendment' | 'annex' | 'other'
+    DocumentKind: 'contract' | 'amendment' | 'annex' | 'evidence' | 'other'
     /**
      * DocumentRead
      * @description Document metadata (FR-DOC-05). The file itself comes from GET /documents/{id}/download.
@@ -930,6 +1082,8 @@ export interface components {
        * Format: uuid
        */
       contract_id: string
+      /** Obligation Id */
+      obligation_id: string | null
       kind: components['schemas']['DocumentKind']
       /** Original Filename */
       original_filename: string
@@ -950,6 +1104,12 @@ export interface components {
        */
       uploaded_at: string
     }
+    /**
+     * EffectiveStatus
+     * @description The status shown everywhere: the stored status, or overdue when the due date has passed (SRS 4.10).
+     * @enum {string}
+     */
+    EffectiveStatus: 'pending' | 'in_progress' | 'completed' | 'overdue' | 'cancelled'
     /**
      * FileType
      * @enum {string}
@@ -1012,6 +1172,189 @@ export interface components {
       /** Data Scopes */
       data_scopes: string[]
     }
+    /**
+     * ObligationCounts
+     * @description Number of obligations per status chip, within the caller's data scope.
+     */
+    ObligationCounts: {
+      /** Open */
+      open: number
+      /** Overdue */
+      overdue: number
+      /** Due This Week */
+      due_this_week: number
+      /** In Progress */
+      in_progress: number
+      /** Pending */
+      pending: number
+      /** Completed */
+      completed: number
+      /** Cancelled */
+      cancelled: number
+    }
+    /** ObligationCreate */
+    ObligationCreate: {
+      /**
+       * Responsible User Id
+       * @description Internal user who follows it up (FR-OBL-03).
+       */
+      responsible_user_id?: string | null
+      /** Start Date */
+      start_date?: string | null
+      /**
+       * Due Date
+       * @description Leave empty for an ongoing duty without a deadline (D-07).
+       */
+      due_date?: string | null
+      /**
+       * Recurrence Rule
+       * @description RFC 5545 RRULE, e.g. FREQ=MONTHLY;INTERVAL=3 (BR-08).
+       */
+      recurrence_rule?: string | null
+      /**
+       * Penalty Text
+       * @description Penalty for missing it, as text (D-08).
+       */
+      penalty_text?: string | null
+      /** Notes */
+      notes?: string | null
+      /**
+       * Contract Id
+       * Format: uuid
+       * @description BR-01: every obligation belongs to a contract.
+       */
+      contract_id: string
+      /** Title */
+      title: string
+      /** Description */
+      description: string
+      /**
+       * Responsible Party Id
+       * Format: uuid
+       * @description One of the contract's parties.
+       */
+      responsible_party_id: string
+      /** @default medium */
+      priority: components['schemas']['Priority']
+      /**
+       * @description Pending or in progress.
+       * @default pending
+       */
+      status: components['schemas']['ObligationStatus']
+    }
+    /** ObligationRead */
+    ObligationRead: {
+      /**
+       * Id
+       * Format: uuid
+       */
+      id: string
+      contract: components['schemas']['ContractRef']
+      /** Title */
+      title: string
+      /** Description */
+      description: string
+      responsible_party: components['schemas']['PartyRef']
+      responsible_user: components['schemas']['UserRef'] | null
+      /** Start Date */
+      start_date: string | null
+      /** Due Date */
+      due_date: string | null
+      priority: components['schemas']['Priority']
+      status: components['schemas']['ObligationStatus']
+      effective_status: components['schemas']['EffectiveStatus']
+      /** Recurrence Rule */
+      recurrence_rule: string | null
+      /** Series Id */
+      series_id: string | null
+      /** Penalty Text */
+      penalty_text: string | null
+      /** Notes */
+      notes: string | null
+      /** Completed At */
+      completed_at: string | null
+      /** Cancelled At */
+      cancelled_at: string | null
+      /** Overdue At */
+      overdue_at: string | null
+      /** Evidence Count */
+      evidence_count: number
+      /**
+       * Created At
+       * Format: date-time
+       */
+      created_at: string
+      /**
+       * Updated At
+       * Format: date-time
+       */
+      updated_at: string
+    }
+    /**
+     * ObligationSort
+     * @enum {string}
+     */
+    ObligationSort: 'due_date' | '-due_date' | 'priority' | 'title' | '-updated_at'
+    /**
+     * ObligationStatus
+     * @description What people set (SRS 4.10). Overdue is not set: it follows from the due date (BR-04).
+     * @enum {string}
+     */
+    ObligationStatus: 'pending' | 'in_progress' | 'completed' | 'cancelled'
+    /**
+     * ObligationSummary
+     * @description A contract's open and overdue obligations, counting only those the user can see.
+     */
+    ObligationSummary: {
+      /** Open */
+      open: number
+      /** Overdue */
+      overdue: number
+    }
+    /**
+     * ObligationUpdate
+     * @description Partial update of the details. Status changes go through POST /obligations/{id}/status.
+     */
+    ObligationUpdate: {
+      /**
+       * Responsible User Id
+       * @description Internal user who follows it up (FR-OBL-03).
+       */
+      responsible_user_id?: string | null
+      /** Start Date */
+      start_date?: string | null
+      /**
+       * Due Date
+       * @description Leave empty for an ongoing duty without a deadline (D-07).
+       */
+      due_date?: string | null
+      /**
+       * Recurrence Rule
+       * @description RFC 5545 RRULE, e.g. FREQ=MONTHLY;INTERVAL=3 (BR-08).
+       */
+      recurrence_rule?: string | null
+      /**
+       * Penalty Text
+       * @description Penalty for missing it, as text (D-08).
+       */
+      penalty_text?: string | null
+      /** Notes */
+      notes?: string | null
+      /** Title */
+      title?: string | null
+      /** Description */
+      description?: string | null
+      /** Responsible Party Id */
+      responsible_party_id?: string | null
+      priority?: components['schemas']['Priority'] | null
+    }
+    /**
+     * ObligationView
+     * @description The list's status chips (design screen 7). Without a view: every obligation.
+     * @enum {string}
+     */
+    ObligationView:
+      'open' | 'overdue' | 'due_this_week' | 'in_progress' | 'pending' | 'completed' | 'cancelled'
     /** Page[AuditLogRead] */
     Page_AuditLogRead_: {
       /** Items */
@@ -1027,6 +1370,17 @@ export interface components {
     Page_ContractRead_: {
       /** Items */
       items: components['schemas']['ContractRead'][]
+      /** Page */
+      page: number
+      /** Page Size */
+      page_size: number
+      /** Total */
+      total: number
+    }
+    /** Page[ObligationRead] */
+    Page_ObligationRead_: {
+      /** Items */
+      items: components['schemas']['ObligationRead'][]
       /** Page */
       page: number
       /** Page Size */
@@ -1141,6 +1495,17 @@ export interface components {
        */
       updated_at: string
     }
+    /** PartyRef */
+    PartyRef: {
+      /**
+       * Id
+       * Format: uuid
+       */
+      id: string
+      /** Display Name */
+      display_name: string
+      party_type: components['schemas']['PartyType']
+    }
     /**
      * PartyRole
      * @description A party's part in a contract (FR-PARTY-03).
@@ -1210,6 +1575,11 @@ export interface components {
       /** Full Name */
       full_name: string
     }
+    /**
+     * Priority
+     * @enum {string}
+     */
+    Priority: 'low' | 'medium' | 'high' | 'critical'
     /** PropertyCreate */
     PropertyCreate: {
       /** Address */
@@ -1363,6 +1733,15 @@ export interface components {
        */
       preferred_language: 'en' | 'ar'
     }
+    /** StatusChange */
+    StatusChange: {
+      status: components['schemas']['ObligationStatus']
+      /**
+       * Note
+       * @description Kept in the audit trail with the change.
+       */
+      note?: string | null
+    }
     /**
      * StatusCode
      * @description Seeded statuses (decision D-17). The codes are fixed; names live in contract_statuses.
@@ -1373,7 +1752,7 @@ export interface components {
      * TargetType
      * @enum {string}
      */
-    TargetType: 'user' | 'party' | 'property' | 'contract' | 'document'
+    TargetType: 'user' | 'party' | 'property' | 'contract' | 'document' | 'obligation'
     /** TokenResponse */
     TokenResponse: {
       /** Access Token */
@@ -1450,6 +1829,31 @@ export interface components {
        * Format: date-time
        */
       updated_at: string
+    }
+    /** UserRef */
+    UserRef: {
+      /**
+       * Id
+       * Format: uuid
+       */
+      id: string
+      /** Full Name */
+      full_name: string
+    }
+    /**
+     * UserSummary
+     * @description Who someone is, for pickers: no roles, status or login history.
+     */
+    UserSummary: {
+      /**
+       * Id
+       * Format: uuid
+       */
+      id: string
+      /** Full Name */
+      full_name: string
+      /** Email */
+      email: string
     }
     /**
      * UserUpdate
@@ -1758,6 +2162,38 @@ export interface operations {
         }
         content: {
           'application/json': components['schemas']['UserRead']
+        }
+      }
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['HTTPValidationError']
+        }
+      }
+    }
+  }
+  user_directory_api_v1_users_directory_get: {
+    parameters: {
+      query?: {
+        /** @description Name or e-mail. */
+        q?: string | null
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['UserSummary'][]
         }
       }
       /** @description Validation Error */
@@ -2780,6 +3216,321 @@ export interface operations {
         content: {
           'application/octet-stream': unknown
         }
+      }
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['HTTPValidationError']
+        }
+      }
+    }
+  }
+  list_obligations_api_v1_obligations_get: {
+    parameters: {
+      query?: {
+        /** @description Status chip. Without it: every obligation. */
+        view?: components['schemas']['ObligationView'] | null
+        /** @description Title, contract number/title or responsible party. */
+        q?: string | null
+        contract_id?: string | null
+        /** @description Obligations of this property's contracts (FR-PROP-02). */
+        property_id?: string | null
+        /** @description Responsible party. */
+        party_id?: string | null
+        responsible_user_id?: string | null
+        /** @description Only obligations assigned to me. */
+        mine?: boolean
+        priority?: components['schemas']['Priority'] | null
+        due_from?: string | null
+        due_to?: string | null
+        sort?: components['schemas']['ObligationSort']
+        /** @description 1-based page number. */
+        page?: number
+        /** @description Items per page (max 100). */
+        page_size?: number
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['Page_ObligationRead_']
+        }
+      }
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['HTTPValidationError']
+        }
+      }
+    }
+  }
+  create_obligation_api_v1_obligations_post: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['ObligationCreate']
+      }
+    }
+    responses: {
+      /** @description Successful Response */
+      201: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ObligationRead']
+        }
+      }
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['HTTPValidationError']
+        }
+      }
+    }
+  }
+  count_obligations_api_v1_obligations_counts_get: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ObligationCounts']
+        }
+      }
+    }
+  }
+  get_obligation_api_v1_obligations__obligation_id__get: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        obligation_id: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ObligationRead']
+        }
+      }
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['HTTPValidationError']
+        }
+      }
+    }
+  }
+  update_obligation_api_v1_obligations__obligation_id__patch: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        obligation_id: string
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['ObligationUpdate']
+      }
+    }
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ObligationRead']
+        }
+      }
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['HTTPValidationError']
+        }
+      }
+    }
+  }
+  change_status_api_v1_obligations__obligation_id__status_post: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        obligation_id: string
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['StatusChange']
+      }
+    }
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ObligationRead']
+        }
+      }
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['HTTPValidationError']
+        }
+      }
+    }
+  }
+  obligation_activity_api_v1_obligations__obligation_id__activity_get: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        obligation_id: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ActivityRead'][]
+        }
+      }
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['HTTPValidationError']
+        }
+      }
+    }
+  }
+  list_evidence_api_v1_obligations__obligation_id__evidence_get: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        obligation_id: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['DocumentRead'][]
+        }
+      }
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['HTTPValidationError']
+        }
+      }
+    }
+  }
+  add_evidence_api_v1_obligations__obligation_id__evidence_post: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        obligation_id: string
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'multipart/form-data': components['schemas']['Body_add_evidence_api_v1_obligations__obligation_id__evidence_post']
+      }
+    }
+    responses: {
+      /** @description Successful Response */
+      201: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['DocumentRead']
+        }
+      }
+      /** @description The file is larger than the limit */
+      413: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description The file type is not supported */
+      415: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
       }
       /** @description Validation Error */
       422: {

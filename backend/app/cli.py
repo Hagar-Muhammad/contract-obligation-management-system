@@ -2,6 +2,7 @@
 
     python -m app.cli create-admin --email admin@example.com --name "System Admin"
     python -m app.cli export-openapi ../frontend/src/api/openapi.json
+    python -m app.cli run-daily-jobs
 
 `create-admin` reads the password from COMS_ADMIN_PASSWORD, or prompts for it.
 """
@@ -58,6 +59,17 @@ def export_openapi(target: str | None) -> int:
     return 0
 
 
+def run_daily_jobs() -> int:
+    """Overdue detection (FR-OBL-05) and next occurrences of recurring obligations (FR-OBL-06)."""
+    from app.modules.obligations import service as obligations
+
+    with SessionLocal() as db:
+        overdue = obligations.mark_overdue(db)
+        created = obligations.roll_recurrences(db)
+    print(f"Marked {len(overdue)} obligation(s) overdue; created {created} recurring occurrence(s).")
+    return 0
+
+
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(prog="python -m app.cli")
     commands = parser.add_subparsers(dest="command", required=True)
@@ -71,9 +83,13 @@ def main(argv: list[str] | None = None) -> int:
     )
     openapi.add_argument("target", nargs="?", help="Output file; stdout when omitted.")
 
+    commands.add_parser("run-daily-jobs", help="Mark overdue obligations and create recurring occurrences.")
+
     args = parser.parse_args(argv)
     if args.command == "create-admin":
         return create_admin(args.email, args.name)
+    if args.command == "run-daily-jobs":
+        return run_daily_jobs()
     return export_openapi(args.target)
 
 

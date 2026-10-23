@@ -372,6 +372,67 @@
         }
       }
     },
+    "/api/v1/users/directory": {
+      "get": {
+        "tags": [
+          "users"
+        ],
+        "summary": "Active users to choose as responsible for an obligation (FR-OBL-03)",
+        "operationId": "user_directory_api_v1_users_directory_get",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "q",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "maxLength": 200
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Name or e-mail.",
+              "title": "Q"
+            },
+            "description": "Name or e-mail."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/UserSummary"
+                  },
+                  "title": "Response User Directory Api V1 Users Directory Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/v1/users/{user_id}": {
       "get": {
         "tags": [
@@ -2225,6 +2286,649 @@
           }
         }
       }
+    },
+    "/api/v1/obligations": {
+      "get": {
+        "tags": [
+          "obligations"
+        ],
+        "summary": "List obligations (FR-OBL-07)",
+        "operationId": "list_obligations_api_v1_obligations_get",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "view",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "$ref": "#/components/schemas/ObligationView"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Status chip. Without it: every obligation.",
+              "title": "View"
+            },
+            "description": "Status chip. Without it: every obligation."
+          },
+          {
+            "name": "q",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "maxLength": 200
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Title, contract number/title or responsible party.",
+              "title": "Q"
+            },
+            "description": "Title, contract number/title or responsible party."
+          },
+          {
+            "name": "contract_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Contract Id"
+            }
+          },
+          {
+            "name": "property_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Obligations of this property's contracts (FR-PROP-02).",
+              "title": "Property Id"
+            },
+            "description": "Obligations of this property's contracts (FR-PROP-02)."
+          },
+          {
+            "name": "party_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Responsible party.",
+              "title": "Party Id"
+            },
+            "description": "Responsible party."
+          },
+          {
+            "name": "responsible_user_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Responsible User Id"
+            }
+          },
+          {
+            "name": "mine",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "boolean",
+              "description": "Only obligations assigned to me.",
+              "default": false,
+              "title": "Mine"
+            },
+            "description": "Only obligations assigned to me."
+          },
+          {
+            "name": "priority",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "$ref": "#/components/schemas/Priority"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Priority"
+            }
+          },
+          {
+            "name": "due_from",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "date"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Due From"
+            }
+          },
+          {
+            "name": "due_to",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "date"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Due To"
+            }
+          },
+          {
+            "name": "sort",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "$ref": "#/components/schemas/ObligationSort",
+              "default": "due_date"
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "description": "1-based page number.",
+              "default": 1,
+              "title": "Page"
+            },
+            "description": "1-based page number."
+          },
+          {
+            "name": "page_size",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 100,
+              "minimum": 1,
+              "description": "Items per page (max 100).",
+              "default": 25,
+              "title": "Page Size"
+            },
+            "description": "Items per page (max 100)."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Page_ObligationRead_"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "obligations"
+        ],
+        "summary": "Create an obligation on a contract (FR-OBL-01..03, BR-01)",
+        "operationId": "create_obligation_api_v1_obligations_post",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ObligationCreate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ObligationRead"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/obligations/counts": {
+      "get": {
+        "tags": [
+          "obligations"
+        ],
+        "summary": "Number of obligations per status chip",
+        "operationId": "count_obligations_api_v1_obligations_counts_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ObligationCounts"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/obligations/{obligation_id}": {
+      "get": {
+        "tags": [
+          "obligations"
+        ],
+        "summary": "Get an obligation",
+        "operationId": "get_obligation_api_v1_obligations__obligation_id__get",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "obligation_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Obligation Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ObligationRead"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "obligations"
+        ],
+        "summary": "Edit an obligation's details",
+        "operationId": "update_obligation_api_v1_obligations__obligation_id__patch",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "obligation_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Obligation Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ObligationUpdate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ObligationRead"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/obligations/{obligation_id}/status": {
+      "post": {
+        "tags": [
+          "obligations"
+        ],
+        "summary": "Change an obligation's status, with an optional note (FR-OBL-04)",
+        "operationId": "change_status_api_v1_obligations__obligation_id__status_post",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "obligation_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Obligation Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/StatusChange"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ObligationRead"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/obligations/{obligation_id}/activity": {
+      "get": {
+        "tags": [
+          "obligations"
+        ],
+        "summary": "Latest changes to an obligation",
+        "operationId": "obligation_activity_api_v1_obligations__obligation_id__activity_get",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "obligation_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Obligation Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ActivityRead"
+                  },
+                  "title": "Response Obligation Activity Api V1 Obligations  Obligation Id  Activity Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/obligations/{obligation_id}/evidence": {
+      "get": {
+        "tags": [
+          "obligations"
+        ],
+        "summary": "Evidence attached to an obligation (SRS 7.3)",
+        "operationId": "list_evidence_api_v1_obligations__obligation_id__evidence_get",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "obligation_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Obligation Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/DocumentRead"
+                  },
+                  "title": "Response List Evidence Api V1 Obligations  Obligation Id  Evidence Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "obligations"
+        ],
+        "summary": "Attach evidence to an obligation, e.g. a certificate (SRS 7.3)",
+        "operationId": "add_evidence_api_v1_obligations__obligation_id__evidence_post",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "obligation_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Obligation Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "$ref": "#/components/schemas/Body_add_evidence_api_v1_obligations__obligation_id__evidence_post"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DocumentRead"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "The file is larger than the limit"
+          },
+          "415": {
+            "description": "The file type is not supported"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
@@ -2252,6 +2956,20 @@
           "action": {
             "$ref": "#/components/schemas/AuditAction"
           },
+          "target_type": {
+            "$ref": "#/components/schemas/TargetType"
+          },
+          "target_label": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Target Label"
+          },
           "changes": {
             "anyOf": [
               {
@@ -2274,6 +2992,8 @@
           "actor_type",
           "actor",
           "action",
+          "target_type",
+          "target_label",
           "changes"
         ],
         "title": "ActivityRead",
@@ -2311,7 +3031,12 @@
           "contract.archived",
           "contract.restored",
           "contract.document_uploaded",
-          "document.downloaded"
+          "document.downloaded",
+          "obligation.created",
+          "obligation.updated",
+          "obligation.status_changed",
+          "obligation.overdue",
+          "obligation.evidence_added"
         ],
         "title": "AuditAction"
       },
@@ -2463,6 +3188,21 @@
           "self_signup_enabled"
         ],
         "title": "AuthOptions"
+      },
+      "Body_add_evidence_api_v1_obligations__obligation_id__evidence_post": {
+        "properties": {
+          "file": {
+            "type": "string",
+            "contentMediaType": "application/octet-stream",
+            "title": "File",
+            "description": "PDF, DOCX, PNG or JPG (decision D-12)."
+          }
+        },
+        "type": "object",
+        "required": [
+          "file"
+        ],
+        "title": "Body_add_evidence_api_v1_obligations__obligation_id__evidence_post"
       },
       "Body_upload_document_api_v1_contracts__contract_id__documents_post": {
         "properties": {
@@ -2880,6 +3620,10 @@
                 "type": "null"
               }
             ]
+          },
+          "obligations": {
+            "$ref": "#/components/schemas/ObligationSummary",
+            "description": "Open and overdue obligations you can see."
           }
         },
         "type": "object",
@@ -2901,9 +3645,34 @@
           "created_at",
           "updated_at",
           "created_by",
-          "updated_by"
+          "updated_by",
+          "obligations"
         ],
         "title": "ContractRead"
+      },
+      "ContractRef": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "contract_number": {
+            "type": "string",
+            "title": "Contract Number"
+          },
+          "title": {
+            "type": "string",
+            "title": "Title"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "contract_number",
+          "title"
+        ],
+        "title": "ContractRef"
       },
       "ContractSort": {
         "type": "string",
@@ -3143,6 +3912,7 @@
           "contract",
           "amendment",
           "annex",
+          "evidence",
           "other"
         ],
         "title": "DocumentKind"
@@ -3158,6 +3928,18 @@
             "type": "string",
             "format": "uuid",
             "title": "Contract Id"
+          },
+          "obligation_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Obligation Id"
           },
           "kind": {
             "$ref": "#/components/schemas/DocumentKind"
@@ -3195,6 +3977,7 @@
         "required": [
           "id",
           "contract_id",
+          "obligation_id",
           "kind",
           "original_filename",
           "file_type",
@@ -3206,6 +3989,18 @@
         ],
         "title": "DocumentRead",
         "description": "Document metadata (FR-DOC-05). The file itself comes from GET /documents/{id}/download."
+      },
+      "EffectiveStatus": {
+        "type": "string",
+        "enum": [
+          "pending",
+          "in_progress",
+          "completed",
+          "overdue",
+          "cancelled"
+        ],
+        "title": "EffectiveStatus",
+        "description": "The status shown everywhere: the stored status, or overdue when the due date has passed (SRS 4.10)."
       },
       "FileType": {
         "type": "string",
@@ -3354,6 +4149,545 @@
         ],
         "title": "MeResponse"
       },
+      "ObligationCounts": {
+        "properties": {
+          "open": {
+            "type": "integer",
+            "title": "Open"
+          },
+          "overdue": {
+            "type": "integer",
+            "title": "Overdue"
+          },
+          "due_this_week": {
+            "type": "integer",
+            "title": "Due This Week"
+          },
+          "in_progress": {
+            "type": "integer",
+            "title": "In Progress"
+          },
+          "pending": {
+            "type": "integer",
+            "title": "Pending"
+          },
+          "completed": {
+            "type": "integer",
+            "title": "Completed"
+          },
+          "cancelled": {
+            "type": "integer",
+            "title": "Cancelled"
+          }
+        },
+        "type": "object",
+        "required": [
+          "open",
+          "overdue",
+          "due_this_week",
+          "in_progress",
+          "pending",
+          "completed",
+          "cancelled"
+        ],
+        "title": "ObligationCounts",
+        "description": "Number of obligations per status chip, within the caller's data scope."
+      },
+      "ObligationCreate": {
+        "properties": {
+          "responsible_user_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Responsible User Id",
+            "description": "Internal user who follows it up (FR-OBL-03)."
+          },
+          "start_date": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Start Date"
+          },
+          "due_date": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Due Date",
+            "description": "Leave empty for an ongoing duty without a deadline (D-07)."
+          },
+          "recurrence_rule": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 500
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Recurrence Rule",
+            "description": "RFC 5545 RRULE, e.g. FREQ=MONTHLY;INTERVAL=3 (BR-08)."
+          },
+          "penalty_text": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 5000
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Penalty Text",
+            "description": "Penalty for missing it, as text (D-08)."
+          },
+          "notes": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 5000
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Notes"
+          },
+          "contract_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Contract Id",
+            "description": "BR-01: every obligation belongs to a contract."
+          },
+          "title": {
+            "type": "string",
+            "maxLength": 300,
+            "minLength": 1,
+            "title": "Title"
+          },
+          "description": {
+            "type": "string",
+            "maxLength": 5000,
+            "minLength": 1,
+            "title": "Description"
+          },
+          "responsible_party_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Responsible Party Id",
+            "description": "One of the contract's parties."
+          },
+          "priority": {
+            "$ref": "#/components/schemas/Priority",
+            "default": "medium"
+          },
+          "status": {
+            "$ref": "#/components/schemas/ObligationStatus",
+            "description": "Pending or in progress.",
+            "default": "pending"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "contract_id",
+          "title",
+          "description",
+          "responsible_party_id"
+        ],
+        "title": "ObligationCreate"
+      },
+      "ObligationRead": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "contract": {
+            "$ref": "#/components/schemas/ContractRef"
+          },
+          "title": {
+            "type": "string",
+            "title": "Title"
+          },
+          "description": {
+            "type": "string",
+            "title": "Description"
+          },
+          "responsible_party": {
+            "$ref": "#/components/schemas/PartyRef"
+          },
+          "responsible_user": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/UserRef"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "start_date": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Start Date"
+          },
+          "due_date": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Due Date"
+          },
+          "priority": {
+            "$ref": "#/components/schemas/Priority"
+          },
+          "status": {
+            "$ref": "#/components/schemas/ObligationStatus"
+          },
+          "effective_status": {
+            "$ref": "#/components/schemas/EffectiveStatus"
+          },
+          "recurrence_rule": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Recurrence Rule"
+          },
+          "series_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Series Id"
+          },
+          "penalty_text": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Penalty Text"
+          },
+          "notes": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Notes"
+          },
+          "completed_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Completed At"
+          },
+          "cancelled_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Cancelled At"
+          },
+          "overdue_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Overdue At"
+          },
+          "evidence_count": {
+            "type": "integer",
+            "title": "Evidence Count"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Updated At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "contract",
+          "title",
+          "description",
+          "responsible_party",
+          "responsible_user",
+          "start_date",
+          "due_date",
+          "priority",
+          "status",
+          "effective_status",
+          "recurrence_rule",
+          "series_id",
+          "penalty_text",
+          "notes",
+          "completed_at",
+          "cancelled_at",
+          "overdue_at",
+          "evidence_count",
+          "created_at",
+          "updated_at"
+        ],
+        "title": "ObligationRead"
+      },
+      "ObligationSort": {
+        "type": "string",
+        "enum": [
+          "due_date",
+          "-due_date",
+          "priority",
+          "title",
+          "-updated_at"
+        ],
+        "title": "ObligationSort"
+      },
+      "ObligationStatus": {
+        "type": "string",
+        "enum": [
+          "pending",
+          "in_progress",
+          "completed",
+          "cancelled"
+        ],
+        "title": "ObligationStatus",
+        "description": "What people set (SRS 4.10). Overdue is not set: it follows from the due date (BR-04)."
+      },
+      "ObligationSummary": {
+        "properties": {
+          "open": {
+            "type": "integer",
+            "title": "Open"
+          },
+          "overdue": {
+            "type": "integer",
+            "title": "Overdue"
+          }
+        },
+        "type": "object",
+        "required": [
+          "open",
+          "overdue"
+        ],
+        "title": "ObligationSummary",
+        "description": "A contract's open and overdue obligations, counting only those the user can see."
+      },
+      "ObligationUpdate": {
+        "properties": {
+          "responsible_user_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Responsible User Id",
+            "description": "Internal user who follows it up (FR-OBL-03)."
+          },
+          "start_date": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Start Date"
+          },
+          "due_date": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Due Date",
+            "description": "Leave empty for an ongoing duty without a deadline (D-07)."
+          },
+          "recurrence_rule": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 500
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Recurrence Rule",
+            "description": "RFC 5545 RRULE, e.g. FREQ=MONTHLY;INTERVAL=3 (BR-08)."
+          },
+          "penalty_text": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 5000
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Penalty Text",
+            "description": "Penalty for missing it, as text (D-08)."
+          },
+          "notes": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 5000
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Notes"
+          },
+          "title": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 300,
+                "minLength": 1
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Title"
+          },
+          "description": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 5000,
+                "minLength": 1
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Description"
+          },
+          "responsible_party_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Responsible Party Id"
+          },
+          "priority": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Priority"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "title": "ObligationUpdate",
+        "description": "Partial update of the details. Status changes go through POST /obligations/{id}/status."
+      },
+      "ObligationView": {
+        "type": "string",
+        "enum": [
+          "open",
+          "overdue",
+          "due_this_week",
+          "in_progress",
+          "pending",
+          "completed",
+          "cancelled"
+        ],
+        "title": "ObligationView",
+        "description": "The list's status chips (design screen 7). Without a view: every obligation."
+      },
       "Page_AuditLogRead_": {
         "properties": {
           "items": {
@@ -3415,6 +4749,37 @@
           "total"
         ],
         "title": "Page[ContractRead]"
+      },
+      "Page_ObligationRead_": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/ObligationRead"
+            },
+            "type": "array",
+            "title": "Items"
+          },
+          "page": {
+            "type": "integer",
+            "title": "Page"
+          },
+          "page_size": {
+            "type": "integer",
+            "title": "Page Size"
+          },
+          "total": {
+            "type": "integer",
+            "title": "Total"
+          }
+        },
+        "type": "object",
+        "required": [
+          "items",
+          "page",
+          "page_size",
+          "total"
+        ],
+        "title": "Page[ObligationRead]"
       },
       "Page_PartyRead_": {
         "properties": {
@@ -3762,6 +5127,29 @@
         ],
         "title": "PartyRead"
       },
+      "PartyRef": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "display_name": {
+            "type": "string",
+            "title": "Display Name"
+          },
+          "party_type": {
+            "$ref": "#/components/schemas/PartyType"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "display_name",
+          "party_type"
+        ],
+        "title": "PartyRef"
+      },
       "PartyRole": {
         "type": "string",
         "enum": [
@@ -3929,6 +5317,16 @@
           "full_name"
         ],
         "title": "PersonRef"
+      },
+      "Priority": {
+        "type": "string",
+        "enum": [
+          "low",
+          "medium",
+          "high",
+          "critical"
+        ],
+        "title": "Priority"
       },
       "PropertyCreate": {
         "properties": {
@@ -4395,6 +5793,32 @@
         "title": "SignUpRequest",
         "description": "Self sign-up. The role is not chosen by the user; the server assigns the configured default."
       },
+      "StatusChange": {
+        "properties": {
+          "status": {
+            "$ref": "#/components/schemas/ObligationStatus"
+          },
+          "note": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 1000
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Note",
+            "description": "Kept in the audit trail with the change."
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "status"
+        ],
+        "title": "StatusChange"
+      },
       "StatusCode": {
         "type": "string",
         "enum": [
@@ -4414,7 +5838,8 @@
           "party",
           "property",
           "contract",
-          "document"
+          "document",
+          "obligation"
         ],
         "title": "TargetType"
       },
@@ -4582,6 +6007,50 @@
           "updated_at"
         ],
         "title": "UserRead"
+      },
+      "UserRef": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "full_name": {
+            "type": "string",
+            "title": "Full Name"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "full_name"
+        ],
+        "title": "UserRef"
+      },
+      "UserSummary": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "full_name": {
+            "type": "string",
+            "title": "Full Name"
+          },
+          "email": {
+            "type": "string",
+            "title": "Email"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "full_name",
+          "email"
+        ],
+        "title": "UserSummary",
+        "description": "Who someone is, for pickers: no roles, status or login history."
       },
       "UserUpdate": {
         "properties": {

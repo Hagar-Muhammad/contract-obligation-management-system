@@ -24,6 +24,7 @@ from app.modules.contracts.scope import visible_contract_ids
 from app.modules.documents.filetypes import MIME_TYPES, FileType, detect
 from app.modules.documents.models import ContractDocument
 from app.modules.documents.schemas import DocumentKind
+from app.modules.obligations.models import Obligation
 
 # Kept in memory up to this size, then spilled to a temporary file.
 _SPOOL_BYTES = 1024 * 1024
@@ -85,10 +86,20 @@ def upload(
     source: BinaryIO,
     filename: str | None,
     kind: DocumentKind,
+    *,
+    obligation: Obligation | None = None,
 ) -> ContractDocument:
-    """Validate and keep the original (FR-DOC-01, FR-DOC-02, FR-DOC-04) and record its metadata (FR-DOC-05)."""
+    """Validate and keep the original (FR-DOC-01, FR-DOC-02, FR-DOC-04) and record its metadata (FR-DOC-05).
+
+    With `obligation`, the file is evidence for it (SRS 7.3); the caller has checked the obligation is in scope.
+    """
     settings = get_settings()
-    contract = contracts_service.get_contract(db, current, contract_id)
+    if (kind == DocumentKind.EVIDENCE) != (obligation is not None):
+        raise BusinessRuleError(
+            "Evidence is attached from its obligation.",
+            details=[{"field": "body.kind", "message": "Choose another document type."}],
+        )
+    contract = obligation.contract if obligation else contracts_service.get_contract(db, current, contract_id)
     if contract.archived_at is not None:
         raise BusinessRuleError("Archived contracts are read-only. Restore the contract to add documents.")
 
@@ -113,6 +124,7 @@ def upload(
     document = ContractDocument(
         id=uuid.uuid4(),
         contract_id=contract.id,
+        obligation_id=obligation.id if obligation else None,
         kind=kind,
         original_filename=_clean_filename(filename),
         file_type=file_type,
@@ -123,13 +135,13 @@ def upload(
         uploaded_by_id=current.id,
     )
     db.add(document)
-    # Shown in the contract's activity: the document belongs to the contract (BR-09).
+    # Shown in the contract's activity: the document belongs to the contract (BR-09), evidence to its obligation.
     audit.record(
         db,
-        AuditAction.CONTRACT_DOCUMENT_UPLOADED,
-        target_type=TargetType.CONTRACT,
-        target_id=contract.id,
-        target_label=f"{contract.contract_number} · {contract.title}",
+        AuditAction.OBLIGATION_EVIDENCE_ADDED if obligation else AuditAction.CONTRACT_DOCUMENT_UPLOADED,
+        target_type=TargetType.OBLIGATION if obligation else TargetType.CONTRACT,
+        target_id=obligation.id if obligation else contract.id,
+        target_label=obligation.title if obligation else f"{contract.contract_number} · {contract.title}",
         actor_id=current.id,
         changes={"document": [None, document.original_filename]},
     )

@@ -12,6 +12,7 @@ class DocumentKind(StrEnum):
     CONTRACT = "contract"  # the signed contract itself ("Original" in the design)
     AMENDMENT = "amendment"
     ANNEX = "annex"
+    EVIDENCE = "evidence"  # set by the obligation evidence upload, not chosen on the contract page
     OTHER = "other"
 
 
@@ -22,6 +23,7 @@ class DocumentRead(BaseModel):
 
     id: uuid.UUID
     contract_id: uuid.UUID
+    obligation_id: uuid.UUID | None
     kind: DocumentKind
     original_filename: str
     file_type: FileType

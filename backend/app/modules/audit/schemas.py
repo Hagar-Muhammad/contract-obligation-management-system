@@ -24,6 +24,8 @@ class ActivityRead(BaseModel):
     actor_type: ActorType
     actor: AuditActor | None
     action: AuditAction
+    target_type: TargetType
+    target_label: str | None
     changes: dict[str, list[Any]] | None
 
 

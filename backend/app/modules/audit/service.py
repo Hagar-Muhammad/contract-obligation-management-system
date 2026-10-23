@@ -9,7 +9,7 @@ from collections.abc import Mapping
 from datetime import datetime
 from typing import Any
 
-from sqlalchemy import or_, select
+from sqlalchemy import Select, and_, or_, select
 from sqlalchemy.orm import Session
 
 from app.core.pagination import PageParams, paginate
@@ -52,12 +52,24 @@ def changes_between(before: Mapping[str, Any], after: Mapping[str, Any]) -> dict
 
 
 def list_activity(
-    db: Session, target_type: TargetType, target_id: uuid.UUID, *, limit: int = 20
+    db: Session,
+    target_type: TargetType,
+    target_id: uuid.UUID,
+    *,
+    related: tuple[TargetType, Select[Any]] | None = None,
+    limit: int = 20,
 ) -> list[AuditLog]:
-    """The latest records about one target, newest first. The caller checks the user may see that target."""
+    """The latest records about one target, newest first, plus records about `related` targets (e.g. a contract's
+    obligations). The caller checks the user may see them."""
+    condition = and_(AuditLog.target_type == target_type, AuditLog.target_id == target_id)
+    if related is not None:
+        related_type, related_ids = related
+        condition = or_(
+            condition, and_(AuditLog.target_type == related_type, AuditLog.target_id.in_(related_ids))
+        )
     stmt = (
         select(AuditLog)
-        .where(AuditLog.target_type == target_type, AuditLog.target_id == target_id)
+        .where(condition)
         .order_by(AuditLog.occurred_at.desc(), AuditLog.id.desc())
         .limit(limit)
     )

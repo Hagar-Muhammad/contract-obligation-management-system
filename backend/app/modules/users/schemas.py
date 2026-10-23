@@ -68,6 +68,16 @@ class UserRead(BaseModel):
     updated_at: datetime
 
 
+class UserSummary(BaseModel):
+    """Who someone is, for pickers: no roles, status or login history."""
+
+    model_config = ConfigDict(from_attributes=True)
+
+    id: uuid.UUID
+    full_name: str
+    email: str
+
+
 class RoleRead(BaseModel):
     code: str
     name: str
