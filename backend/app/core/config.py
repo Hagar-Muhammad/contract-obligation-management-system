@@ -37,6 +37,11 @@ class Settings(BaseSettings):
         "admin", "contract_manager", "legal", "property_manager", "employee", "management"
     ] = "employee"
 
+    # Contracts (module 4, docs/decisions.md T-26)
+    default_currency: str = Field(default="EGP", pattern=r"^[A-Z]{3}$")
+    contract_number_prefix: str = Field(default="CT", pattern=r"^[A-Z0-9]{1,10}$")
+    expiring_soon_days: int = Field(default=60, ge=1, le=365)
+
     @property
     def is_production(self) -> bool:
         return self.app_env == "production"
