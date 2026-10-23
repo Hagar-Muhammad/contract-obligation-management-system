@@ -18,7 +18,8 @@ class ContractDocument(Base):
 
     __tablename__ = "contract_documents"
     __table_args__ = (
-        CheckConstraint("kind IN ('contract', 'amendment', 'annex', 'other')", name="kind"),
+        CheckConstraint("kind IN ('contract', 'amendment', 'annex', 'evidence', 'other')", name="kind"),
+        CheckConstraint("(kind = 'evidence') = (obligation_id IS NOT NULL)", name="evidence_has_obligation"),
         CheckConstraint("size_bytes > 0", name="size_positive"),
     )
 
@@ -26,6 +27,10 @@ class ContractDocument(Base):
     # BR-09: every document belongs to a contract.
     contract_id: Mapped[uuid.UUID] = mapped_column(
         ForeignKey("contracts.id", ondelete="RESTRICT"), index=True
+    )
+    # Evidence for an obligation (7.3 Evidence/Attachment); the obligation belongs to the same contract.
+    obligation_id: Mapped[uuid.UUID | None] = mapped_column(
+        ForeignKey("obligations.id", ondelete="RESTRICT"), index=True
     )
     kind: Mapped[str] = mapped_column(String(20))
     original_filename: Mapped[str] = mapped_column(String(255))
