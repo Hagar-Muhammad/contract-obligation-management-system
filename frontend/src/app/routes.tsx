@@ -13,6 +13,8 @@ import { ContractFormPage } from '../features/contracts/ContractFormPage'
 import { ContractsPage } from '../features/contracts/ContractsPage'
 import { PartiesPage } from '../features/parties/PartiesPage'
 import { PartyFormPage } from '../features/parties/PartyFormPage'
+import { ObligationFormPage } from '../features/obligations/ObligationFormPage'
+import { ObligationsPage } from '../features/obligations/ObligationsPage'
 import { ComingSoonPage } from '../features/placeholder/ComingSoonPage'
 import { NotFoundPage } from '../features/placeholder/NotFoundPage'
 import { PropertiesPage } from '../features/properties/PropertiesPage'
@@ -46,6 +48,16 @@ export function AppRoutes() {
         <Route path="contracts/new" element={guarded(PERMISSIONS.contractCreate, <ContractFormPage />)} />
         <Route path="contracts/:id" element={guarded(PERMISSIONS.contractView, <ContractDetailsPage />)} />
         <Route path="contracts/:id/edit" element={guarded(PERMISSIONS.contractEdit, <ContractFormPage />)} />
+        <Route path="obligations" element={guarded(PERMISSIONS.obligationView, <ObligationsPage />)} />
+        <Route
+          path="obligations/new"
+          element={guarded(PERMISSIONS.obligationCreate, <ObligationFormPage />)}
+        />
+        <Route path="obligations/:id" element={guarded(PERMISSIONS.obligationView, <ObligationsPage />)} />
+        <Route
+          path="obligations/:id/edit"
+          element={guarded(PERMISSIONS.obligationUpdate, <ObligationFormPage />)}
+        />
         <Route path="parties" element={guarded(PERMISSIONS.contractView, <PartiesPage />)} />
         <Route path="parties/new" element={guarded(PERMISSIONS.partyManage, <PartyFormPage />)} />
         <Route path="parties/:id" element={guarded(PERMISSIONS.contractView, <PartyFormPage />)} />

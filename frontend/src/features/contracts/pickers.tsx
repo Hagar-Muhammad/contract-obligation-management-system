@@ -3,6 +3,7 @@ import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useParties, type Party } from '../parties/api'
 import { useProperties, type Property } from '../properties/api'
+import { useContracts } from './api'
 
 const PICKER_SIZE = 20
 
@@ -97,6 +98,55 @@ export function PropertySelect({
       notFoundContent={t('contracts.noPropertiesFound')}
       className={className}
       aria-label={ariaLabel}
+    />
+  )
+}
+
+interface ContractSelectProps {
+  value?: string
+  onChange?: (id: string | undefined) => void
+  placeholder?: string
+  className?: string
+  ariaLabel?: string
+  disabled?: boolean
+  /** A contract to show by name even when the search does not return it (e.g. the preselected one). */
+  known?: { id: string; contract_number: string; title: string }
+}
+
+/** Search the contracts visible to the user by number, title, party or property (archived ones left out). */
+export function ContractSelect({
+  value,
+  onChange,
+  placeholder,
+  className,
+  ariaLabel,
+  disabled,
+  known,
+}: ContractSelectProps) {
+  const { t } = useTranslation()
+  const [search, setSearch] = useState('')
+  const contracts = useContracts({ page: 1, pageSize: PICKER_SIZE, q: search })
+  const options = new Map(
+    [...(known ? [known] : []), ...(contracts.data?.items ?? [])].map((c) => [
+      c.id,
+      { value: c.id, label: `${c.contract_number} · ${c.title}` },
+    ]),
+  )
+  return (
+    <Select<string>
+      showSearch
+      allowClear
+      filterOption={false}
+      onSearch={setSearch}
+      value={value}
+      onChange={(id) => onChange?.(id ?? undefined)}
+      options={[...options.values()]}
+      loading={contracts.isFetching}
+      placeholder={placeholder}
+      notFoundContent={t('obligations.noContractsFound')}
+      className={className}
+      aria-label={ariaLabel}
+      disabled={disabled}
     />
   )
 }

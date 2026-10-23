@@ -45,7 +45,6 @@ export const NAV_SECTIONS: NavSection[] = [
         labelKey: 'nav.obligations',
         icon: <CheckSquareOutlined />,
         permission: PERMISSIONS.obligationView,
-        module: 6,
       },
       {
         path: '/review-queue',

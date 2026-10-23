@@ -98,9 +98,14 @@ export function PropertyFormPage() {
         subtitle={existing.data?.code}
         actions={
           existing.data && (
-            <Link to={`/contracts?property=${existing.data.id}`}>
-              <Button>{t('properties.contracts')}</Button>
-            </Link>
+            <span className="page-actions">
+              <Link to={`/contracts?property=${existing.data.id}`}>
+                <Button>{t('properties.contracts')}</Button>
+              </Link>
+              <Link to={`/obligations?property=${existing.data.id}`}>
+                <Button>{t('properties.obligations')}</Button>
+              </Link>
+            </span>
           )
         }
         breadcrumb={[{ label: t('properties.title'), to: '/properties' }, { label: title }]}

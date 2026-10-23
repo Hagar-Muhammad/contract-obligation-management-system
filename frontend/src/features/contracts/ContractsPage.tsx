@@ -197,6 +197,21 @@ export function ContractsPage() {
         )
       },
     },
+    {
+      title: t('contracts.colObligations'),
+      key: 'obligations',
+      render: (_, contract) => (
+        <span className="nowrap">
+          {t('obligations.openCount', { count: contract.obligations.open })}
+          {contract.obligations.overdue > 0 && (
+            <span className="text-danger">
+              {' · '}
+              {t('obligations.overdueCount', { count: contract.obligations.overdue })}
+            </span>
+          )}
+        </span>
+      ),
+    },
     { key: 'actions', width: 56, render: (_, contract) => <RowActions contract={contract} /> },
   ]
 
@@ -283,7 +298,7 @@ export function ContractsPage() {
           columns={columns}
           dataSource={contracts.data?.items}
           loading={contracts.isFetching}
-          scroll={{ x: 1040 }}
+          scroll={{ x: 1160 }}
           locale={{ emptyText: t(`contracts.empty.${view}`) }}
           pagination={{
             current: page,

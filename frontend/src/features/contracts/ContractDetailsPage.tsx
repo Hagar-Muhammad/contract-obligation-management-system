@@ -1,4 +1,4 @@
-import { EditOutlined, InboxOutlined, UndoOutlined } from '@ant-design/icons'
+import { EditOutlined, InboxOutlined, PlusOutlined, UndoOutlined } from '@ant-design/icons'
 import { Alert, App, Button, Spin } from 'antd'
 import { useTranslation } from 'react-i18next'
 import { Link, useNavigate, useParams } from 'react-router-dom'
@@ -15,6 +15,7 @@ import {
   type Contract,
 } from './api'
 import { DocumentsPanel } from '../documents/DocumentsPanel'
+import { ContractObligations } from '../obligations/ContractObligations'
 import { useContractFormat } from './useContractFormat'
 
 const ACTIVITY_TONE: Record<string, string> = {
@@ -24,6 +25,11 @@ const ACTIVITY_TONE: Record<string, string> = {
   'contract.archived': 'grey',
   'contract.restored': 'green',
   'contract.document_uploaded': 'green',
+  'obligation.created': 'green',
+  'obligation.updated': 'blue',
+  'obligation.status_changed': 'blue',
+  'obligation.overdue': 'red',
+  'obligation.evidence_added': 'green',
 }
 
 function ActivityList({ contract }: { contract: Contract }) {
@@ -53,6 +59,21 @@ function ActivityList({ contract }: { contract: Contract }) {
         })
       case 'contract.document_uploaded':
         return t('contracts.activity.documentUploaded', { name: changes.document?.[1] })
+      case 'obligation.status_changed': {
+        const [from, to] = changes.status ?? []
+        return from
+          ? t('contracts.activity.obligationMoved', {
+              title: entry.target_label,
+              from: t(`obligations.statuses.${String(from)}`),
+              to: t(`obligations.statuses.${String(to)}`),
+            })
+          : t('contracts.activity.obligationNote', { title: entry.target_label })
+      }
+      case 'obligation.created':
+      case 'obligation.updated':
+      case 'obligation.overdue':
+      case 'obligation.evidence_added':
+        return t(`contracts.activity.obligation_${entry.action.split('.')[1]}`, { title: entry.target_label })
       default:
         return t(`contracts.activity.${entry.action.split('.')[1]}`)
     }
@@ -172,11 +193,20 @@ export function ContractDetailsPage() {
             )}
             {can(PERMISSIONS.contractEdit) && !archived && (
               <Button
-                type="primary"
+                type={can(PERMISSIONS.obligationCreate) ? 'default' : 'primary'}
                 icon={<EditOutlined />}
                 onClick={() => navigate(`/contracts/${c.id}/edit`)}
               >
                 {t('contracts.edit')}
+              </Button>
+            )}
+            {can(PERMISSIONS.obligationCreate) && !archived && (
+              <Button
+                type="primary"
+                icon={<PlusOutlined />}
+                onClick={() => navigate(`/obligations/new?contract=${c.id}`)}
+              >
+                {t('obligations.add')}
               </Button>
             )}
           </div>
@@ -200,6 +230,18 @@ export function ContractDetailsPage() {
             <dt>{t('contracts.renewalDate')}</dt>
             <dd>{format.date(c.renewal_date)}</dd>
           </div>
+          <div>
+            <dt>{t('obligations.title')}</dt>
+            <dd>
+              {t('obligations.openCount', { count: c.obligations.open })}
+              {c.obligations.overdue > 0 && (
+                <span className="text-danger">
+                  {' '}
+                  · {t('obligations.overdueCount', { count: c.obligations.overdue })}
+                </span>
+              )}
+            </dd>
+          </div>
         </dl>
         {progress && (
           <div className="term-progress">
@@ -221,16 +263,19 @@ export function ContractDetailsPage() {
       </section>
 
       <div className="details-layout">
-        <section className="panel">
-          <h2 className="panel-title panel-gap">{t('contracts.summary')}</h2>
-          {c.description ? (
-            <p className="preserve-lines" dir="auto">
-              {c.description}
-            </p>
-          ) : (
-            <p className="muted">{t('contracts.noDescription')}</p>
-          )}
-        </section>
+        <div className="details-main">
+          <ContractObligations contractId={c.id} />
+          <section className="panel">
+            <h2 className="panel-title panel-gap">{t('contracts.summary')}</h2>
+            {c.description ? (
+              <p className="preserve-lines" dir="auto">
+                {c.description}
+              </p>
+            ) : (
+              <p className="muted">{t('contracts.noDescription')}</p>
+            )}
+          </section>
+        </div>
 
         <aside className="details-aside">
           <section className="panel">

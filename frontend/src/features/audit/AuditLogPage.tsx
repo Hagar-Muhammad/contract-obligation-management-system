@@ -37,9 +37,14 @@ const ACTION_TONE: Record<AuditAction, Tone> = {
   'contract.restored': 'green',
   'contract.document_uploaded': 'green',
   'document.downloaded': 'grey',
+  'obligation.created': 'green',
+  'obligation.updated': 'blue',
+  'obligation.status_changed': 'blue',
+  'obligation.overdue': 'red',
+  'obligation.evidence_added': 'green',
 }
 
-const ACTION_GROUPS = ['auth', 'user', 'party', 'property', 'contract', 'document'] as const
+const ACTION_GROUPS = ['auth', 'user', 'party', 'property', 'contract', 'obligation', 'document'] as const
 
 /** Where each kind of record opens in the app (documents open from their contract). */
 const TARGET_PATH: Partial<Record<AuditLog['target_type'], string>> = {
@@ -47,6 +52,7 @@ const TARGET_PATH: Partial<Record<AuditLog['target_type'], string>> = {
   party: '/parties',
   property: '/properties',
   contract: '/contracts',
+  obligation: '/obligations',
 }
 
 /** Local calendar day "YYYY-MM-DD" → ISO instant at the start of that day (or of the next day). */

@@ -5,7 +5,8 @@
   },
   "common": {
     "save": "حفظ",
-    "cancel": "إلغاء"
+    "cancel": "إلغاء",
+    "close": "إغلاق"
   },
   "language": {
     "label": "اللغة",
@@ -174,7 +175,8 @@
       "party": "الأطراف",
       "property": "العقارات",
       "contract": "العقود",
-      "document": "المستندات"
+      "document": "المستندات",
+      "obligation": "الالتزامات"
     },
     "actions": {
       "auth": {
@@ -209,6 +211,13 @@
       },
       "document": {
         "downloaded": "تنزيل مستند"
+      },
+      "obligation": {
+        "created": "إنشاء التزام",
+        "updated": "تعديل التزام",
+        "status_changed": "تغيير حالة التزام",
+        "overdue": "تأخر التزام",
+        "evidence_added": "إرفاق دليل"
       }
     },
     "targets": {
@@ -216,7 +225,8 @@
       "party": "طرف",
       "property": "عقار",
       "contract": "عقد",
-      "document": "مستند"
+      "document": "مستند",
+      "obligation": "التزام"
     },
     "fields": {
       "email": "البريد الإلكتروني",
@@ -252,7 +262,15 @@
       "renewal_date": "موعد إشعار التجديد",
       "parties": "الأطراف",
       "properties": "العقارات",
-      "document": "المستند"
+      "document": "المستند",
+      "responsible_party": "الطرف المسؤول",
+      "responsible_user": "المسؤول",
+      "due_date": "تاريخ الاستحقاق",
+      "priority": "الأولوية",
+      "recurrence_rule": "قاعدة التكرار",
+      "penalty_text": "الغرامة",
+      "note": "ملاحظة",
+      "series": "التكرار"
     }
   },
   "parties": {
@@ -329,7 +347,8 @@
     "notes": "ملاحظات",
     "created": "تم إنشاء العقار.",
     "saved": "تم حفظ التغييرات.",
-    "contracts": "عقود هذا العقار"
+    "contracts": "عقود هذا العقار",
+    "obligations": "التزامات هذا العقار"
   },
   "partyTypes": {
     "individual": "فرد",
@@ -478,7 +497,13 @@
       "statusChanged": "نقل العقد من {{from}} إلى {{to}}",
       "archived": "أرشف العقد",
       "restored": "استعاد العقد",
-      "documentUploaded": "رفع {{name}}"
+      "documentUploaded": "رفع {{name}}",
+      "obligationMoved": "نقل «{{title}}» من {{from}} إلى {{to}}",
+      "obligationNote": "أضاف ملاحظة إلى «{{title}}»",
+      "obligation_created": "أضاف الالتزام «{{title}}»",
+      "obligation_updated": "عدّل «{{title}}»",
+      "obligation_overdue": "حدّد «{{title}}» متأخرًا",
+      "obligation_evidence_added": "أرفق دليلًا إلى «{{title}}»"
     },
     "fullAuditLog": "سجل التدقيق الكامل",
     "notFound": "هذا العقد غير موجود أو غير متاح لك.",
@@ -490,7 +515,168 @@
     "summary": "الملخص والشروط الرئيسية",
     "noDescription": "لا يوجد وصف بعد.",
     "noProperties": "غير مرتبط بعقار.",
-    "allForProperty": "كل عقود هذا العقار"
+    "allForProperty": "كل عقود هذا العقار",
+    "colObligations": "الالتزامات"
+  },
+  "obligations": {
+    "title": "الالتزامات",
+    "subtitle": "كل التزام في عقودك — من المسؤول عنه، ومتى يستحق، وأين وصل.",
+    "new": "التزام جديد",
+    "add": "إضافة التزام",
+    "edit": "تعديل الالتزام",
+    "create": "إنشاء الالتزام",
+    "created": "تم إنشاء الالتزام.",
+    "saved": "تم حفظ التغييرات.",
+    "updated": "تم تحديث الالتزام.",
+    "statusFilter": "تصفية حسب الحالة",
+    "views": {
+      "open": "كل المفتوحة",
+      "overdue": "متأخرة",
+      "due_this_week": "تستحق هذا الأسبوع",
+      "in_progress": "قيد التنفيذ",
+      "pending": "معلقة",
+      "completed": "مكتملة",
+      "cancelled": "ملغاة"
+    },
+    "statuses": {
+      "pending": "معلق",
+      "in_progress": "قيد التنفيذ",
+      "completed": "مكتمل",
+      "overdue": "متأخر",
+      "cancelled": "ملغى"
+    },
+    "priorities": {
+      "low": "منخفضة",
+      "medium": "متوسطة",
+      "high": "عالية",
+      "critical": "حرجة"
+    },
+    "repeat": {
+      "weekly": "أسبوعيًا",
+      "monthly": "شهريًا",
+      "quarterly": "كل ثلاثة أشهر",
+      "half_yearly": "كل ستة أشهر",
+      "yearly": "سنويًا",
+      "custom": "قاعدة مخصصة"
+    },
+    "oneTime": "مرة واحدة",
+    "noDeadline": "بلا موعد نهائي",
+    "dueToday": "يستحق اليوم",
+    "dueIn_zero": "اليوم",
+    "dueIn_one": "خلال يوم واحد",
+    "dueIn_two": "خلال يومين",
+    "dueIn_few": "خلال {{count}} أيام",
+    "dueIn_many": "خلال {{count}} يومًا",
+    "dueIn_other": "خلال {{count}} يوم",
+    "daysOverdue_zero": "متأخر",
+    "daysOverdue_one": "متأخر يومًا واحدًا",
+    "daysOverdue_two": "متأخر يومين",
+    "daysOverdue_few": "متأخر {{count}} أيام",
+    "daysOverdue_many": "متأخر {{count}} يومًا",
+    "daysOverdue_other": "متأخر {{count}} يوم",
+    "search": "ابحث في الالتزامات",
+    "anyContract": "العقد: أي عقد",
+    "contractFilter": "تصفية حسب العقد",
+    "anyOwner": "المسؤول: أي شخص",
+    "ownerFilter": "تصفية حسب المسؤول",
+    "anyPriority": "الأولوية: أي أولوية",
+    "priorityFilter": "تصفية حسب الأولوية",
+    "dueFrom": "يستحق من",
+    "dueTo": "إلى",
+    "dueFilter": "تصفية حسب تاريخ الاستحقاق",
+    "onlyMine": "التزاماتي فقط",
+    "sorts": {
+      "due_date": "تاريخ الاستحقاق — الأقرب",
+      "-due_date": "تاريخ الاستحقاق — الأبعد",
+      "priority": "الأولوية — الأعلى",
+      "title": "العنوان",
+      "-updated_at": "آخر تحديث"
+    },
+    "colObligation": "الالتزام",
+    "colResponsible": "المسؤول",
+    "colDue": "الاستحقاق",
+    "colPriority": "الأولوية",
+    "colStatus": "الحالة",
+    "empty": {
+      "open": "لا توجد التزامات مفتوحة.",
+      "overdue": "لا توجد التزامات متأخرة.",
+      "due_this_week": "لا شيء يستحق هذا الأسبوع.",
+      "in_progress": "لا شيء قيد التنفيذ.",
+      "pending": "لا شيء معلق.",
+      "completed": "لا شيء مكتمل بعد.",
+      "cancelled": "لا شيء ملغى."
+    },
+    "showing": "عرض {{from}}–{{to}} من {{total}}",
+    "details": "تفاصيل الالتزام",
+    "party": "الطرف",
+    "owner": "المسؤول",
+    "due": "الاستحقاق",
+    "repeats": "التكرار",
+    "description": "الوصف",
+    "penalty": "الغرامة",
+    "updateStatus": "تحديث الحالة",
+    "overdueHelp": "يحدد النظام حالة التأخر عند فوات تاريخ الاستحقاق وتزول عند الإكمال.",
+    "attachEvidence": "إرفاق دليل (مثل الشهادة)",
+    "note": "ملاحظة",
+    "notePlaceholder": "أضف ملاحظة لسجل التدقيق…",
+    "saveUpdate": "حفظ التحديث",
+    "evidence": "الأدلة",
+    "history": "السجل",
+    "activity": {
+      "statusChanged": "نقله من {{from}} إلى {{to}}",
+      "status_changed": "أضاف ملاحظة",
+      "created": "أنشأه",
+      "updated": "عدّله",
+      "overdue": "حدّده متأخرًا",
+      "evidence_added": "أرفق دليلًا"
+    },
+    "editDetails": "تعديل التفاصيل",
+    "noContractsFound": "لا توجد عقود مطابقة.",
+    "noUsersFound": "لا يوجد مستخدمون مطابقون.",
+    "openOnContract": "الالتزامات المفتوحة",
+    "viewAll_zero": "عرض الكل",
+    "viewAll_one": "عرض الالتزام",
+    "viewAll_two": "عرض الالتزامين",
+    "viewAll_few": "عرض الـ {{count}}",
+    "viewAll_many": "عرض الـ {{count}}",
+    "viewAll_other": "عرض الـ {{count}}",
+    "noneOpen": "لا توجد التزامات مفتوحة.",
+    "more_zero": "",
+    "more_one": "+ التزام مفتوح آخر",
+    "more_two": "+ التزامان مفتوحان آخران",
+    "more_few": "+ {{count}} التزامات مفتوحة أخرى",
+    "more_many": "+ {{count}} التزامًا مفتوحًا آخر",
+    "more_other": "+ {{count}} التزام مفتوح آخر",
+    "openCount_zero": "لا شيء مفتوح",
+    "openCount_one": "التزام مفتوح",
+    "openCount_two": "التزامان مفتوحان",
+    "openCount_few": "{{count}} مفتوحة",
+    "openCount_many": "{{count}} مفتوحًا",
+    "openCount_other": "{{count}} مفتوح",
+    "overdueCount_zero": "لا شيء متأخر",
+    "overdueCount_one": "واحد متأخر",
+    "overdueCount_two": "اثنان متأخران",
+    "overdueCount_few": "{{count}} متأخرة",
+    "overdueCount_many": "{{count}} متأخرًا",
+    "overdueCount_other": "{{count}} متأخر",
+    "whatSection": "ما المطلوب",
+    "contract": "العقد",
+    "titleField": "العنوان",
+    "priority": "الأولوية",
+    "initialStatus": "الحالة",
+    "whoSection": "من المسؤول",
+    "partyHelp": "أحد أطراف العقد.",
+    "ownerHelp": "الشخص الذي يتابعه هنا. سيرى هذا الالتزام وعقده.",
+    "whenSection": "المواعيد",
+    "startDate": "تاريخ البدء",
+    "dueRequired": "اختر تاريخ استحقاق أو حدّده كالتزام مستمر.",
+    "dueBeforeStart": "لا يمكن أن يكون تاريخ الاستحقاق قبل تاريخ البدء.",
+    "ongoing": "التزام مستمر بلا موعد نهائي",
+    "customRule": "قاعدة التكرار",
+    "customRuleHelp": "قاعدة RFC 5545، مثل FREQ=MONTHLY;INTERVAL=2 (أسبوعيًا أو شهريًا أو سنويًا).",
+    "moreSection": "تفاصيل إضافية",
+    "penaltyHelp": "ما يترتب على التأخر، كما ورد في العقد.",
+    "notes": "ملاحظات"
   },
   "partyRoles": {
     "landlord": "المؤجر",

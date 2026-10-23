@@ -5,7 +5,8 @@
   },
   "common": {
     "save": "Save",
-    "cancel": "Cancel"
+    "cancel": "Cancel",
+    "close": "Close"
   },
   "language": {
     "label": "Language",
@@ -174,7 +175,8 @@
       "party": "Parties",
       "property": "Properties",
       "contract": "Contracts",
-      "document": "Documents"
+      "document": "Documents",
+      "obligation": "Obligations"
     },
     "actions": {
       "auth": {
@@ -209,6 +211,13 @@
       },
       "document": {
         "downloaded": "Downloaded document"
+      },
+      "obligation": {
+        "created": "Created obligation",
+        "updated": "Edited obligation",
+        "status_changed": "Changed obligation status",
+        "overdue": "Obligation became overdue",
+        "evidence_added": "Attached evidence"
       }
     },
     "targets": {
@@ -216,7 +225,8 @@
       "party": "Party",
       "property": "Property",
       "contract": "Contract",
-      "document": "Document"
+      "document": "Document",
+      "obligation": "Obligation"
     },
     "fields": {
       "email": "Email",
@@ -252,7 +262,15 @@
       "renewal_date": "Renewal notice date",
       "parties": "Parties",
       "properties": "Properties",
-      "document": "Document"
+      "document": "Document",
+      "responsible_party": "Responsible party",
+      "responsible_user": "Owner",
+      "due_date": "Due date",
+      "priority": "Priority",
+      "recurrence_rule": "Repeat rule",
+      "penalty_text": "Penalty",
+      "note": "Note",
+      "series": "Repeats"
     }
   },
   "parties": {
@@ -329,7 +347,8 @@
     "notes": "Notes",
     "created": "Property created.",
     "saved": "Changes saved.",
-    "contracts": "Contracts for this property"
+    "contracts": "Contracts for this property",
+    "obligations": "Obligations for this property"
   },
   "partyTypes": {
     "individual": "Individual",
@@ -462,7 +481,13 @@
       "statusChanged": "moved the contract from {{from}} to {{to}}",
       "archived": "archived the contract",
       "restored": "restored the contract",
-      "documentUploaded": "uploaded {{name}}"
+      "documentUploaded": "uploaded {{name}}",
+      "obligationMoved": "moved “{{title}}” from {{from}} to {{to}}",
+      "obligationNote": "added a note to “{{title}}”",
+      "obligation_created": "added the obligation “{{title}}”",
+      "obligation_updated": "edited “{{title}}”",
+      "obligation_overdue": "marked “{{title}}” Overdue",
+      "obligation_evidence_added": "attached evidence to “{{title}}”"
     },
     "fullAuditLog": "Full audit log",
     "notFound": "This contract does not exist or is not available to you.",
@@ -474,7 +499,144 @@
     "summary": "Summary & key terms",
     "noDescription": "No description yet.",
     "noProperties": "Not linked to a property.",
-    "allForProperty": "All contracts for this property"
+    "allForProperty": "All contracts for this property",
+    "colObligations": "Obligations"
+  },
+  "obligations": {
+    "title": "Obligations",
+    "subtitle": "Every duty across your contracts — who owns it, when it's due, and where it stands.",
+    "new": "New obligation",
+    "add": "Add obligation",
+    "edit": "Edit obligation",
+    "create": "Create obligation",
+    "created": "Obligation created.",
+    "saved": "Changes saved.",
+    "updated": "Obligation updated.",
+    "statusFilter": "Filter by status",
+    "views": {
+      "open": "All open",
+      "overdue": "Overdue",
+      "due_this_week": "Due this week",
+      "in_progress": "In progress",
+      "pending": "Pending",
+      "completed": "Completed",
+      "cancelled": "Cancelled"
+    },
+    "statuses": {
+      "pending": "Pending",
+      "in_progress": "In progress",
+      "completed": "Completed",
+      "overdue": "Overdue",
+      "cancelled": "Cancelled"
+    },
+    "priorities": {
+      "low": "Low",
+      "medium": "Medium",
+      "high": "High",
+      "critical": "Critical"
+    },
+    "repeat": {
+      "weekly": "Weekly",
+      "monthly": "Monthly",
+      "quarterly": "Quarterly",
+      "half_yearly": "Every 6 months",
+      "yearly": "Yearly",
+      "custom": "Custom rule"
+    },
+    "oneTime": "One-time",
+    "noDeadline": "No deadline",
+    "dueToday": "due today",
+    "dueIn_one": "in {{count}} day",
+    "dueIn_other": "in {{count}} days",
+    "daysOverdue_one": "{{count}} day overdue",
+    "daysOverdue_other": "{{count}} days overdue",
+    "search": "Search obligations",
+    "anyContract": "Contract: any",
+    "contractFilter": "Filter by contract",
+    "anyOwner": "Owner: anyone",
+    "ownerFilter": "Filter by owner",
+    "anyPriority": "Priority: any",
+    "priorityFilter": "Filter by priority",
+    "dueFrom": "Due from",
+    "dueTo": "to",
+    "dueFilter": "Filter by due date",
+    "onlyMine": "Only mine",
+    "sorts": {
+      "due_date": "Due date — soonest",
+      "-due_date": "Due date — latest",
+      "priority": "Priority — highest",
+      "title": "Title",
+      "-updated_at": "Recently updated"
+    },
+    "colObligation": "Obligation",
+    "colResponsible": "Responsible",
+    "colDue": "Due",
+    "colPriority": "Priority",
+    "colStatus": "Status",
+    "empty": {
+      "open": "Nothing open. Well done.",
+      "overdue": "Nothing overdue.",
+      "due_this_week": "Nothing due this week.",
+      "in_progress": "Nothing in progress.",
+      "pending": "Nothing pending.",
+      "completed": "Nothing completed yet.",
+      "cancelled": "Nothing cancelled."
+    },
+    "showing": "Showing {{from}}–{{to}} of {{total}}",
+    "details": "Obligation details",
+    "party": "Party",
+    "owner": "Owner",
+    "due": "Due",
+    "repeats": "Repeats",
+    "description": "Description",
+    "penalty": "Penalty",
+    "updateStatus": "Update status",
+    "overdueHelp": "Overdue is set by the system when the due date passes and clears once completed.",
+    "attachEvidence": "Attach evidence (e.g. the certificate)",
+    "note": "Note",
+    "notePlaceholder": "Add a note for the audit trail…",
+    "saveUpdate": "Save update",
+    "evidence": "Evidence",
+    "history": "History",
+    "activity": {
+      "statusChanged": "moved it from {{from}} to {{to}}",
+      "status_changed": "added a note",
+      "created": "created it",
+      "updated": "edited it",
+      "overdue": "marked it Overdue",
+      "evidence_added": "attached evidence"
+    },
+    "editDetails": "Edit details",
+    "noContractsFound": "No contracts match.",
+    "noUsersFound": "No users match.",
+    "openOnContract": "Open obligations",
+    "viewAll_one": "View {{count}}",
+    "viewAll_other": "View all {{count}}",
+    "noneOpen": "No open obligations.",
+    "more_one": "+ {{count}} more open obligation",
+    "more_other": "+ {{count}} more open obligations",
+    "openCount_one": "{{count}} open",
+    "openCount_other": "{{count}} open",
+    "overdueCount_one": "{{count}} overdue",
+    "overdueCount_other": "{{count}} overdue",
+    "whatSection": "What has to be done",
+    "contract": "Contract",
+    "titleField": "Title",
+    "priority": "Priority",
+    "initialStatus": "Status",
+    "whoSection": "Who is responsible",
+    "partyHelp": "One of the contract's parties.",
+    "ownerHelp": "The person here who follows it up. They will see this obligation and its contract.",
+    "whenSection": "When",
+    "startDate": "Start date",
+    "dueRequired": "Choose a due date, or mark it as ongoing.",
+    "dueBeforeStart": "Due date can't be earlier than the start date.",
+    "ongoing": "Ongoing duty without a deadline",
+    "customRule": "Repeat rule",
+    "customRuleHelp": "An RFC 5545 rule, e.g. FREQ=MONTHLY;INTERVAL=2 (weekly, monthly or yearly).",
+    "moreSection": "More",
+    "penaltyHelp": "What happens if it is missed, as written in the contract.",
+    "notes": "Notes"
   },
   "partyRoles": {
     "landlord": "Landlord",
