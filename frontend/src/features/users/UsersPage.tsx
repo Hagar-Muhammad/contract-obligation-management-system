@@ -1,11 +1,12 @@
 import { PlusOutlined, SearchOutlined } from '@ant-design/icons'
 import { App, Button, Input, Table, Tabs, Tag, type TableProps } from 'antd'
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '../../auth/context'
 import { ROLE_CODES, ROLE_TAG_CLASS, scopeKey, type RoleCodeName } from '../../auth/roles'
 import { PageHeader } from '../../components/PageHeader'
+import { useListSearch } from '../../components/useListSearch'
 import { UserAvatar } from '../../components/UserAvatar'
 import { useRelativeTime } from '../../i18n/useRelativeTime'
 import { useRoles, useSetUserActive, useUsers, type Role, type User } from './api'
@@ -25,18 +26,8 @@ export function UsersPage() {
   const navigate = useNavigate()
   const relativeTime = useRelativeTime()
   const [tab, setTab] = useState('users')
-  const [page, setPage] = useState(1)
-  const [search, setSearch] = useState('')
-  const [q, setQ] = useState('')
-  // Query the server once typing pauses, not on every keystroke.
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setQ(search.trim())
-      setPage(1)
-    }, 300)
-    return () => clearTimeout(timer)
-  }, [search])
-  const users = useUsers({ page, pageSize: PAGE_SIZE, q })
+  const { search, setSearch, query, page, setPage } = useListSearch()
+  const users = useUsers({ page, pageSize: PAGE_SIZE, q: query })
   const roles = useRoles()
   const setActive = useSetUserActive()
 
@@ -54,7 +45,7 @@ export function UsersPage() {
           <UserAvatar name={user.full_name} muted={!user.is_active} />
           <span className="person-text">
             <span className="person-name">
-              {user.full_name}
+              <bdi>{user.full_name}</bdi>
               {user.id === me?.id && <span className="person-you"> · {t('users.you')}</span>}
             </span>
             <span className="person-email">{user.email}</span>

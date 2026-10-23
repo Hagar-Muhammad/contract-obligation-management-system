@@ -6,6 +6,7 @@ import { ApiError } from '../../api/errors'
 import { useAuth } from '../../auth/context'
 import { ROLE_CODES } from '../../auth/roles'
 import { PageHeader } from '../../components/PageHeader'
+import { showServerErrors } from '../../components/showServerErrors'
 import { useCreateUser, useRoles, useSetUserActive, useUpdateUser, useUser, type RoleCode } from './api'
 
 const PASSWORD_MIN_LENGTH = 8
@@ -55,17 +56,8 @@ export function UserFormPage() {
       }
       navigate('/users')
     } catch (err) {
-      if (!(err instanceof ApiError)) throw err
-      const fields = err.fieldErrors()
-      if (err.status === 409) fields.email = t('users.emailTaken')
-      const entries = Object.entries(fields)
-      if (entries.length) {
-        form.setFields(
-          entries.map(([name, error]) => ({ name: name as keyof UserFormValues, errors: [error] })),
-        )
-      } else {
-        message.error(err.message || t('errors.generic'))
-      }
+      const conflict = err instanceof ApiError && err.status === 409
+      showServerErrors(err, form, message, t, conflict ? { email: t('users.emailTaken') } : {})
     }
   }
 
@@ -88,7 +80,7 @@ export function UserFormPage() {
   return (
     <div className="page page-narrow">
       <PageHeader
-        title={existing.data?.full_name ?? title}
+        title={existing.data ? <bdi>{existing.data.full_name}</bdi> : title}
         breadcrumb={[{ label: t('users.title'), to: '/users' }, { label: title }]}
       />
       <Form<UserFormValues>
