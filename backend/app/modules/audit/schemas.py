@@ -15,6 +15,18 @@ class AuditActor(BaseModel):
     email: str
 
 
+class ActivityRead(BaseModel):
+    """A record's history as its viewers see it: who did what and what changed (no request id or IP)."""
+
+    model_config = ConfigDict(from_attributes=True)
+
+    occurred_at: datetime
+    actor_type: ActorType
+    actor: AuditActor | None
+    action: AuditAction
+    changes: dict[str, list[Any]] | None
+
+
 class AuditLogRead(BaseModel):
     """One audit record (FR-AUD-02): who did what, to what, when, and what changed."""
 

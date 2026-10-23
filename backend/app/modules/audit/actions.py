@@ -22,6 +22,11 @@ class AuditAction(StrEnum):
     PARTY_UPDATED = "party.updated"
     PROPERTY_CREATED = "property.created"
     PROPERTY_UPDATED = "property.updated"
+    CONTRACT_CREATED = "contract.created"
+    CONTRACT_UPDATED = "contract.updated"
+    CONTRACT_STATUS_CHANGED = "contract.status_changed"
+    CONTRACT_ARCHIVED = "contract.archived"
+    CONTRACT_RESTORED = "contract.restored"
 
 
 class ActorType(StrEnum):
@@ -36,3 +41,4 @@ class TargetType(StrEnum):
     USER = "user"
     PARTY = "party"
     PROPERTY = "property"
+    CONTRACT = "contract"

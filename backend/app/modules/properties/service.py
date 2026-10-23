@@ -1,14 +1,14 @@
-"""Property register and Property Manager assignments (SRS 4.6; groundwork for FR-PROP-01/02).
+"""Property register and Property Manager assignments (SRS 4.6; FR-PROP-01/02).
 
 Who sees properties: users whose data scope is all records see every property; Property Managers see the properties
-assigned to them; other users see none until contracts and obligations exist (modules 4 and 6 widen this).
+assigned to them; other users see the properties of the contracts they can see.
 """
 
 import uuid
 from collections.abc import Sequence
 from typing import Any
 
-from sqlalchemy import Select, false, or_, select
+from sqlalchemy import Select, or_, select
 from sqlalchemy.orm import Session
 
 from app.core.errors import BusinessRuleError, ConflictError, NotFoundError
@@ -16,6 +16,8 @@ from app.core.pagination import PageParams, paginate
 from app.modules.audit import service as audit
 from app.modules.audit.actions import AuditAction, TargetType
 from app.modules.auth.dependencies import CurrentUser
+from app.modules.contracts.models import contract_properties
+from app.modules.contracts.scope import visible_contract_ids
 from app.modules.properties.models import Property, property_assignments
 from app.modules.properties.schemas import PropertyCreate, PropertyType, PropertyUpdate
 from app.modules.users.models import Role, User
@@ -38,7 +40,13 @@ def _in_scope(stmt: Select[Property], current: CurrentUser) -> Select[Property]:
                 )
             )
         case _:
-            return stmt.where(false())
+            return stmt.where(
+                Property.id.in_(
+                    select(contract_properties.c.property_id).where(
+                        contract_properties.c.contract_id.in_(visible_contract_ids(current))
+                    )
+                )
+            )
 
 
 def _snapshot(prop: Property) -> dict[str, Any]:
@@ -120,6 +128,13 @@ def get_property(db: Session, current: CurrentUser, property_id: uuid.UUID) -> P
     if prop is None:
         raise NotFoundError("Property not found.")
     return prop
+
+
+def get_visible(db: Session, current: CurrentUser, ids: Sequence[uuid.UUID]) -> list[Property]:
+    """The properties among `ids` that the user can see (unknown or out-of-scope ids are left out)."""
+    if not ids:
+        return []
+    return list(db.scalars(_in_scope(select(Property), current).where(Property.id.in_(set(ids)))))
 
 
 def list_assignable_managers(db: Session, *, q: str | None = None) -> list[User]:

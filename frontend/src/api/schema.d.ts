@@ -333,10 +333,183 @@ export interface paths {
     patch: operations['update_property_api_v1_properties__property_id__patch']
     trace?: never
   }
+  '/api/v1/contract-types': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Active contract types (FR-CON-06) */
+    get: operations['list_contract_types_api_v1_contract_types_get']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/api/v1/contract-statuses': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Contract statuses and their allowed transitions (FR-CON-06, D-17) */
+    get: operations['list_contract_statuses_api_v1_contract_statuses_get']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/api/v1/contracts': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** List the contracts visible to you */
+    get: operations['list_contracts_api_v1_contracts_get']
+    put?: never
+    /** Create a contract (FR-CON-01, FR-CON-02) */
+    post: operations['create_contract_api_v1_contracts_post']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/api/v1/contracts/counts': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Number of contracts per list tab */
+    get: operations['count_contracts_api_v1_contracts_counts_get']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/api/v1/contracts/defaults': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Suggested values for a new contract */
+    get: operations['contract_defaults_api_v1_contracts_defaults_get']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/api/v1/contracts/{contract_id}': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Contract details (FR-CON-03) */
+    get: operations['get_contract_api_v1_contracts__contract_id__get']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    /** Edit a contract, its status, parties or properties (FR-CON-04) */
+    patch: operations['update_contract_api_v1_contracts__contract_id__patch']
+    trace?: never
+  }
+  '/api/v1/contracts/{contract_id}/archive': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /** Archive a contract (FR-CON-05) */
+    post: operations['archive_contract_api_v1_contracts__contract_id__archive_post']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/api/v1/contracts/{contract_id}/restore': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /** Restore an archived contract */
+    post: operations['restore_contract_api_v1_contracts__contract_id__restore_post']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/api/v1/contracts/{contract_id}/activity': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Latest changes to a contract, for everyone who can see it */
+    get: operations['contract_activity_api_v1_contracts__contract_id__activity_get']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
 }
 export type webhooks = Record<string, never>
 export interface components {
   schemas: {
+    /**
+     * ActivityRead
+     * @description A record's history as its viewers see it: who did what and what changed (no request id or IP).
+     */
+    ActivityRead: {
+      /**
+       * Occurred At
+       * Format: date-time
+       */
+      occurred_at: string
+      actor_type: components['schemas']['ActorType']
+      actor: components['schemas']['AuditActor'] | null
+      action: components['schemas']['AuditAction']
+      /** Changes */
+      changes: {
+        [key: string]: unknown[]
+      } | null
+    }
     /**
      * ActorType
      * @enum {string}
@@ -361,6 +534,11 @@ export interface components {
       | 'party.updated'
       | 'property.created'
       | 'property.updated'
+      | 'contract.created'
+      | 'contract.updated'
+      | 'contract.status_changed'
+      | 'contract.archived'
+      | 'contract.restored'
     /** AuditActor */
     AuditActor: {
       /**
@@ -418,6 +596,234 @@ export interface components {
       self_signup_enabled: boolean
     }
     /**
+     * ContractCounts
+     * @description Number of contracts per list tab, within the caller's data scope.
+     */
+    ContractCounts: {
+      /** Active */
+      active: number
+      /** Draft */
+      draft: number
+      /** Expiring */
+      expiring: number
+      /** Ended */
+      ended: number
+      /** Archived */
+      archived: number
+    }
+    /** ContractCreate */
+    ContractCreate: {
+      /** Description */
+      description?: string | null
+      /**
+       * End Date
+       * @description Leave empty for an open-ended contract. Not before start_date.
+       */
+      end_date?: string | null
+      /** Value Amount */
+      value_amount?: number | string | null
+      /**
+       * Currency
+       * @description ISO 4217 code; required when a value is given.
+       */
+      currency?: string | null
+      /**
+       * Renewal Date
+       * @description When renewal notice is due (decision D-09).
+       */
+      renewal_date?: string | null
+      /**
+       * Contract Number
+       * @description Stored upper-cased; unique. See GET /contracts/defaults.
+       */
+      contract_number: string
+      /** Title */
+      title: string
+      /**
+       * Type Code
+       * @description An active code from GET /contract-types.
+       */
+      type_code: string
+      /**
+       * @description A new contract starts as draft or active.
+       * @default draft
+       */
+      status_code: components['schemas']['StatusCode']
+      /**
+       * Start Date
+       * Format: date
+       */
+      start_date: string
+      /**
+       * Parties
+       * @description At least one party (BR-02).
+       */
+      parties: components['schemas']['ContractPartyIn'][]
+      /** Property Ids */
+      property_ids?: string[]
+    }
+    /** ContractDefaults */
+    ContractDefaults: {
+      /**
+       * Next Number
+       * @description Suggested number for a new contract; the user can change it.
+       */
+      next_number: string
+      /** Default Currency */
+      default_currency: string
+      /**
+       * Expiring Soon Days
+       * @description An active contract ending within this many days is expiring.
+       */
+      expiring_soon_days: number
+    }
+    /** ContractPartyIn */
+    ContractPartyIn: {
+      /**
+       * Party Id
+       * Format: uuid
+       */
+      party_id: string
+      role: components['schemas']['PartyRole']
+    }
+    /** ContractPartyRead */
+    ContractPartyRead: {
+      /**
+       * Id
+       * Format: uuid
+       */
+      id: string
+      /** Display Name */
+      display_name: string
+      party_type: components['schemas']['PartyType']
+      role: components['schemas']['PartyRole']
+    }
+    /** ContractPropertyRead */
+    ContractPropertyRead: {
+      /**
+       * Id
+       * Format: uuid
+       */
+      id: string
+      /** Code */
+      code: string
+      /** Name */
+      name: string
+      property_type: components['schemas']['PropertyType']
+    }
+    /** ContractRead */
+    ContractRead: {
+      /**
+       * Id
+       * Format: uuid
+       */
+      id: string
+      /** Contract Number */
+      contract_number: string
+      /** Title */
+      title: string
+      contract_type: components['schemas']['LookupRead']
+      status: components['schemas']['ContractStatusRead']
+      /** Description */
+      description: string | null
+      /**
+       * Start Date
+       * Format: date
+       */
+      start_date: string
+      /** End Date */
+      end_date: string | null
+      /** Value Amount */
+      value_amount: string | null
+      /** Currency */
+      currency: string | null
+      /** Renewal Date */
+      renewal_date: string | null
+      /** Parties */
+      parties: components['schemas']['ContractPartyRead'][]
+      /** Properties */
+      properties: components['schemas']['ContractPropertyRead'][]
+      /** Archived At */
+      archived_at: string | null
+      /**
+       * Created At
+       * Format: date-time
+       */
+      created_at: string
+      /**
+       * Updated At
+       * Format: date-time
+       */
+      updated_at: string
+      created_by: components['schemas']['PersonRef'] | null
+      updated_by: components['schemas']['PersonRef'] | null
+    }
+    /**
+     * ContractSort
+     * @enum {string}
+     */
+    ContractSort:
+      'end_date' | '-end_date' | 'start_date' | '-start_date' | 'contract_number' | 'title' | '-updated_at'
+    /** ContractStatusRead */
+    ContractStatusRead: {
+      /** Code */
+      code: string
+      /** Name En */
+      name_en: string
+      /** Name Ar */
+      name_ar: string
+      /**
+       * Next Codes
+       * @description Statuses this one may change to (D-17).
+       */
+      next_codes: components['schemas']['StatusCode'][]
+    }
+    /**
+     * ContractUpdate
+     * @description Partial update: only the fields sent change. `parties` and `property_ids` replace the whole list.
+     */
+    ContractUpdate: {
+      /** Description */
+      description?: string | null
+      /**
+       * End Date
+       * @description Leave empty for an open-ended contract. Not before start_date.
+       */
+      end_date?: string | null
+      /** Value Amount */
+      value_amount?: number | string | null
+      /**
+       * Currency
+       * @description ISO 4217 code; required when a value is given.
+       */
+      currency?: string | null
+      /**
+       * Renewal Date
+       * @description When renewal notice is due (decision D-09).
+       */
+      renewal_date?: string | null
+      /** Contract Number */
+      contract_number?: string | null
+      /** Title */
+      title?: string | null
+      /** Type Code */
+      type_code?: string | null
+      /** @description Must follow the allowed transitions (D-17). */
+      status_code?: components['schemas']['StatusCode'] | null
+      /** Start Date */
+      start_date?: string | null
+      /** Parties */
+      parties?: components['schemas']['ContractPartyIn'][] | null
+      /** Property Ids */
+      property_ids?: string[] | null
+    }
+    /**
+     * ContractView
+     * @description The list tabs. Without a view, the list shows every contract that is not archived (BR-07).
+     * @enum {string}
+     */
+    ContractView: 'active' | 'draft' | 'expiring' | 'ended' | 'archived'
+    /**
      * DataScope
      * @description Which records a role can see (applied in services, docs/roles-and-permissions.md).
      * @enum {string}
@@ -451,6 +857,15 @@ export interface components {
        */
       remember_me: boolean
     }
+    /** LookupRead */
+    LookupRead: {
+      /** Code */
+      code: string
+      /** Name En */
+      name_en: string
+      /** Name Ar */
+      name_ar: string
+    }
     /** MeResponse */
     MeResponse: {
       /**
@@ -475,6 +890,17 @@ export interface components {
     Page_AuditLogRead_: {
       /** Items */
       items: components['schemas']['AuditLogRead'][]
+      /** Page */
+      page: number
+      /** Page Size */
+      page_size: number
+      /** Total */
+      total: number
+    }
+    /** Page[ContractRead] */
+    Page_ContractRead_: {
+      /** Items */
+      items: components['schemas']['ContractRead'][]
       /** Page */
       page: number
       /** Page Size */
@@ -590,6 +1016,24 @@ export interface components {
       updated_at: string
     }
     /**
+     * PartyRole
+     * @description A party's part in a contract (FR-PARTY-03).
+     * @enum {string}
+     */
+    PartyRole:
+      | 'landlord'
+      | 'tenant'
+      | 'seller'
+      | 'buyer'
+      | 'owner'
+      | 'service_provider'
+      | 'contractor'
+      | 'consultant'
+      | 'partner'
+      | 'licensor'
+      | 'licensee'
+      | 'other'
+    /**
      * PartyType
      * @enum {string}
      */
@@ -629,6 +1073,16 @@ export interface components {
       notes?: string | null
       /** Display Name */
       display_name?: string | null
+    }
+    /** PersonRef */
+    PersonRef: {
+      /**
+       * Id
+       * Format: uuid
+       */
+      id: string
+      /** Full Name */
+      full_name: string
     }
     /** PropertyCreate */
     PropertyCreate: {
@@ -784,10 +1238,16 @@ export interface components {
       preferred_language: 'en' | 'ar'
     }
     /**
+     * StatusCode
+     * @description Seeded statuses (decision D-17). The codes are fixed; names live in contract_statuses.
+     * @enum {string}
+     */
+    StatusCode: 'draft' | 'active' | 'expired' | 'terminated' | 'cancelled'
+    /**
      * TargetType
      * @enum {string}
      */
-    TargetType: 'user' | 'party' | 'property'
+    TargetType: 'user' | 'party' | 'property' | 'contract'
     /** TokenResponse */
     TokenResponse: {
       /** Access Token */
@@ -1692,6 +2152,339 @@ export interface operations {
           [name: string]: unknown
         }
         content?: never
+      }
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['HTTPValidationError']
+        }
+      }
+    }
+  }
+  list_contract_types_api_v1_contract_types_get: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['LookupRead'][]
+        }
+      }
+    }
+  }
+  list_contract_statuses_api_v1_contract_statuses_get: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ContractStatusRead'][]
+        }
+      }
+    }
+  }
+  list_contracts_api_v1_contracts_get: {
+    parameters: {
+      query?: {
+        /** @description List tab. Without it: every contract not archived (BR-07). */
+        view?: components['schemas']['ContractView'] | null
+        /** @description Number, title, party name, or property name/code. */
+        q?: string | null
+        type_code?: string | null
+        party_id?: string | null
+        /** @description Contracts on this property (FR-PROP-02). */
+        property_id?: string | null
+        /** @description Contracts in force on or after this date. */
+        term_from?: string | null
+        /** @description Contracts in force on or before this date. */
+        term_to?: string | null
+        sort?: components['schemas']['ContractSort']
+        /** @description 1-based page number. */
+        page?: number
+        /** @description Items per page (max 100). */
+        page_size?: number
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['Page_ContractRead_']
+        }
+      }
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['HTTPValidationError']
+        }
+      }
+    }
+  }
+  create_contract_api_v1_contracts_post: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['ContractCreate']
+      }
+    }
+    responses: {
+      /** @description Successful Response */
+      201: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ContractRead']
+        }
+      }
+      /** @description The contract number is already used */
+      409: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['HTTPValidationError']
+        }
+      }
+    }
+  }
+  count_contracts_api_v1_contracts_counts_get: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ContractCounts']
+        }
+      }
+    }
+  }
+  contract_defaults_api_v1_contracts_defaults_get: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ContractDefaults']
+        }
+      }
+    }
+  }
+  get_contract_api_v1_contracts__contract_id__get: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        contract_id: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ContractRead']
+        }
+      }
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['HTTPValidationError']
+        }
+      }
+    }
+  }
+  update_contract_api_v1_contracts__contract_id__patch: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        contract_id: string
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['ContractUpdate']
+      }
+    }
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ContractRead']
+        }
+      }
+      /** @description The contract number is already used */
+      409: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['HTTPValidationError']
+        }
+      }
+    }
+  }
+  archive_contract_api_v1_contracts__contract_id__archive_post: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        contract_id: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ContractRead']
+        }
+      }
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['HTTPValidationError']
+        }
+      }
+    }
+  }
+  restore_contract_api_v1_contracts__contract_id__restore_post: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        contract_id: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ContractRead']
+        }
+      }
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['HTTPValidationError']
+        }
+      }
+    }
+  }
+  contract_activity_api_v1_contracts__contract_id__activity_get: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        contract_id: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ActivityRead'][]
+        }
       }
       /** @description Validation Error */
       422: {

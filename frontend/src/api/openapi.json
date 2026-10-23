@@ -1377,10 +1377,676 @@
           }
         }
       }
+    },
+    "/api/v1/contract-types": {
+      "get": {
+        "tags": [
+          "contracts"
+        ],
+        "summary": "Active contract types (FR-CON-06)",
+        "operationId": "list_contract_types_api_v1_contract_types_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/LookupRead"
+                  },
+                  "type": "array",
+                  "title": "Response List Contract Types Api V1 Contract Types Get"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/contract-statuses": {
+      "get": {
+        "tags": [
+          "contracts"
+        ],
+        "summary": "Contract statuses and their allowed transitions (FR-CON-06, D-17)",
+        "operationId": "list_contract_statuses_api_v1_contract_statuses_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/ContractStatusRead"
+                  },
+                  "type": "array",
+                  "title": "Response List Contract Statuses Api V1 Contract Statuses Get"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/contracts": {
+      "get": {
+        "tags": [
+          "contracts"
+        ],
+        "summary": "List the contracts visible to you",
+        "operationId": "list_contracts_api_v1_contracts_get",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "view",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "$ref": "#/components/schemas/ContractView"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "List tab. Without it: every contract not archived (BR-07).",
+              "title": "View"
+            },
+            "description": "List tab. Without it: every contract not archived (BR-07)."
+          },
+          {
+            "name": "q",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "maxLength": 200
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Number, title, party name, or property name/code.",
+              "title": "Q"
+            },
+            "description": "Number, title, party name, or property name/code."
+          },
+          {
+            "name": "type_code",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "maxLength": 50
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Type Code"
+            }
+          },
+          {
+            "name": "party_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Party Id"
+            }
+          },
+          {
+            "name": "property_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Contracts on this property (FR-PROP-02).",
+              "title": "Property Id"
+            },
+            "description": "Contracts on this property (FR-PROP-02)."
+          },
+          {
+            "name": "term_from",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "date"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Contracts in force on or after this date.",
+              "title": "Term From"
+            },
+            "description": "Contracts in force on or after this date."
+          },
+          {
+            "name": "term_to",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "date"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Contracts in force on or before this date.",
+              "title": "Term To"
+            },
+            "description": "Contracts in force on or before this date."
+          },
+          {
+            "name": "sort",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "$ref": "#/components/schemas/ContractSort",
+              "default": "end_date"
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "description": "1-based page number.",
+              "default": 1,
+              "title": "Page"
+            },
+            "description": "1-based page number."
+          },
+          {
+            "name": "page_size",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 100,
+              "minimum": 1,
+              "description": "Items per page (max 100).",
+              "default": 25,
+              "title": "Page Size"
+            },
+            "description": "Items per page (max 100)."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Page_ContractRead_"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "contracts"
+        ],
+        "summary": "Create a contract (FR-CON-01, FR-CON-02)",
+        "operationId": "create_contract_api_v1_contracts_post",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ContractCreate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ContractRead"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "The contract number is already used"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/contracts/counts": {
+      "get": {
+        "tags": [
+          "contracts"
+        ],
+        "summary": "Number of contracts per list tab",
+        "operationId": "count_contracts_api_v1_contracts_counts_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ContractCounts"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/contracts/defaults": {
+      "get": {
+        "tags": [
+          "contracts"
+        ],
+        "summary": "Suggested values for a new contract",
+        "operationId": "contract_defaults_api_v1_contracts_defaults_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ContractDefaults"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/contracts/{contract_id}": {
+      "get": {
+        "tags": [
+          "contracts"
+        ],
+        "summary": "Contract details (FR-CON-03)",
+        "operationId": "get_contract_api_v1_contracts__contract_id__get",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "contract_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Contract Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ContractRead"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "contracts"
+        ],
+        "summary": "Edit a contract, its status, parties or properties (FR-CON-04)",
+        "operationId": "update_contract_api_v1_contracts__contract_id__patch",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "contract_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Contract Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ContractUpdate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ContractRead"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "The contract number is already used"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/contracts/{contract_id}/archive": {
+      "post": {
+        "tags": [
+          "contracts"
+        ],
+        "summary": "Archive a contract (FR-CON-05)",
+        "operationId": "archive_contract_api_v1_contracts__contract_id__archive_post",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "contract_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Contract Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ContractRead"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/contracts/{contract_id}/restore": {
+      "post": {
+        "tags": [
+          "contracts"
+        ],
+        "summary": "Restore an archived contract",
+        "operationId": "restore_contract_api_v1_contracts__contract_id__restore_post",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "contract_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Contract Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ContractRead"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/contracts/{contract_id}/activity": {
+      "get": {
+        "tags": [
+          "contracts"
+        ],
+        "summary": "Latest changes to a contract, for everyone who can see it",
+        "operationId": "contract_activity_api_v1_contracts__contract_id__activity_get",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "contract_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Contract Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ActivityRead"
+                  },
+                  "title": "Response Contract Activity Api V1 Contracts  Contract Id  Activity Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
     "schemas": {
+      "ActivityRead": {
+        "properties": {
+          "occurred_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Occurred At"
+          },
+          "actor_type": {
+            "$ref": "#/components/schemas/ActorType"
+          },
+          "actor": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/AuditActor"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "action": {
+            "$ref": "#/components/schemas/AuditAction"
+          },
+          "changes": {
+            "anyOf": [
+              {
+                "additionalProperties": {
+                  "items": {},
+                  "type": "array"
+                },
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Changes"
+          }
+        },
+        "type": "object",
+        "required": [
+          "occurred_at",
+          "actor_type",
+          "actor",
+          "action",
+          "changes"
+        ],
+        "title": "ActivityRead",
+        "description": "A record's history as its viewers see it: who did what and what changed (no request id or IP)."
+      },
       "ActorType": {
         "type": "string",
         "enum": [
@@ -1406,7 +2072,12 @@
           "party.created",
           "party.updated",
           "property.created",
-          "property.updated"
+          "property.updated",
+          "contract.created",
+          "contract.updated",
+          "contract.status_changed",
+          "contract.archived",
+          "contract.restored"
         ],
         "title": "AuditAction"
       },
@@ -1559,6 +2230,650 @@
         ],
         "title": "AuthOptions"
       },
+      "ContractCounts": {
+        "properties": {
+          "active": {
+            "type": "integer",
+            "title": "Active"
+          },
+          "draft": {
+            "type": "integer",
+            "title": "Draft"
+          },
+          "expiring": {
+            "type": "integer",
+            "title": "Expiring"
+          },
+          "ended": {
+            "type": "integer",
+            "title": "Ended"
+          },
+          "archived": {
+            "type": "integer",
+            "title": "Archived"
+          }
+        },
+        "type": "object",
+        "required": [
+          "active",
+          "draft",
+          "expiring",
+          "ended",
+          "archived"
+        ],
+        "title": "ContractCounts",
+        "description": "Number of contracts per list tab, within the caller's data scope."
+      },
+      "ContractCreate": {
+        "properties": {
+          "description": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 5000
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Description"
+          },
+          "end_date": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "End Date",
+            "description": "Leave empty for an open-ended contract. Not before start_date."
+          },
+          "value_amount": {
+            "anyOf": [
+              {
+                "type": "number",
+                "minimum": 0.0
+              },
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Value Amount"
+          },
+          "currency": {
+            "anyOf": [
+              {
+                "type": "string",
+                "pattern": "^[A-Z]{3}$"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Currency",
+            "description": "ISO 4217 code; required when a value is given."
+          },
+          "renewal_date": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Renewal Date",
+            "description": "When renewal notice is due (decision D-09)."
+          },
+          "contract_number": {
+            "type": "string",
+            "maxLength": 100,
+            "minLength": 1,
+            "title": "Contract Number",
+            "description": "Stored upper-cased; unique. See GET /contracts/defaults."
+          },
+          "title": {
+            "type": "string",
+            "maxLength": 300,
+            "minLength": 1,
+            "title": "Title"
+          },
+          "type_code": {
+            "type": "string",
+            "maxLength": 50,
+            "title": "Type Code",
+            "description": "An active code from GET /contract-types."
+          },
+          "status_code": {
+            "$ref": "#/components/schemas/StatusCode",
+            "description": "A new contract starts as draft or active.",
+            "default": "draft"
+          },
+          "start_date": {
+            "type": "string",
+            "format": "date",
+            "title": "Start Date"
+          },
+          "parties": {
+            "items": {
+              "$ref": "#/components/schemas/ContractPartyIn"
+            },
+            "type": "array",
+            "minItems": 1,
+            "title": "Parties",
+            "description": "At least one party (BR-02)."
+          },
+          "property_ids": {
+            "items": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "type": "array",
+            "title": "Property Ids"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "contract_number",
+          "title",
+          "type_code",
+          "start_date",
+          "parties"
+        ],
+        "title": "ContractCreate"
+      },
+      "ContractDefaults": {
+        "properties": {
+          "next_number": {
+            "type": "string",
+            "title": "Next Number",
+            "description": "Suggested number for a new contract; the user can change it."
+          },
+          "default_currency": {
+            "type": "string",
+            "title": "Default Currency"
+          },
+          "expiring_soon_days": {
+            "type": "integer",
+            "title": "Expiring Soon Days",
+            "description": "An active contract ending within this many days is expiring."
+          }
+        },
+        "type": "object",
+        "required": [
+          "next_number",
+          "default_currency",
+          "expiring_soon_days"
+        ],
+        "title": "ContractDefaults"
+      },
+      "ContractPartyIn": {
+        "properties": {
+          "party_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Party Id"
+          },
+          "role": {
+            "$ref": "#/components/schemas/PartyRole"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "party_id",
+          "role"
+        ],
+        "title": "ContractPartyIn"
+      },
+      "ContractPartyRead": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "display_name": {
+            "type": "string",
+            "title": "Display Name"
+          },
+          "party_type": {
+            "$ref": "#/components/schemas/PartyType"
+          },
+          "role": {
+            "$ref": "#/components/schemas/PartyRole"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "display_name",
+          "party_type",
+          "role"
+        ],
+        "title": "ContractPartyRead"
+      },
+      "ContractPropertyRead": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "code": {
+            "type": "string",
+            "title": "Code"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "property_type": {
+            "$ref": "#/components/schemas/PropertyType"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "code",
+          "name",
+          "property_type"
+        ],
+        "title": "ContractPropertyRead"
+      },
+      "ContractRead": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "contract_number": {
+            "type": "string",
+            "title": "Contract Number"
+          },
+          "title": {
+            "type": "string",
+            "title": "Title"
+          },
+          "contract_type": {
+            "$ref": "#/components/schemas/LookupRead"
+          },
+          "status": {
+            "$ref": "#/components/schemas/ContractStatusRead"
+          },
+          "description": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Description"
+          },
+          "start_date": {
+            "type": "string",
+            "format": "date",
+            "title": "Start Date"
+          },
+          "end_date": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "End Date"
+          },
+          "value_amount": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Value Amount"
+          },
+          "currency": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Currency"
+          },
+          "renewal_date": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Renewal Date"
+          },
+          "parties": {
+            "items": {
+              "$ref": "#/components/schemas/ContractPartyRead"
+            },
+            "type": "array",
+            "title": "Parties"
+          },
+          "properties": {
+            "items": {
+              "$ref": "#/components/schemas/ContractPropertyRead"
+            },
+            "type": "array",
+            "title": "Properties"
+          },
+          "archived_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Archived At"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Updated At"
+          },
+          "created_by": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/PersonRef"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "updated_by": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/PersonRef"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "contract_number",
+          "title",
+          "contract_type",
+          "status",
+          "description",
+          "start_date",
+          "end_date",
+          "value_amount",
+          "currency",
+          "renewal_date",
+          "parties",
+          "properties",
+          "archived_at",
+          "created_at",
+          "updated_at",
+          "created_by",
+          "updated_by"
+        ],
+        "title": "ContractRead"
+      },
+      "ContractSort": {
+        "type": "string",
+        "enum": [
+          "end_date",
+          "-end_date",
+          "start_date",
+          "-start_date",
+          "contract_number",
+          "title",
+          "-updated_at"
+        ],
+        "title": "ContractSort"
+      },
+      "ContractStatusRead": {
+        "properties": {
+          "code": {
+            "type": "string",
+            "title": "Code"
+          },
+          "name_en": {
+            "type": "string",
+            "title": "Name En"
+          },
+          "name_ar": {
+            "type": "string",
+            "title": "Name Ar"
+          },
+          "next_codes": {
+            "items": {
+              "$ref": "#/components/schemas/StatusCode"
+            },
+            "type": "array",
+            "title": "Next Codes",
+            "description": "Statuses this one may change to (D-17)."
+          }
+        },
+        "type": "object",
+        "required": [
+          "code",
+          "name_en",
+          "name_ar",
+          "next_codes"
+        ],
+        "title": "ContractStatusRead"
+      },
+      "ContractUpdate": {
+        "properties": {
+          "description": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 5000
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Description"
+          },
+          "end_date": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "End Date",
+            "description": "Leave empty for an open-ended contract. Not before start_date."
+          },
+          "value_amount": {
+            "anyOf": [
+              {
+                "type": "number",
+                "minimum": 0.0
+              },
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Value Amount"
+          },
+          "currency": {
+            "anyOf": [
+              {
+                "type": "string",
+                "pattern": "^[A-Z]{3}$"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Currency",
+            "description": "ISO 4217 code; required when a value is given."
+          },
+          "renewal_date": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Renewal Date",
+            "description": "When renewal notice is due (decision D-09)."
+          },
+          "contract_number": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 100,
+                "minLength": 1
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Contract Number"
+          },
+          "title": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 300,
+                "minLength": 1
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Title"
+          },
+          "type_code": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 50
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Type Code"
+          },
+          "status_code": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/StatusCode"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Must follow the allowed transitions (D-17)."
+          },
+          "start_date": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Start Date"
+          },
+          "parties": {
+            "anyOf": [
+              {
+                "items": {
+                  "$ref": "#/components/schemas/ContractPartyIn"
+                },
+                "type": "array",
+                "minItems": 1
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Parties"
+          },
+          "property_ids": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Property Ids"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "title": "ContractUpdate",
+        "description": "Partial update: only the fields sent change. `parties` and `property_ids` replace the whole list."
+      },
+      "ContractView": {
+        "type": "string",
+        "enum": [
+          "active",
+          "draft",
+          "expiring",
+          "ended",
+          "archived"
+        ],
+        "title": "ContractView",
+        "description": "The list tabs. Without a view, the list shows every contract that is not archived (BR-07)."
+      },
       "DataScope": {
         "type": "string",
         "enum": [
@@ -1629,6 +2944,29 @@
           "password"
         ],
         "title": "LoginRequest"
+      },
+      "LookupRead": {
+        "properties": {
+          "code": {
+            "type": "string",
+            "title": "Code"
+          },
+          "name_en": {
+            "type": "string",
+            "title": "Name En"
+          },
+          "name_ar": {
+            "type": "string",
+            "title": "Name Ar"
+          }
+        },
+        "type": "object",
+        "required": [
+          "code",
+          "name_en",
+          "name_ar"
+        ],
+        "title": "LookupRead"
       },
       "MeResponse": {
         "properties": {
@@ -1713,6 +3051,37 @@
           "total"
         ],
         "title": "Page[AuditLogRead]"
+      },
+      "Page_ContractRead_": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/ContractRead"
+            },
+            "type": "array",
+            "title": "Items"
+          },
+          "page": {
+            "type": "integer",
+            "title": "Page"
+          },
+          "page_size": {
+            "type": "integer",
+            "title": "Page Size"
+          },
+          "total": {
+            "type": "integer",
+            "title": "Total"
+          }
+        },
+        "type": "object",
+        "required": [
+          "items",
+          "page",
+          "page_size",
+          "total"
+        ],
+        "title": "Page[ContractRead]"
       },
       "Page_PartyRead_": {
         "properties": {
@@ -2060,6 +3429,25 @@
         ],
         "title": "PartyRead"
       },
+      "PartyRole": {
+        "type": "string",
+        "enum": [
+          "landlord",
+          "tenant",
+          "seller",
+          "buyer",
+          "owner",
+          "service_provider",
+          "contractor",
+          "consultant",
+          "partner",
+          "licensor",
+          "licensee",
+          "other"
+        ],
+        "title": "PartyRole",
+        "description": "A party's part in a contract (FR-PARTY-03)."
+      },
       "PartyType": {
         "type": "string",
         "enum": [
@@ -2189,6 +3577,25 @@
         "type": "object",
         "title": "PartyUpdate",
         "description": "Partial update: only the fields sent change; send null to clear one. The party type cannot change."
+      },
+      "PersonRef": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "full_name": {
+            "type": "string",
+            "title": "Full Name"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "full_name"
+        ],
+        "title": "PersonRef"
       },
       "PropertyCreate": {
         "properties": {
@@ -2655,12 +4062,25 @@
         "title": "SignUpRequest",
         "description": "Self sign-up. The role is not chosen by the user; the server assigns the configured default."
       },
+      "StatusCode": {
+        "type": "string",
+        "enum": [
+          "draft",
+          "active",
+          "expired",
+          "terminated",
+          "cancelled"
+        ],
+        "title": "StatusCode",
+        "description": "Seeded statuses (decision D-17). The codes are fixed; names live in contract_statuses."
+      },
       "TargetType": {
         "type": "string",
         "enum": [
           "user",
           "party",
-          "property"
+          "property",
+          "contract"
         ],
         "title": "TargetType"
       },

@@ -51,6 +51,19 @@ def changes_between(before: Mapping[str, Any], after: Mapping[str, Any]) -> dict
     return {field: [before.get(field), value] for field, value in after.items() if before.get(field) != value}
 
 
+def list_activity(
+    db: Session, target_type: TargetType, target_id: uuid.UUID, *, limit: int = 20
+) -> list[AuditLog]:
+    """The latest records about one target, newest first. The caller checks the user may see that target."""
+    stmt = (
+        select(AuditLog)
+        .where(AuditLog.target_type == target_type, AuditLog.target_id == target_id)
+        .order_by(AuditLog.occurred_at.desc(), AuditLog.id.desc())
+        .limit(limit)
+    )
+    return list(db.scalars(stmt))
+
+
 def list_audit_logs(
     db: Session,
     params: PageParams,

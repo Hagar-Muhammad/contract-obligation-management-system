@@ -1,13 +1,13 @@
 """Party directory (FR-PARTY-01, FR-PARTY-02).
 
 Who sees parties: users whose data scope is all records, and users who manage parties (they pick parties for
-contracts). Other users see none until contracts exist; module 4 adds the parties of contracts in their scope.
+contracts). Other users see the parties of the contracts they can see.
 """
 
 import uuid
 from typing import Any
 
-from sqlalchemy import Select, false, or_, select
+from sqlalchemy import Select, or_, select
 from sqlalchemy.orm import Session
 
 from app.core.errors import BusinessRuleError, ConflictError, NotFoundError
@@ -15,6 +15,8 @@ from app.core.pagination import PageParams, paginate
 from app.modules.audit import service as audit
 from app.modules.audit.actions import AuditAction, TargetType
 from app.modules.auth.dependencies import CurrentUser
+from app.modules.contracts.models import ContractParty
+from app.modules.contracts.scope import visible_contract_ids
 from app.modules.parties.models import Party
 from app.modules.parties.schemas import PartyCreate, PartyType, PartyUpdate
 from app.modules.users.rbac import DataScope, Perm
@@ -41,7 +43,11 @@ _UNIQUE_FIELDS = ("national_id", "passport_no", "registration_no")
 def _in_scope(stmt: Select[Party], current: CurrentUser) -> Select[Party]:
     if current.data_scope == DataScope.ALL or current.has(Perm.PARTY_MANAGE):
         return stmt
-    return stmt.where(false())
+    return stmt.where(
+        Party.id.in_(
+            select(ContractParty.party_id).where(ContractParty.contract_id.in_(visible_contract_ids(current)))
+        )
+    )
 
 
 def _snapshot(party: Party) -> dict[str, Any]:
