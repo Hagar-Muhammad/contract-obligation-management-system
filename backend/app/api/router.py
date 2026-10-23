@@ -8,6 +8,7 @@ from app.modules.documents.router import router as documents_router
 from app.modules.obligations.router import router as obligations_router
 from app.modules.parties.router import router as parties_router
 from app.modules.properties.router import router as properties_router
+from app.modules.search.router import router as search_router
 from app.modules.users.router import router as users_router
 
 API_PREFIX = "/api/v1"
@@ -22,3 +23,4 @@ api_router.include_router(properties_router)
 api_router.include_router(contracts_router)
 api_router.include_router(documents_router)
 api_router.include_router(obligations_router)
+api_router.include_router(search_router)

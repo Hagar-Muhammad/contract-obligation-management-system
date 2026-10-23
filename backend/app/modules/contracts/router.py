@@ -119,6 +119,7 @@ def list_contracts(
         None, max_length=200, description="Number, title, party name, or property name/code."
     ),
     type_code: str | None = Query(None, max_length=50),
+    status_code: list[StatusCode] = Query([], description="One or more statuses (FR-SEARCH-02)."),
     party_id: uuid.UUID | None = Query(None),
     property_id: uuid.UUID | None = Query(None, description="Contracts on this property (FR-PROP-02)."),
     term_from: date | None = Query(None, description="Contracts in force on or after this date."),
@@ -134,6 +135,7 @@ def list_contracts(
         view=view,
         q=q,
         type_code=type_code,
+        status_codes=status_code,
         party_id=party_id,
         property_id=property_id,
         term_from=term_from,

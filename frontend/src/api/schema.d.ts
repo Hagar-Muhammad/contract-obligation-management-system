@@ -679,6 +679,23 @@ export interface paths {
     patch?: never
     trace?: never
   }
+  '/api/v1/search': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Search everything you can see (top bar) */
+    get: operations['search_api_v1_search_get']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
 }
 export type webhooks = Record<string, never>
 export interface components {
@@ -895,6 +912,18 @@ export interface components {
        * @description An active contract ending within this many days is expiring.
        */
       expiring_soon_days: number
+    }
+    /** ContractHit */
+    ContractHit: {
+      /**
+       * Id
+       * Format: uuid
+       */
+      id: string
+      /** Contract Number */
+      contract_number: string
+      /** Title */
+      title: string
     }
     /** ContractPartyIn */
     ContractPartyIn: {
@@ -1242,6 +1271,21 @@ export interface components {
        */
       status: components['schemas']['ObligationStatus']
     }
+    /** ObligationHit */
+    ObligationHit: {
+      /**
+       * Id
+       * Format: uuid
+       */
+      id: string
+      /** Title */
+      title: string
+      /** Contract Number */
+      contract_number: string
+      /** Due Date */
+      due_date: string | null
+      effective_status: components['schemas']['EffectiveStatus']
+    }
     /** ObligationRead */
     ObligationRead: {
       /**
@@ -1458,6 +1502,17 @@ export interface components {
        */
       display_name: string
     }
+    /** PartyHit */
+    PartyHit: {
+      /**
+       * Id
+       * Format: uuid
+       */
+      id: string
+      /** Display Name */
+      display_name: string
+      party_type: components['schemas']['PartyType']
+    }
     /** PartyRead */
     PartyRead: {
       /**
@@ -1609,6 +1664,18 @@ export interface components {
        */
       manager_ids?: string[]
     }
+    /** PropertyHit */
+    PropertyHit: {
+      /**
+       * Id
+       * Format: uuid
+       */
+      id: string
+      /** Code */
+      code: string
+      /** Name */
+      name: string
+    }
     /** PropertyManagerRead */
     PropertyManagerRead: {
       /**
@@ -1711,6 +1778,17 @@ export interface components {
        * @description Granted only within the role's data scope ("Allowed" in SRS 3.2, shown as Scoped).
        */
       scoped_permissions: string[]
+    }
+    /** SearchResults */
+    SearchResults: {
+      /** Contracts */
+      contracts: components['schemas']['ContractHit'][]
+      /** Parties */
+      parties: components['schemas']['PartyHit'][]
+      /** Properties */
+      properties: components['schemas']['PropertyHit'][]
+      /** Obligations */
+      obligations: components['schemas']['ObligationHit'][]
     }
     /**
      * SignUpRequest
@@ -2781,6 +2859,8 @@ export interface operations {
         /** @description Number, title, party name, or property name/code. */
         q?: string | null
         type_code?: string | null
+        /** @description One or more statuses (FR-SEARCH-02). */
+        status_code?: components['schemas']['StatusCode'][]
         party_id?: string | null
         /** @description Contracts on this property (FR-PROP-02). */
         property_id?: string | null
@@ -3531,6 +3611,40 @@ export interface operations {
           [name: string]: unknown
         }
         content?: never
+      }
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['HTTPValidationError']
+        }
+      }
+    }
+  }
+  search_api_v1_search_get: {
+    parameters: {
+      query: {
+        /** @description At least two characters. */
+        q: string
+        /** @description Results per group. */
+        limit?: number
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['SearchResults']
+        }
       }
       /** @description Validation Error */
       422: {

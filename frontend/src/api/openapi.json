@@ -1567,6 +1567,21 @@
             }
           },
           {
+            "name": "status_code",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/components/schemas/StatusCode"
+              },
+              "description": "One or more statuses (FR-SEARCH-02).",
+              "default": [],
+              "title": "Status Code"
+            },
+            "description": "One or more statuses (FR-SEARCH-02)."
+          },
+          {
             "name": "party_id",
             "in": "query",
             "required": false,
@@ -2929,6 +2944,71 @@
           }
         }
       }
+    },
+    "/api/v1/search": {
+      "get": {
+        "tags": [
+          "search"
+        ],
+        "summary": "Search everything you can see (top bar)",
+        "operationId": "search_api_v1_search_get",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "q",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 2,
+              "maxLength": 200,
+              "description": "At least two characters.",
+              "title": "Q"
+            },
+            "description": "At least two characters."
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 20,
+              "minimum": 1,
+              "description": "Results per group.",
+              "default": 5,
+              "title": "Limit"
+            },
+            "description": "Results per group."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SearchResults"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
@@ -3407,6 +3487,30 @@
           "expiring_soon_days"
         ],
         "title": "ContractDefaults"
+      },
+      "ContractHit": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "contract_number": {
+            "type": "string",
+            "title": "Contract Number"
+          },
+          "title": {
+            "type": "string",
+            "title": "Title"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "contract_number",
+          "title"
+        ],
+        "title": "ContractHit"
       },
       "ContractPartyIn": {
         "properties": {
@@ -4315,6 +4419,47 @@
         ],
         "title": "ObligationCreate"
       },
+      "ObligationHit": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "title": {
+            "type": "string",
+            "title": "Title"
+          },
+          "contract_number": {
+            "type": "string",
+            "title": "Contract Number"
+          },
+          "due_date": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Due Date"
+          },
+          "effective_status": {
+            "$ref": "#/components/schemas/EffectiveStatus"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "title",
+          "contract_number",
+          "due_date",
+          "effective_status"
+        ],
+        "title": "ObligationHit"
+      },
       "ObligationRead": {
         "properties": {
           "id": {
@@ -4996,6 +5141,29 @@
         ],
         "title": "PartyCreate"
       },
+      "PartyHit": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "display_name": {
+            "type": "string",
+            "title": "Display Name"
+          },
+          "party_type": {
+            "$ref": "#/components/schemas/PartyType"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "display_name",
+          "party_type"
+        ],
+        "title": "PartyHit"
+      },
       "PartyRead": {
         "properties": {
           "id": {
@@ -5429,6 +5597,30 @@
         ],
         "title": "PropertyCreate"
       },
+      "PropertyHit": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "code": {
+            "type": "string",
+            "title": "Code"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "code",
+          "name"
+        ],
+        "title": "PropertyHit"
+      },
       "PropertyManagerRead": {
         "properties": {
           "id": {
@@ -5753,6 +5945,46 @@
           "scoped_permissions"
         ],
         "title": "RoleRead"
+      },
+      "SearchResults": {
+        "properties": {
+          "contracts": {
+            "items": {
+              "$ref": "#/components/schemas/ContractHit"
+            },
+            "type": "array",
+            "title": "Contracts"
+          },
+          "parties": {
+            "items": {
+              "$ref": "#/components/schemas/PartyHit"
+            },
+            "type": "array",
+            "title": "Parties"
+          },
+          "properties": {
+            "items": {
+              "$ref": "#/components/schemas/PropertyHit"
+            },
+            "type": "array",
+            "title": "Properties"
+          },
+          "obligations": {
+            "items": {
+              "$ref": "#/components/schemas/ObligationHit"
+            },
+            "type": "array",
+            "title": "Obligations"
+          }
+        },
+        "type": "object",
+        "required": [
+          "contracts",
+          "parties",
+          "properties",
+          "obligations"
+        ],
+        "title": "SearchResults"
       },
       "SignUpRequest": {
         "properties": {
