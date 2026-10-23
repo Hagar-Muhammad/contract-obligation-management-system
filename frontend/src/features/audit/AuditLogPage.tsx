@@ -35,12 +35,14 @@ const ACTION_TONE: Record<AuditAction, Tone> = {
   'contract.status_changed': 'blue',
   'contract.archived': 'grey',
   'contract.restored': 'green',
+  'contract.document_uploaded': 'green',
+  'document.downloaded': 'grey',
 }
 
-const ACTION_GROUPS = ['auth', 'user', 'party', 'property', 'contract'] as const
+const ACTION_GROUPS = ['auth', 'user', 'party', 'property', 'contract', 'document'] as const
 
-/** Where each kind of record opens in the app. */
-const TARGET_PATH: Record<AuditLog['target_type'], string> = {
+/** Where each kind of record opens in the app (documents open from their contract). */
+const TARGET_PATH: Partial<Record<AuditLog['target_type'], string>> = {
   user: '/users',
   party: '/parties',
   property: '/properties',
@@ -141,7 +143,7 @@ export function AuditLogPage() {
     const label = entry.target_label ?? '—'
     return (
       <span className="person-text">
-        {entry.target_id ? (
+        {entry.target_id && TARGET_PATH[entry.target_type] ? (
           <Link to={`${TARGET_PATH[entry.target_type]}/${entry.target_id}`} className="person-name">
             <bdi>{label}</bdi>
           </Link>

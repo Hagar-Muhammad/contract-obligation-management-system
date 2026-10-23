@@ -929,6 +929,87 @@ p {
   }
 }
 
+/* ---- Documents (screen 4) ---- */
+
+.document-list {
+  display: grid;
+  gap: 10px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.document-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px;
+  border: 1px solid var(--ct-border);
+  border-radius: 10px;
+}
+
+.document-text {
+  flex: 1;
+  min-width: 0;
+}
+
+.document-text bdi {
+  overflow-wrap: anywhere;
+}
+
+.file-badge {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  font-size: 10px;
+  font-weight: 800;
+}
+
+.file-pdf {
+  background: var(--ct-red-soft);
+  color: #b91c1c;
+}
+
+.file-docx {
+  background: var(--ct-blue-soft);
+  color: #1d4ed8;
+}
+
+.file-png,
+.file-jpg {
+  background: var(--ct-green-soft);
+  color: #15803d;
+}
+
+/* A button that looks like a link, for actions that are not navigation (open a file). */
+.link-text {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--ct-text);
+  font: inherit;
+  font-weight: 700;
+  text-align: start;
+  cursor: pointer;
+}
+
+.link-text:hover {
+  color: var(--ct-blue);
+}
+
+.upload-error {
+  margin-top: 12px;
+}
+
+.form-note {
+  margin-top: 10px;
+  font-size: 13px;
+}
+
 /* ---- Forms ---- */
 
 .form-section {

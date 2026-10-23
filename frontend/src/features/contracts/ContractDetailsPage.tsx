@@ -14,6 +14,7 @@ import {
   type Activity,
   type Contract,
 } from './api'
+import { DocumentsPanel } from '../documents/DocumentsPanel'
 import { useContractFormat } from './useContractFormat'
 
 const ACTIVITY_TONE: Record<string, string> = {
@@ -22,6 +23,7 @@ const ACTIVITY_TONE: Record<string, string> = {
   'contract.status_changed': 'blue',
   'contract.archived': 'grey',
   'contract.restored': 'green',
+  'contract.document_uploaded': 'green',
 }
 
 function ActivityList({ contract }: { contract: Contract }) {
@@ -49,6 +51,8 @@ function ActivityList({ contract }: { contract: Contract }) {
             .map((field) => t(`audit.fields.${field}`, { defaultValue: field }))
             .join(', '),
         })
+      case 'contract.document_uploaded':
+        return t('contracts.activity.documentUploaded', { name: changes.document?.[1] })
       default:
         return t(`contracts.activity.${entry.action.split('.')[1]}`)
     }
@@ -273,6 +277,8 @@ export function ContractDetailsPage() {
               </ul>
             )}
           </section>
+
+          <DocumentsPanel contractId={c.id} readOnly={archived} />
 
           <ActivityList contract={c} />
         </aside>

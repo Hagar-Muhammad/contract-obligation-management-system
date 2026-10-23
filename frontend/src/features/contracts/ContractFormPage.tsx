@@ -4,6 +4,7 @@ import dayjs, { type Dayjs } from 'dayjs'
 import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Navigate, useNavigate, useParams } from 'react-router-dom'
+import { PERMISSIONS, useAuth } from '../../auth/context'
 import { PageHeader } from '../../components/PageHeader'
 import { showServerErrors } from '../../components/showServerErrors'
 import {
@@ -15,6 +16,8 @@ import {
   useUpdateContract,
   type StatusCode,
 } from './api'
+import { uploadDocument } from '../documents/api'
+import { NewContractFiles } from '../documents/NewContractFiles'
 import { PartiesField, type PartyRow } from './PartiesField'
 import { PropertySelect } from './pickers'
 import { useContractFormat } from './useContractFormat'
@@ -59,6 +62,8 @@ export function ContractFormPage() {
   const types = useContractTypes()
   const statuses = useContractStatuses()
   const create = useCreateContract()
+  const { can } = useAuth()
+  const [files, setFiles] = useState<File[]>([])
   const update = useUpdateContract(id ?? '')
   const values = Form.useWatch([], form) as Partial<ContractFormValues> | undefined
 
@@ -121,6 +126,16 @@ export function ContractFormPage() {
     try {
       const saved = isNew ? await create.mutateAsync(body) : await update.mutateAsync(body)
       message.success(isNew ? t('contracts.created') : t('contracts.saved'))
+      // Files chosen in section 4 can only be stored once the contract exists (BR-09).
+      const failed: string[] = []
+      for (const file of isNew ? files : []) {
+        try {
+          await uploadDocument(saved.id, file, 'contract')
+        } catch {
+          failed.push(file.name)
+        }
+      }
+      if (failed.length) message.warning(t('documents.someFailed', { names: failed.join(', ') }))
       navigate(`/contracts/${saved.id}`)
     } catch (err) {
       showServerErrors(err, form, message, t)
@@ -316,6 +331,16 @@ export function ContractFormPage() {
               <PartiesField />
             </Form.Item>
           </section>
+
+          {isNew && can(PERMISSIONS.documentUpload) && (
+            <section className="panel form-section">
+              <h2 className="form-section-title">
+                <span className="step">4</span>
+                {t('documents.formSection')}
+              </h2>
+              <NewContractFiles value={files} onChange={setFiles} />
+            </section>
+          )}
 
           <div className="panel form-footer">
             <span className="form-footer-status">

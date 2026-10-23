@@ -173,7 +173,8 @@
       "user": "المستخدمون",
       "party": "الأطراف",
       "property": "العقارات",
-      "contract": "العقود"
+      "contract": "العقود",
+      "document": "المستندات"
     },
     "actions": {
       "auth": {
@@ -203,14 +204,19 @@
         "updated": "تعديل عقد",
         "status_changed": "تغيير حالة عقد",
         "archived": "أرشفة عقد",
-        "restored": "استعادة عقد"
+        "restored": "استعادة عقد",
+        "document_uploaded": "رفع مستند"
+      },
+      "document": {
+        "downloaded": "تنزيل مستند"
       }
     },
     "targets": {
       "user": "مستخدم",
       "party": "طرف",
       "property": "عقار",
-      "contract": "عقد"
+      "contract": "عقد",
+      "document": "مستند"
     },
     "fields": {
       "email": "البريد الإلكتروني",
@@ -245,7 +251,8 @@
       "currency": "العملة",
       "renewal_date": "موعد إشعار التجديد",
       "parties": "الأطراف",
-      "properties": "العقارات"
+      "properties": "العقارات",
+      "document": "المستند"
     }
   },
   "parties": {
@@ -470,7 +477,8 @@
       "updated": "عدّل {{fields}}",
       "statusChanged": "نقل العقد من {{from}} إلى {{to}}",
       "archived": "أرشف العقد",
-      "restored": "استعاد العقد"
+      "restored": "استعاد العقد",
+      "documentUploaded": "رفع {{name}}"
     },
     "fullAuditLog": "سجل التدقيق الكامل",
     "notFound": "هذا العقد غير موجود أو غير متاح لك.",
@@ -497,6 +505,34 @@
     "licensor": "المرخِّص",
     "licensee": "المرخَّص له",
     "other": "أخرى"
+  },
+  "documents": {
+    "title": "المستندات",
+    "upload": "رفع",
+    "uploadTitle": "رفع مستند",
+    "kind": "نوع المستند",
+    "kinds": {
+      "contract": "الأصل",
+      "amendment": "ملحق تعديل",
+      "annex": "مرفق",
+      "other": "أخرى"
+    },
+    "dropHere": "أفلت الملف هنا أو انقر لاختياره",
+    "dropSigned": "أفلت العقد الموقّع هنا أو انقر للاستعراض",
+    "hint": "{{types}} — حتى {{max}} ميجابايت",
+    "chooseFile": "اختر ملفًا أولًا.",
+    "wrongType": "نوع الملف غير مدعوم. ارفع {{types}}.",
+    "tooLarge": "حجم الملف أكبر من {{max}} ميجابايت.",
+    "empty": "الملف فارغ.",
+    "uploaded": "تم رفع {{name}}.",
+    "none": "لا توجد مستندات بعد.",
+    "downloadName": "تنزيل {{name}}",
+    "downloadFailed": "تعذّر تنزيل الملف. حاول مرة أخرى.",
+    "megabytes": "{{value}} ميجابايت",
+    "kilobytes": "{{value}} كيلوبايت",
+    "formSection": "مستند العقد",
+    "afterSaving": "تُرفق الملفات عند حفظ العقد، ويُحفظ الأصل دون تغيير.",
+    "someFailed": "تم حفظ العقد لكن لم تُرفع هذه الملفات: {{names}}. أضفها من صفحة العقد."
   },
   "scope": {
     "all": "كل العقود",

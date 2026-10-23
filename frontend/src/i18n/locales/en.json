@@ -173,7 +173,8 @@
       "user": "Users",
       "party": "Parties",
       "property": "Properties",
-      "contract": "Contracts"
+      "contract": "Contracts",
+      "document": "Documents"
     },
     "actions": {
       "auth": {
@@ -203,14 +204,19 @@
         "updated": "Edited contract",
         "status_changed": "Changed contract status",
         "archived": "Archived contract",
-        "restored": "Restored contract"
+        "restored": "Restored contract",
+        "document_uploaded": "Uploaded document"
+      },
+      "document": {
+        "downloaded": "Downloaded document"
       }
     },
     "targets": {
       "user": "User",
       "party": "Party",
       "property": "Property",
-      "contract": "Contract"
+      "contract": "Contract",
+      "document": "Document"
     },
     "fields": {
       "email": "Email",
@@ -245,7 +251,8 @@
       "currency": "Currency",
       "renewal_date": "Renewal notice date",
       "parties": "Parties",
-      "properties": "Properties"
+      "properties": "Properties",
+      "document": "Document"
     }
   },
   "parties": {
@@ -454,7 +461,8 @@
       "updated": "edited {{fields}}",
       "statusChanged": "moved the contract from {{from}} to {{to}}",
       "archived": "archived the contract",
-      "restored": "restored the contract"
+      "restored": "restored the contract",
+      "documentUploaded": "uploaded {{name}}"
     },
     "fullAuditLog": "Full audit log",
     "notFound": "This contract does not exist or is not available to you.",
@@ -481,6 +489,34 @@
     "licensor": "Licensor",
     "licensee": "Licensee",
     "other": "Other"
+  },
+  "documents": {
+    "title": "Documents",
+    "upload": "Upload",
+    "uploadTitle": "Upload a document",
+    "kind": "Document type",
+    "kinds": {
+      "contract": "Original",
+      "amendment": "Amendment",
+      "annex": "Annex",
+      "other": "Other"
+    },
+    "dropHere": "Drop a file here, or click to choose one",
+    "dropSigned": "Drop the signed contract here, or click to browse",
+    "hint": "{{types}} — up to {{max}} MB",
+    "chooseFile": "Choose a file first.",
+    "wrongType": "This file type is not supported. Upload {{types}}.",
+    "tooLarge": "The file is larger than {{max}} MB.",
+    "empty": "The file is empty.",
+    "uploaded": "{{name}} uploaded.",
+    "none": "No documents yet.",
+    "downloadName": "Download {{name}}",
+    "downloadFailed": "The file could not be downloaded. Try again.",
+    "megabytes": "{{value}} MB",
+    "kilobytes": "{{value}} KB",
+    "formSection": "Contract document",
+    "afterSaving": "Files are attached when you save the contract. The original is kept unchanged.",
+    "someFailed": "The contract was saved, but these files were not uploaded: {{names}}. Add them from the contract page."
   },
   "scope": {
     "all": "All contracts",

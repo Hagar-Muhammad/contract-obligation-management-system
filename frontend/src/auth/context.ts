@@ -28,6 +28,7 @@ export const PERMISSIONS = {
   contractCreate: 'contract:create',
   contractEdit: 'contract:edit',
   contractArchive: 'contract:archive',
+  documentUpload: 'document:upload',
   obligationView: 'obligation:view',
   extractionConfirm: 'extraction:confirm',
   partyManage: 'party:manage',
