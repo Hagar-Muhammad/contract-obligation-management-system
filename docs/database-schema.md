@@ -14,6 +14,9 @@ and this file is updated in that module's PR if the design changes.
   without a code change.
 - **Soft archive** instead of delete for contracts (`archived_at`), so history and audit stay intact (BR-07).
 - **Constraint names** follow the naming convention in `app/core/db.py`, for stable migrations.
+- **Search** (module 7, decision T-45): the IMMUTABLE function `search_normalize(text)` (migration `0008_search`)
+  lowercases and folds Arabic letter forms and diacritics; text searches compare `search_normalize(column)` with
+  the normalised query, mirroring `app/core/search.normalize()`. Trigram indexes on it can be added later (T-47).
 
 ## Entity relationship diagram
 
