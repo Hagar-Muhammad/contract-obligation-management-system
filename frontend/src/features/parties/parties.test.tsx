@@ -51,7 +51,7 @@ describe('TC-PARTY-01 parties list (FR-PARTY-01)', () => {
 
     expect(await screen.findByRole('heading', { name: 'Parties' })).toBeInTheDocument()
     // The number is wrapped in left-to-right isolate marks so it keeps its order in Arabic.
-    expect(await screen.findByText('Organization · Reg. no. ⁦41872⁩')).toBeInTheDocument()
+    expect(await screen.findByText('Organization · Reg. no. \u206641872\u2069')).toBeInTheDocument()
     expect(screen.getByText('Individual · National ID on file')).toBeInTheDocument()
     expect(screen.queryByText('28501011234567')).not.toBeInTheDocument()
     expect(screen.getByRole('link', { name: /Hany Fawzy/ })).toHaveAttribute('href', `/parties/${HANY.id}`)

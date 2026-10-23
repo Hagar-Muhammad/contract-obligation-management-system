@@ -2,7 +2,7 @@ import { useTranslation } from 'react-i18next'
 import type { Party } from './api'
 
 // Left-to-right isolate (LRI … PDI): keeps "512-884-201" in order inside Arabic text.
-const ltr = (value: string) => `⁦${value}⁩`
+const ltr = (value: string) => `\u2066${value}\u2069`
 
 /** "Organization · Reg. no. 41872" / "Individual · National ID on file", as in the design's party chips. */
 export function usePartySummary() {
