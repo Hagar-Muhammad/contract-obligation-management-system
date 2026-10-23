@@ -488,6 +488,75 @@ export interface paths {
     patch?: never
     trace?: never
   }
+  '/api/v1/documents/limits': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Allowed file types and size (D-12) */
+    get: operations['upload_limits_api_v1_documents_limits_get']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/api/v1/contracts/{contract_id}/documents': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** A contract's documents, newest first (FR-DOC-05) */
+    get: operations['list_documents_api_v1_contracts__contract_id__documents_get']
+    put?: never
+    /** Upload a document to a contract (FR-DOC-01, FR-DOC-04) */
+    post: operations['upload_document_api_v1_contracts__contract_id__documents_post']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/api/v1/documents/{document_id}': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Document metadata (FR-DOC-05) */
+    get: operations['get_document_api_v1_documents__document_id__get']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/api/v1/documents/{document_id}/download': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Download the original file (FR-DOC-02, FR-DOC-03, NFR-SEC-05) */
+    get: operations['download_document_api_v1_documents__document_id__download_get']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
 }
 export type webhooks = Record<string, never>
 export interface components {
@@ -539,6 +608,8 @@ export interface components {
       | 'contract.status_changed'
       | 'contract.archived'
       | 'contract.restored'
+      | 'contract.document_uploaded'
+      | 'document.downloaded'
     /** AuditActor */
     AuditActor: {
       /**
@@ -594,6 +665,16 @@ export interface components {
     AuthOptions: {
       /** Self Signup Enabled */
       self_signup_enabled: boolean
+    }
+    /** Body_upload_document_api_v1_contracts__contract_id__documents_post */
+    Body_upload_document_api_v1_contracts__contract_id__documents_post: {
+      /**
+       * File
+       * @description PDF, DOCX, PNG or JPG (decision D-12).
+       */
+      file: string
+      /** @default other */
+      kind: components['schemas']['DocumentKind']
     }
     /**
      * ContractCounts
@@ -829,6 +910,51 @@ export interface components {
      * @enum {string}
      */
     DataScope: 'all' | 'assigned_properties' | 'assigned_obligations'
+    /**
+     * DocumentKind
+     * @enum {string}
+     */
+    DocumentKind: 'contract' | 'amendment' | 'annex' | 'other'
+    /**
+     * DocumentRead
+     * @description Document metadata (FR-DOC-05). The file itself comes from GET /documents/{id}/download.
+     */
+    DocumentRead: {
+      /**
+       * Id
+       * Format: uuid
+       */
+      id: string
+      /**
+       * Contract Id
+       * Format: uuid
+       */
+      contract_id: string
+      kind: components['schemas']['DocumentKind']
+      /** Original Filename */
+      original_filename: string
+      file_type: components['schemas']['FileType']
+      /** Mime Type */
+      mime_type: string
+      /** Size Bytes */
+      size_bytes: number
+      /**
+       * Sha256
+       * @description SHA-256 of the original, recorded at upload (FR-DOC-02).
+       */
+      sha256: string
+      uploaded_by: components['schemas']['PersonRef']
+      /**
+       * Uploaded At
+       * Format: date-time
+       */
+      uploaded_at: string
+    }
+    /**
+     * FileType
+     * @enum {string}
+     */
+    FileType: 'pdf' | 'docx' | 'png' | 'jpg'
     /** HTTPValidationError */
     HTTPValidationError: {
       /** Detail */
@@ -1247,7 +1373,7 @@ export interface components {
      * TargetType
      * @enum {string}
      */
-    TargetType: 'user' | 'party' | 'property' | 'contract'
+    TargetType: 'user' | 'party' | 'property' | 'contract' | 'document'
     /** TokenResponse */
     TokenResponse: {
       /** Access Token */
@@ -1264,6 +1390,13 @@ export interface components {
        */
       expires_in: number
       user: components['schemas']['MeResponse']
+    }
+    /** UploadLimits */
+    UploadLimits: {
+      /** Max Bytes */
+      max_bytes: number
+      /** Allowed Types */
+      allowed_types: components['schemas']['FileType'][]
     }
     /** UserCreate */
     UserCreate: {
@@ -2484,6 +2617,168 @@ export interface operations {
         }
         content: {
           'application/json': components['schemas']['ActivityRead'][]
+        }
+      }
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['HTTPValidationError']
+        }
+      }
+    }
+  }
+  upload_limits_api_v1_documents_limits_get: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['UploadLimits']
+        }
+      }
+    }
+  }
+  list_documents_api_v1_contracts__contract_id__documents_get: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        contract_id: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['DocumentRead'][]
+        }
+      }
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['HTTPValidationError']
+        }
+      }
+    }
+  }
+  upload_document_api_v1_contracts__contract_id__documents_post: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        contract_id: string
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'multipart/form-data': components['schemas']['Body_upload_document_api_v1_contracts__contract_id__documents_post']
+      }
+    }
+    responses: {
+      /** @description Successful Response */
+      201: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['DocumentRead']
+        }
+      }
+      /** @description The file is larger than the limit */
+      413: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description The file type is not supported */
+      415: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['HTTPValidationError']
+        }
+      }
+    }
+  }
+  get_document_api_v1_documents__document_id__get: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        document_id: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['DocumentRead']
+        }
+      }
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['HTTPValidationError']
+        }
+      }
+    }
+  }
+  download_document_api_v1_documents__document_id__download_get: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        document_id: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description The original file */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/octet-stream': unknown
         }
       }
       /** @description Validation Error */

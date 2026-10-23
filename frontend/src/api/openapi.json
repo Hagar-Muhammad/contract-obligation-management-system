@@ -1993,6 +1993,238 @@
           }
         }
       }
+    },
+    "/api/v1/documents/limits": {
+      "get": {
+        "tags": [
+          "documents"
+        ],
+        "summary": "Allowed file types and size (D-12)",
+        "operationId": "upload_limits_api_v1_documents_limits_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UploadLimits"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/contracts/{contract_id}/documents": {
+      "get": {
+        "tags": [
+          "documents"
+        ],
+        "summary": "A contract's documents, newest first (FR-DOC-05)",
+        "operationId": "list_documents_api_v1_contracts__contract_id__documents_get",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "contract_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Contract Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/DocumentRead"
+                  },
+                  "title": "Response List Documents Api V1 Contracts  Contract Id  Documents Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "documents"
+        ],
+        "summary": "Upload a document to a contract (FR-DOC-01, FR-DOC-04)",
+        "operationId": "upload_document_api_v1_contracts__contract_id__documents_post",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "contract_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Contract Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "$ref": "#/components/schemas/Body_upload_document_api_v1_contracts__contract_id__documents_post"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DocumentRead"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "The file is larger than the limit"
+          },
+          "415": {
+            "description": "The file type is not supported"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/documents/{document_id}": {
+      "get": {
+        "tags": [
+          "documents"
+        ],
+        "summary": "Document metadata (FR-DOC-05)",
+        "operationId": "get_document_api_v1_documents__document_id__get",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "document_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Document Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DocumentRead"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/documents/{document_id}/download": {
+      "get": {
+        "tags": [
+          "documents"
+        ],
+        "summary": "Download the original file (FR-DOC-02, FR-DOC-03, NFR-SEC-05)",
+        "operationId": "download_document_api_v1_documents__document_id__download_get",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "document_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Document Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The original file",
+            "content": {
+              "application/octet-stream": {}
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
@@ -2077,7 +2309,9 @@
           "contract.updated",
           "contract.status_changed",
           "contract.archived",
-          "contract.restored"
+          "contract.restored",
+          "contract.document_uploaded",
+          "document.downloaded"
         ],
         "title": "AuditAction"
       },
@@ -2229,6 +2463,25 @@
           "self_signup_enabled"
         ],
         "title": "AuthOptions"
+      },
+      "Body_upload_document_api_v1_contracts__contract_id__documents_post": {
+        "properties": {
+          "file": {
+            "type": "string",
+            "contentMediaType": "application/octet-stream",
+            "title": "File",
+            "description": "PDF, DOCX, PNG or JPG (decision D-12)."
+          },
+          "kind": {
+            "$ref": "#/components/schemas/DocumentKind",
+            "default": "other"
+          }
+        },
+        "type": "object",
+        "required": [
+          "file"
+        ],
+        "title": "Body_upload_document_api_v1_contracts__contract_id__documents_post"
       },
       "ContractCounts": {
         "properties": {
@@ -2883,6 +3136,86 @@
         ],
         "title": "DataScope",
         "description": "Which records a role can see (applied in services, docs/roles-and-permissions.md)."
+      },
+      "DocumentKind": {
+        "type": "string",
+        "enum": [
+          "contract",
+          "amendment",
+          "annex",
+          "other"
+        ],
+        "title": "DocumentKind"
+      },
+      "DocumentRead": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "contract_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Contract Id"
+          },
+          "kind": {
+            "$ref": "#/components/schemas/DocumentKind"
+          },
+          "original_filename": {
+            "type": "string",
+            "title": "Original Filename"
+          },
+          "file_type": {
+            "$ref": "#/components/schemas/FileType"
+          },
+          "mime_type": {
+            "type": "string",
+            "title": "Mime Type"
+          },
+          "size_bytes": {
+            "type": "integer",
+            "title": "Size Bytes"
+          },
+          "sha256": {
+            "type": "string",
+            "title": "Sha256",
+            "description": "SHA-256 of the original, recorded at upload (FR-DOC-02)."
+          },
+          "uploaded_by": {
+            "$ref": "#/components/schemas/PersonRef"
+          },
+          "uploaded_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Uploaded At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "contract_id",
+          "kind",
+          "original_filename",
+          "file_type",
+          "mime_type",
+          "size_bytes",
+          "sha256",
+          "uploaded_by",
+          "uploaded_at"
+        ],
+        "title": "DocumentRead",
+        "description": "Document metadata (FR-DOC-05). The file itself comes from GET /documents/{id}/download."
+      },
+      "FileType": {
+        "type": "string",
+        "enum": [
+          "pdf",
+          "docx",
+          "png",
+          "jpg"
+        ],
+        "title": "FileType"
       },
       "HTTPValidationError": {
         "properties": {
@@ -4080,7 +4413,8 @@
           "user",
           "party",
           "property",
-          "contract"
+          "contract",
+          "document"
         ],
         "title": "TargetType"
       },
@@ -4112,6 +4446,27 @@
           "user"
         ],
         "title": "TokenResponse"
+      },
+      "UploadLimits": {
+        "properties": {
+          "max_bytes": {
+            "type": "integer",
+            "title": "Max Bytes"
+          },
+          "allowed_types": {
+            "items": {
+              "$ref": "#/components/schemas/FileType"
+            },
+            "type": "array",
+            "title": "Allowed Types"
+          }
+        },
+        "type": "object",
+        "required": [
+          "max_bytes",
+          "allowed_types"
+        ],
+        "title": "UploadLimits"
       },
       "UserCreate": {
         "properties": {

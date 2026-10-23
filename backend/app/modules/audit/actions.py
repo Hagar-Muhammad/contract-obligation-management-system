@@ -27,6 +27,8 @@ class AuditAction(StrEnum):
     CONTRACT_STATUS_CHANGED = "contract.status_changed"
     CONTRACT_ARCHIVED = "contract.archived"
     CONTRACT_RESTORED = "contract.restored"
+    CONTRACT_DOCUMENT_UPLOADED = "contract.document_uploaded"
+    DOCUMENT_DOWNLOADED = "document.downloaded"
 
 
 class ActorType(StrEnum):
@@ -42,3 +44,4 @@ class TargetType(StrEnum):
     PARTY = "party"
     PROPERTY = "property"
     CONTRACT = "contract"
+    DOCUMENT = "document"
