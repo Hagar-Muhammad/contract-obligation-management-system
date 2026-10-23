@@ -4,9 +4,9 @@ import { useEffect, useState } from 'react'
  * State for a paginated, searchable list: the search box text, the trimmed query to send (updated once typing
  * pauses, not on every keystroke) and the current page, which goes back to 1 whenever the query changes.
  */
-export function useListSearch(delayMs = 300) {
-  const [search, setSearch] = useState('')
-  const [query, setQuery] = useState('')
+export function useListSearch(initial = '', delayMs = 300) {
+  const [search, setSearch] = useState(initial)
+  const [query, setQuery] = useState(initial.trim())
   const [page, setPage] = useState(1)
 
   useEffect(() => {

@@ -2,7 +2,7 @@ import { EllipsisOutlined, PlusOutlined, SearchOutlined } from '@ant-design/icon
 import { App, Button, DatePicker, Dropdown, Input, Select, Table, Tabs, type TableProps } from 'antd'
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { Link, useNavigate, useSearchParams } from 'react-router-dom'
+import { Link, useLocation, useNavigate, useSearchParams } from 'react-router-dom'
 import { PERMISSIONS, useAuth } from '../../auth/context'
 import { PageHeader } from '../../components/PageHeader'
 import { useListSearch } from '../../components/useListSearch'
@@ -10,11 +10,13 @@ import {
   useContractCounts,
   useContractDefaults,
   useContracts,
+  useContractStatuses,
   useContractTypes,
   useSetArchived,
   type Contract,
   type ContractSort,
   type ContractView,
+  type StatusCode,
 } from './api'
 import { PartySelect, PropertySelect } from './pickers'
 import { useContractFormat } from './useContractFormat'
@@ -85,13 +87,20 @@ function RowActions({ contract }: { contract: Contract }) {
 
 /** Contracts (docs/design/ConTrack-UI.pdf, screen 3; FR-CON-03, FR-CON-05, FR-SEARCH-01/02, BR-07). */
 export function ContractsPage() {
+  // A new ?q= or ?property= (e.g. from the top-bar search) starts the list afresh.
+  const { search } = useLocation()
+  return <ContractList key={search} />
+}
+
+function ContractList() {
   const { t } = useTranslation()
   const { can } = useAuth()
   const format = useContractFormat()
   const [searchParams] = useSearchParams()
-  const { search, setSearch, query, page, setPage } = useListSearch()
+  const { search, setSearch, query, page, setPage } = useListSearch(searchParams.get('q') ?? '')
   const [view, setView] = useState<ContractView>('active')
   const [typeCode, setTypeCode] = useState<string>()
+  const [statusCodes, setStatusCodes] = useState<StatusCode[]>([])
   const [partyId, setPartyId] = useState<string>()
   // "All contracts for this property" links open the list filtered by ?property=<id> (FR-PROP-02).
   const [propertyId, setPropertyId] = useState<string | undefined>(searchParams.get('property') ?? undefined)
@@ -103,6 +112,7 @@ export function ContractsPage() {
     view,
     q: query,
     typeCode,
+    statusCodes,
     partyId,
     propertyId,
     termFrom: term.from,
@@ -111,6 +121,7 @@ export function ContractsPage() {
   })
   const counts = useContractCounts()
   const types = useContractTypes()
+  const statuses = useContractStatuses()
   const defaults = useContractDefaults()
   const expiringDays = defaults.data?.expiring_soon_days ?? 60
   const filtered =
@@ -260,6 +271,20 @@ export function ContractsPage() {
             value={typeCode}
             onChange={filtered(setTypeCode)}
             options={(types.data ?? []).map((type) => ({ value: type.code, label: format.name(type) }))}
+          />
+          <Select<StatusCode[]>
+            mode="multiple"
+            allowClear
+            maxTagCount="responsive"
+            className="filter-select"
+            placeholder={t('contracts.anyStatus')}
+            aria-label={t('contracts.statusFilter')}
+            value={statusCodes}
+            onChange={filtered(setStatusCodes)}
+            options={(statuses.data ?? []).map((status) => ({
+              value: status.code as StatusCode,
+              label: format.name(status),
+            }))}
           />
           <PartySelect
             className="filter-select"

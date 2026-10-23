@@ -1250,6 +1250,40 @@ p {
   }
 }
 
+/* ---- Top-bar search ---- */
+
+.topbar-search {
+  width: min(360px, 40vw);
+}
+
+.search-hit {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.search-hit bdi {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.search-hit-meta {
+  flex: none;
+  color: var(--ct-muted);
+  font-size: 12px;
+}
+
+.search-all {
+  color: var(--ct-blue);
+  font-weight: 600;
+}
+
+@media (max-width: 576px) {
+  .topbar-search {
+    width: 44vw;
+  }
+}
+
 /* ---- Forms ---- */
 
 .form-section {

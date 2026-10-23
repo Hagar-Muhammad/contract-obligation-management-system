@@ -6,6 +6,7 @@ import { Outlet, useLocation } from 'react-router-dom'
 import { useLanguage } from '../i18n/useLanguage'
 import { ErrorBoundary } from './ErrorBoundary'
 import { Sidebar } from './Sidebar'
+import { TopBarSearch } from './TopBarSearch'
 import { UserMenu } from './UserMenu'
 
 /** Signed-in layout from the design: dark sidebar, white top bar, light content area. */
@@ -40,6 +41,7 @@ export function AppShell() {
             aria-label={t('nav.openMenu')}
             onClick={() => setDrawerOpen(true)}
           />
+          <TopBarSearch />
           <div className="app-topbar-spacer" />
           <Button
             type="text"

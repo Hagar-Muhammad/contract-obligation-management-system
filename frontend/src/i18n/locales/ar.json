@@ -32,6 +32,11 @@
     "mainNavigation": "التنقل الرئيسي",
     "account": "الحساب"
   },
+  "search": {
+    "placeholder": "ابحث في العقود والأطراف والعقارات…",
+    "allContracts": "ابحث في كل العقود عن «{{query}}»",
+    "nothing": "لا توجد نتائج."
+  },
   "dashboard": {
     "morning": "صباح الخير، {{name}}",
     "afternoon": "مساء الخير، {{name}}",
@@ -516,7 +521,9 @@
     "noDescription": "لا يوجد وصف بعد.",
     "noProperties": "غير مرتبط بعقار.",
     "allForProperty": "كل عقود هذا العقار",
-    "colObligations": "الالتزامات"
+    "colObligations": "الالتزامات",
+    "anyStatus": "الحالة: أي حالة",
+    "statusFilter": "تصفية حسب الحالة"
   },
   "obligations": {
     "title": "الالتزامات",

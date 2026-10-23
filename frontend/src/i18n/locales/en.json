@@ -32,6 +32,11 @@
     "mainNavigation": "Main navigation",
     "account": "Account"
   },
+  "search": {
+    "placeholder": "Search contracts, parties, properties…",
+    "allContracts": "Search all contracts for “{{query}}”",
+    "nothing": "Nothing found."
+  },
   "dashboard": {
     "morning": "Good morning, {{name}}",
     "afternoon": "Good afternoon, {{name}}",
@@ -500,7 +505,9 @@
     "noDescription": "No description yet.",
     "noProperties": "Not linked to a property.",
     "allForProperty": "All contracts for this property",
-    "colObligations": "Obligations"
+    "colObligations": "Obligations",
+    "anyStatus": "Status: any",
+    "statusFilter": "Filter by status"
   },
   "obligations": {
     "title": "Obligations",

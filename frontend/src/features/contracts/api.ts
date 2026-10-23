@@ -36,6 +36,7 @@ export interface ContractListParams {
   view?: ContractView
   q?: string
   typeCode?: string
+  statusCodes?: StatusCode[]
   partyId?: string
   propertyId?: string
   termFrom?: string
@@ -67,6 +68,7 @@ export function useContracts(params: ContractListParams) {
               view: params.view,
               q: params.q || undefined,
               type_code: params.typeCode,
+              status_code: params.statusCodes?.length ? params.statusCodes : undefined,
               party_id: params.partyId,
               property_id: params.propertyId,
               term_from: params.termFrom,

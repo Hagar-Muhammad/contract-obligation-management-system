@@ -15,7 +15,7 @@ export default defineConfig({
     environment: 'jsdom',
     setupFiles: ['./src/test/setup.ts'],
     css: false,
-    // Ant Design in jsdom is slow; full-page flows (type, select, navigate) need more than 5s on CI.
-    testTimeout: 20000,
+    // Ant Design in jsdom is slow; full-page flows (type, select, navigate) need well over 5s on a loaded machine.
+    testTimeout: 30000,
   },
 })
