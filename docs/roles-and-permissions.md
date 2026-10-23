@@ -73,8 +73,9 @@ These are needed by the SRS functions but are not listed in 3.2. Defaults below;
 
   | Records | All-records roles | Property Manager | Employee |
   |---|---|---|---|
-  | Parties | All | All (holds `party:manage`; picks parties for contracts) | None until module 4: the parties of contracts in their scope |
-  | Properties | All | Assigned properties only | None until modules 4/6: properties of contracts in their scope |
+  | Contracts | All | Contracts linked to an assigned property; new contracts must link one (T-27) | Contracts of their obligations (module 6); none until then |
+  | Parties | All | All (holds `party:manage`; picks parties for contracts) | Parties of the contracts they can see |
+  | Properties | All | Assigned properties only | Properties of the contracts they can see |
 
 - Data scope is applied inside services, so list endpoints simply never return out-of-scope records, and fetching an
   out-of-scope record by ID returns `404` (not `403`) to avoid revealing that it exists.

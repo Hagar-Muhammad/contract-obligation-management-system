@@ -145,7 +145,7 @@ Seeded from 4.4 and decision D-17.
 | Column | Type | 7.2 field | Required |
 |---|---|---|---|
 | id | UUID PK | Contract ID | System |
-| contract_number | VARCHAR(100) UNIQUE NOT NULL | Contract Number | Yes |
+| contract_number | VARCHAR(100) UNIQUE NOT NULL | Contract Number | Yes (stored upper-cased, CHECK) |
 | title | VARCHAR(300) NOT NULL | Contract Name/Title | Yes |
 | contract_type_id | UUID FK NOT NULL | Contract Type | Yes |
 | description | TEXT | Description | Optional |
@@ -165,9 +165,12 @@ Constraints:
 - `CHECK ((value_amount IS NULL) = (currency IS NULL))` (currency required when value present).
 - At least one row in `contract_parties` (BR-02) — enforced in the service layer within the same transaction.
 
-**`contract_parties`** (7.1 ContractParty, FR-PARTY-03): `contract_id FK`, `party_id FK`, `role_in_contract` (e.g. `landlord`, `tenant`, `buyer`, `seller`, `contractor`, `other`), PK (`contract_id`, `party_id`, `role_in_contract`).
+**`contract_parties`** (7.1 ContractParty, FR-PARTY-03): `contract_id FK` (CASCADE), `party_id FK` (RESTRICT, indexed), `role` (`landlord`, `tenant`, `seller`, `buyer`, `owner`, `service_provider`, `contractor`, `consultant`, `partner`, `licensor`, `licensee`, `other`), PK (`contract_id`, `party_id`): one role per party per contract (T-30).
 
-**`contract_properties`** (FR-PROP-01): `contract_id FK`, `property_id FK`, PK (both).
+**`contract_properties`** (FR-PROP-01): `contract_id FK` (CASCADE), `property_id FK` (RESTRICT, indexed), PK (both).
+
+`source_document_id` (FR-EXT-06) is added with the documents and extraction modules. Indexes: `end_date`, `status_id`,
+`contract_type_id`, `archived_at`. Lookup rows are seeded by migration `0005_contracts` (English and Arabic names).
 
 ### Documents — module 5 (`documents`)
 

@@ -46,15 +46,15 @@ UC-03, UC-04 and UC-05 are the workflows defined in SRS 9.1–9.3; the others ar
 | FR-AUD-03 | UC-12 | Read-only page; hidden and blocked without `audit:view` | No write endpoints; triggers reject UPDATE, DELETE and TRUNCATE on `audit_logs` | TC-AUD-03 | 2 audit-trail | ✅ |
 | FR-PARTY-01 | UC-06 | Parties list (`features/parties/PartiesPage.tsx`), Party form (`PartyFormPage.tsx`) | `GET/POST /parties`, `GET/PATCH /parties/{id}` (`party:manage` to write); duplicate official numbers → 409; audited | TC-PARTY-01 | 3 parties-properties | ✅ |
 | FR-PARTY-02 | UC-06 | Party form: individual / organization switch with each type's fields | `party_type` CHECK + type-only identifier CHECKs; service rejects the other type's fields per field (422); type fixed after creation | TC-PARTY-02 | 3 parties-properties | ✅ |
-| FR-PARTY-03 | UC-03 | Contract form: parties section | `contract_parties`, `/contracts/{id}/parties` | TC-PARTY-03 | 3 parties-properties / 4 contracts | ⏳ |
-| FR-PROP-01 | UC-07 | Properties list + form with manager assignment (module 3); contract form: properties section (module 4) | Module 3: `properties`, `property_assignments`, `/properties` CRUD, `/properties/assignable-managers`. Module 4: `contract_properties`, `/contracts/{id}/properties` | TC-PROP-01 | 3 parties-properties / 4 contracts | 🚧 property register and assignments done; contract links in module 4 |
-| FR-PROP-02 | UC-07 | Property details: contracts & obligations tabs | `GET /properties/{id}/contracts`, `/obligations?property_id=` | TC-PROP-02 | 3 parties-properties / 6 obligations | ⏳ |
-| FR-CON-01 | UC-03 | Create Contract page | `POST /contracts` | TC-CON-01 | 4 contracts | ⏳ |
-| FR-CON-02 | UC-03 | Contract details page | Contract model (7.2 fields) | TC-CON-02 | 4 contracts | ⏳ |
-| FR-CON-03 | UC-03 | Contract details page | `GET /contracts/{id}` | TC-CON-03 | 4 contracts | ⏳ |
-| FR-CON-04 | UC-03 | Edit Contract page | `PATCH /contracts/{id}` + audit | TC-CON-04 | 4 contracts | ⏳ |
-| FR-CON-05 | UC-03 | Archive action, "show archived" toggle | `POST /contracts/{id}/archive` | TC-CON-05 | 4 contracts | ⏳ |
-| FR-CON-06 | UC-03 | Type/status selects from lookup API | `contract_types`, `contract_statuses` validation | TC-CON-06 | 4 contracts | ⏳ |
+| FR-PARTY-03 | UC-03 | Contract form section 3 (`features/contracts/PartiesField.tsx`): search parties, role per party, quick-create; details page Parties card | `contract_parties` (party + role); parties in `GET /contracts/{id}`; `GET /contracts?party_id=` | TC-PARTY-03 (`test_TC_CON_01_*`, `test_TC_CON_04_*`, `test_TC_BR_02_*`) | 3 parties-properties / 4 contracts | ✅ |
+| FR-PROP-01 | UC-07 | Properties list + form with manager assignment; contract form: properties field | `properties`, `property_assignments`, `/properties`, `/properties/assignable-managers`; `contract_properties` set via `property_ids` on `POST/PATCH /contracts` | TC-PROP-01 | 3 parties-properties / 4 contracts | ✅ |
+| FR-PROP-02 | UC-07 | "Contracts for this property" (property page) and "All contracts for this property" (contract page) open the contract list filtered by property; obligations in module 6 | `GET /contracts?property_id=`; `/obligations?property_id=` in module 6 | TC-PROP-02 (`test_contract_list_search_and_filters`) | 3 parties-properties / 6 obligations | 🚧 contracts done; obligations in module 6 |
+| FR-CON-01 | UC-03 | New contract (`features/contracts/ContractFormPage.tsx`, design screen 5): suggested number, save as draft | `POST /contracts`, `GET /contracts/defaults` | TC-CON-01 | 4 contracts | ✅ |
+| FR-CON-02 | UC-03 | Contract details: key facts, parties, properties (documents in module 5) | `contracts` (7.2 fields incl. renewal date, D-09), `contract_parties`, `contract_properties` | TC-CON-02 (`test_TC_CON_01_contract_manager_creates_*`) | 4 contracts | ✅ |
+| FR-CON-03 | UC-03 | Contracts list (screen 3) and details page (screen 4) with activity | `GET /contracts`, `GET /contracts/{id}`, `GET /contracts/{id}/activity` (scoped) | TC-CON-03 | 4 contracts | ✅ |
+| FR-CON-04 | UC-03 | Edit contract page; status choices limited to allowed transitions | `PATCH /contracts/{id}`; audited as `contract.updated` / `contract.status_changed` | TC-CON-04 | 4 contracts | ✅ |
+| FR-CON-05 | UC-03 | Archive / Restore on the details page and row menu; Archived tab | `POST /contracts/{id}/archive`, `/restore`; archived contracts read-only | TC-CON-05 | 4 contracts | ✅ |
+| FR-CON-06 | UC-03 | Type and status selects from the lookup API | `contract_types`, `contract_statuses` (seeded, `is_active`), `GET /contract-types`, `GET /contract-statuses`; D-17 transitions | TC-CON-06 | 4 contracts | ✅ |
 | FR-DOC-01 | UC-08 | Document upload on contract page | `POST /contracts/{id}/documents` | TC-DOC-01 | 5 documents | ⏳ |
 | FR-DOC-02 | UC-08 | Download original | Write-once storage + SHA-256 | TC-DOC-02 | 5 documents | ⏳ |
 | FR-DOC-03 | UC-08 | View/download action | `GET /documents/{id}/download` (permission-checked) | TC-DOC-03 | 5 documents | ⏳ |
@@ -67,10 +67,10 @@ UC-03, UC-04 and UC-05 are the workflows defined in SRS 9.1–9.3; the others ar
 | FR-OBL-05 | UC-05 | Obligation list/details (Overdue badge) | Overdue status logic + scheduled job | TC-OBL-05 | 6 obligations | ⏳ |
 | FR-OBL-06 | UC-05 | Recurrence editor | RRULE storage + occurrence job | TC-OBL-06 | 6 obligations | ⏳ |
 | FR-OBL-07 | UC-05 | Obligations list (search/filter/sort) | `GET /obligations` query params | TC-OBL-07 | 6 obligations / 7 search-filtering | ⏳ |
-| FR-SEARCH-01 | UC-09 | Contracts list search box | `GET /contracts?q=` | TC-SEARCH-01 | 7 search-filtering | ⏳ |
-| FR-SEARCH-02 | UC-09 | Contracts list filter bar | `GET /contracts` filters | TC-SEARCH-02 | 7 search-filtering | ⏳ |
+| FR-SEARCH-01 | UC-09 | Contracts list search box (number, title, party, property) | `GET /contracts?q=` | TC-SEARCH-01 (`test_contract_list_search_and_filters`) | 4 contracts / 7 search-filtering | ✅ contracts; top-bar search in module 7 |
+| FR-SEARCH-02 | UC-09 | Contracts list filter bar: type, party, property, term, tabs, sort | `GET /contracts` filters (`view`, `type_code`, `party_id`, `property_id`, `term_from/to`, `sort`) | TC-SEARCH-02 (`test_contract_list_search_and_filters`, `test_TC_CON_05_list_tabs_and_counts`) | 4 contracts / 7 search-filtering | ✅ |
 | FR-SEARCH-03 | UC-09 | Obligations list filter bar | `GET /obligations` filters | TC-SEARCH-03 | 7 search-filtering | ⏳ |
-| FR-SEARCH-04 | UC-09 | Paginated data table | Shared pagination (`page`, `page_size`, `total`) | TC-SEARCH-04 | 7 search-filtering | ⏳ |
+| FR-SEARCH-04 | UC-09 | Paginated tables (users, audit, parties, properties, contracts) | Shared pagination (`page`, `page_size`, `total`) in `app/core/pagination.py` | TC-SEARCH-04 (list tests per module) | 7 search-filtering | ✅ |
 | FR-NOTIF-01 | UC-10 | Notification bell / list | Reminder job (configured rules) | TC-NOTIF-01 | 8 notifications | ⏳ |
 | FR-NOTIF-02 | UC-10 | Notification bell / list | Overdue notification on status change | TC-NOTIF-02 | 8 notifications | ⏳ |
 | FR-NOTIF-03 | UC-10 | Mark read/unread | `POST /notifications/{id}/read` | TC-NOTIF-03 | 8 notifications | ⏳ |
@@ -98,12 +98,12 @@ UC-03, UC-04 and UC-05 are the workflows defined in SRS 9.1–9.3; the others ar
 | Rule | Enforced in | Test case | Module | Status |
 |---|---|---|---|---|
 | BR-01 | Obligation service + `NOT NULL` FK | TC-BR-01 | 6 obligations | ⏳ |
-| BR-02 | Contract service (≥1 party, same transaction) | TC-BR-02 | 4 contracts | ⏳ |
-| BR-03 | Pydantic validator + DB `CHECK` | TC-BR-03 | 4 contracts | ⏳ |
+| BR-02 | Contract service (`_parties`: ≥1, each once, must exist) + schema `min_length=1`; same transaction | TC-BR-02 | 4 contracts | ✅ |
+| BR-03 | Service check (field error on `end_date`) + DB `CHECK end_not_before_start`; form validation | TC-BR-03 | 4 contracts | ✅ |
 | BR-04 | Overdue status logic | TC-BR-04 | 6 obligations | ⏳ |
 | BR-05 | Extraction confirm flow (candidates separate) | TC-BR-05 | 9 extraction | ⏳ |
-| BR-06 | `require_permission()` on every write endpoint | TC-BR-06 | 1 auth-users-rbac (+ every module) | 🚧 users, parties (`party:manage`) and properties (`property:manage`) done; each module adds its endpoints |
-| BR-07 | Contract list default filter | TC-BR-07 | 4 contracts | ⏳ |
+| BR-06 | `require_permission()` on every write endpoint | TC-BR-06 | 1 auth-users-rbac (+ every module) | 🚧 users, parties, properties and contracts (create, edit, archive) done; each module adds its endpoints |
+| BR-07 | `GET /contracts` without `view` excludes archived; Archived tab asks with `view=archived` | TC-BR-07 (`test_TC_CON_05_*`) | 4 contracts | ✅ |
 | BR-08 | RRULE validation | TC-BR-08 | 6 obligations | ⏳ |
 | BR-09 | Document service + `NOT NULL` FK | TC-BR-09 | 5 documents | ⏳ |
 
