@@ -44,10 +44,10 @@ UC-03, UC-04 and UC-05 are the workflows defined in SRS 9.1–9.3; the others ar
 | FR-AUD-01 | UC-12 | — | `audit.record()` (`app/modules/audit/service.py`) in the same transaction as each change; module 1 records sign-in, failed sign-in, sign-out, stolen refresh token, user created/registered/updated/password reset/deactivated/activated | TC-AUD-01 | 2 audit-trail | ✅ |
 | FR-AUD-02 | UC-12 | Audit log page (`features/audit/AuditLogPage.tsx`): search, action and date filters, expandable changes | `audit_logs` (actor, action, target, timestamp, `{field: [old, new]}` changes, request id, IP); `GET /audit-logs` (`audit:view`) | TC-AUD-02 | 2 audit-trail | ✅ |
 | FR-AUD-03 | UC-12 | Read-only page; hidden and blocked without `audit:view` | No write endpoints; triggers reject UPDATE, DELETE and TRUNCATE on `audit_logs` | TC-AUD-03 | 2 audit-trail | ✅ |
-| FR-PARTY-01 | UC-06 | Parties list / Party form | `/parties` CRUD | TC-PARTY-01 | 3 parties-properties | ⏳ |
-| FR-PARTY-02 | UC-06 | Party form (type-specific fields) | Party type validation | TC-PARTY-02 | 3 parties-properties | ⏳ |
+| FR-PARTY-01 | UC-06 | Parties list (`features/parties/PartiesPage.tsx`), Party form (`PartyFormPage.tsx`) | `GET/POST /parties`, `GET/PATCH /parties/{id}` (`party:manage` to write); duplicate official numbers → 409; audited | TC-PARTY-01 | 3 parties-properties | ✅ |
+| FR-PARTY-02 | UC-06 | Party form: individual / organization switch with each type's fields | `party_type` CHECK + type-only identifier CHECKs; service rejects the other type's fields per field (422); type fixed after creation | TC-PARTY-02 | 3 parties-properties | ✅ |
 | FR-PARTY-03 | UC-03 | Contract form: parties section | `contract_parties`, `/contracts/{id}/parties` | TC-PARTY-03 | 3 parties-properties / 4 contracts | ⏳ |
-| FR-PROP-01 | UC-07 | Contract form: properties section | `contract_properties`, `/contracts/{id}/properties` | TC-PROP-01 | 3 parties-properties / 4 contracts | ⏳ |
+| FR-PROP-01 | UC-07 | Properties list + form with manager assignment (module 3); contract form: properties section (module 4) | Module 3: `properties`, `property_assignments`, `/properties` CRUD, `/properties/assignable-managers`. Module 4: `contract_properties`, `/contracts/{id}/properties` | TC-PROP-01 | 3 parties-properties / 4 contracts | 🚧 property register and assignments done; contract links in module 4 |
 | FR-PROP-02 | UC-07 | Property details: contracts & obligations tabs | `GET /properties/{id}/contracts`, `/obligations?property_id=` | TC-PROP-02 | 3 parties-properties / 6 obligations | ⏳ |
 | FR-CON-01 | UC-03 | Create Contract page | `POST /contracts` | TC-CON-01 | 4 contracts | ⏳ |
 | FR-CON-02 | UC-03 | Contract details page | Contract model (7.2 fields) | TC-CON-02 | 4 contracts | ⏳ |
@@ -102,7 +102,7 @@ UC-03, UC-04 and UC-05 are the workflows defined in SRS 9.1–9.3; the others ar
 | BR-03 | Pydantic validator + DB `CHECK` | TC-BR-03 | 4 contracts | ⏳ |
 | BR-04 | Overdue status logic | TC-BR-04 | 6 obligations | ⏳ |
 | BR-05 | Extraction confirm flow (candidates separate) | TC-BR-05 | 9 extraction | ⏳ |
-| BR-06 | `require_permission()` on every write endpoint | TC-BR-06 | 1 auth-users-rbac (+ every module) | 🚧 user management done; each module adds its endpoints |
+| BR-06 | `require_permission()` on every write endpoint | TC-BR-06 | 1 auth-users-rbac (+ every module) | 🚧 users, parties (`party:manage`) and properties (`property:manage`) done; each module adds its endpoints |
 | BR-07 | Contract list default filter | TC-BR-07 | 4 contracts | ⏳ |
 | BR-08 | RRULE validation | TC-BR-08 | 6 obligations | ⏳ |
 | BR-09 | Document service + `NOT NULL` FK | TC-BR-09 | 5 documents | ⏳ |
@@ -115,7 +115,7 @@ UC-03, UC-04 and UC-05 are the workflows defined in SRS 9.1–9.3; the others ar
 | NFR-REL-02 | `backend/tests/test_errors.py::test_unhandled_errors_do_not_leak_implementation_details` | ✅ |
 | NFR-UX-02 | `backend/tests/test_errors.py::test_validation_errors_list_every_invalid_field`; `users.test.tsx` (server field errors shown on the form) | 🚧 each new form adds tests |
 | NFR-SEC-01 | `test_auth.py::test_TC_AUTH_02_every_non_public_endpoint_rejects_unauthenticated_requests` (walks every route in the OpenAPI document) | ✅ |
-| NFR-SEC-02 | `test_rbac.py` (seeded matrix = SRS 3.2, per-role permissions), `test_users.py::test_TC_BR_06_*` | ✅ |
+| NFR-SEC-02 | `test_rbac.py` (seeded matrix = SRS 3.2, per-role permissions), `test_users.py::test_TC_BR_06_*`; data scope: `test_parties.py::test_party_directory_follows_data_scope`, `test_properties.py::test_property_manager_sees_only_assigned_properties` | ✅ |
 | NFR-SEC-03 | `test_auth.py::test_passwords_are_stored_as_argon2_hashes` | ✅ |
 | NFR-SEC-04 | `test_security.py` (HSTS + Secure cookies in production, weak JWT secret refused) | ✅ |
 | NFR-MAIN-03 | `test_request_context.py` (`X-Request-ID` on every response and in every log line); `test_audit.py` (important actions recorded) | ✅ |

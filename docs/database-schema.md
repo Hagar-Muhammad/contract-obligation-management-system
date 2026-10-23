@@ -106,17 +106,34 @@ application bugs (FR-AUD-03). Users are never deleted (only deactivated), hence 
 | Column | Type | Notes |
 |---|---|---|
 | id | UUID PK | |
-| party_type | VARCHAR(20) NOT NULL | `individual` or `organization` (CHECK). |
-| display_name | VARCHAR(300) NOT NULL | Full name or company name. |
-| national_id / passport_no | VARCHAR(50) | Individuals. Exact required fields: decision D-05. |
-| registration_no / tax_no | VARCHAR(50) | Organizations. |
-| email, phone, address | VARCHAR / TEXT | |
+| party_type | VARCHAR(20) NOT NULL | `individual` or `organization` (CHECK). Cannot change after creation. |
+| display_name | VARCHAR(300) NOT NULL | Full name or company name. Indexed. |
+| national_id / passport_no | VARCHAR(50) | Individuals only (CHECK). Stored without spaces, upper-cased; partial UNIQUE index each. |
+| registration_no / tax_no | VARCHAR(50) | Organizations only (CHECK). Same normalisation; `registration_no` has a partial UNIQUE index. |
+| email, phone, address | VARCHAR(320) / VARCHAR(50) / TEXT | |
 | notes | TEXT | |
 | created/updated metadata | | |
 
-**`properties`** (7.1 Property): `id`, `code UNIQUE`, `name`, `property_type`, `address`, `city`, `country`, `notes`, metadata.
+Required fields follow decision D-05 (only the name). No delete: parties will be referenced by contracts and the
+audit trail.
 
-**`property_assignments`**: `property_id FK`, `user_id FK`. Defines a Property Manager's data scope.
+**`properties`** (7.1 Property)
+
+| Column | Type | Notes |
+|---|---|---|
+| id | UUID PK | |
+| code | VARCHAR(50) UNIQUE NOT NULL | Business reference, e.g. `WM-G14`. Stored upper-cased (CHECK `code = upper(code)`). |
+| name | VARCHAR(200) NOT NULL | Indexed. |
+| property_type | VARCHAR(30) NOT NULL | `residential`, `retail`, `office`, `industrial`, `land`, `mixed_use`, `other` (CHECK; T-24). |
+| address | TEXT | |
+| city, country | VARCHAR(100) | |
+| area_sqm | NUMERIC(12,2) | Optional; CHECK > 0. |
+| notes | TEXT | |
+| created/updated metadata | | |
+
+**`property_assignments`**: `property_id FK` (CASCADE), `user_id FK` (CASCADE, indexed), PK (`property_id`,
+`user_id`). Defines a Property Manager's data scope; only active users with the Property Manager role can be
+assigned.
 
 ### Contracts — module 4 (`contracts`)
 

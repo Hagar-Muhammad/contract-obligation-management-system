@@ -69,6 +69,13 @@ These are needed by the SRS functions but are not listed in 3.2. Defaults below;
 
 - Every endpoint declares the permission it needs: `Depends(require_permission("contract:create"))`.
   Missing authentication → `401`; missing permission → `403` (FR-AUTH-02, FR-AUTH-03, NFR-SEC-02).
+- Data scope by record type (each module adds its own):
+
+  | Records | All-records roles | Property Manager | Employee |
+  |---|---|---|---|
+  | Parties | All | All (holds `party:manage`; picks parties for contracts) | None until module 4: the parties of contracts in their scope |
+  | Properties | All | Assigned properties only | None until modules 4/6: properties of contracts in their scope |
+
 - Data scope is applied inside services, so list endpoints simply never return out-of-scope records, and fetching an
   out-of-scope record by ID returns `404` (not `403`) to avoid revealing that it exists.
 - The frontend receives the current user's permission codes from `GET /api/v1/auth/me` and hides actions the user
