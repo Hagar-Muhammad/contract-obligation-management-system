@@ -8,11 +8,12 @@ import uuid
 from collections.abc import Sequence
 from typing import Any
 
-from sqlalchemy import Select, or_, select
+from sqlalchemy import Select, select
 from sqlalchemy.orm import Session
 
 from app.core.errors import BusinessRuleError, ConflictError, NotFoundError
 from app.core.pagination import PageParams, paginate
+from app.core.search import text_matches
 from app.modules.audit import service as audit
 from app.modules.audit.actions import AuditAction, TargetType
 from app.modules.auth.dependencies import CurrentUser
@@ -106,15 +107,7 @@ def list_properties(
     """Alphabetical by name. `q` matches code, name, city or address."""
     stmt = _in_scope(select(Property), current).order_by(Property.name, Property.code)
     if q:
-        pattern = f"%{q.strip()}%"
-        stmt = stmt.where(
-            or_(
-                Property.code.ilike(pattern),
-                Property.name.ilike(pattern),
-                Property.city.ilike(pattern),
-                Property.address.ilike(pattern),
-            )
-        )
+        stmt = stmt.where(text_matches(q, Property.code, Property.name, Property.city, Property.address))
     if property_type is not None:
         stmt = stmt.where(Property.property_type == property_type)
     if manager_id is not None:
@@ -140,8 +133,7 @@ def get_visible(db: Session, current: CurrentUser, ids: Sequence[uuid.UUID]) -> 
 def list_assignable_managers(db: Session, *, q: str | None = None) -> list[User]:
     stmt = _assignable()
     if q:
-        pattern = f"%{q.strip()}%"
-        stmt = stmt.where(or_(User.full_name.ilike(pattern), User.email.ilike(pattern)))
+        stmt = stmt.where(text_matches(q, User.full_name, User.email))
     return list(db.scalars(stmt.limit(ASSIGNABLE_LIMIT)))
 
 

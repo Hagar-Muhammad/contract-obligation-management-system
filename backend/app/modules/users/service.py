@@ -6,12 +6,13 @@ Administration functions assume the caller was already checked for `user:manage`
 import uuid
 from collections.abc import Sequence
 
-from sqlalchemy import or_, select
+from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from app.core.config import get_settings
 from app.core.errors import BusinessRuleError, ConflictError, ForbiddenError, NotFoundError
 from app.core.pagination import PageParams, paginate
+from app.core.search import text_matches
 from app.core.security import hash_password
 from app.modules.audit import service as audit
 from app.modules.audit.actions import ActorType, AuditAction, TargetType
@@ -81,8 +82,7 @@ def list_users(
 ) -> tuple[list[User], int]:
     stmt = select(User).order_by(User.full_name, User.email)
     if q:
-        pattern = f"%{q.strip()}%"
-        stmt = stmt.where(or_(User.full_name.ilike(pattern), User.email.ilike(pattern)))
+        stmt = stmt.where(text_matches(q, User.full_name, User.email))
     if is_active is not None:
         stmt = stmt.where(User.is_active.is_(is_active))
     return paginate(db, stmt, params)
@@ -92,8 +92,7 @@ def directory(db: Session, *, q: str | None = None, limit: int = 50) -> list[Use
     """Active users by name, for choosing who follows up an obligation."""
     stmt = select(User).where(User.is_active.is_(True)).order_by(User.full_name, User.email)
     if q:
-        pattern = f"%{q.strip()}%"
-        stmt = stmt.where(or_(User.full_name.ilike(pattern), User.email.ilike(pattern)))
+        stmt = stmt.where(text_matches(q, User.full_name, User.email))
     return list(db.scalars(stmt.limit(limit)))
 
 

@@ -12,6 +12,7 @@ from sqlalchemy.orm import Session
 
 from app.core.errors import BusinessRuleError, ConflictError, NotFoundError
 from app.core.pagination import PageParams, paginate
+from app.core.search import text_matches
 from app.modules.audit import service as audit
 from app.modules.audit.actions import AuditAction, TargetType
 from app.modules.auth.dependencies import CurrentUser
@@ -95,13 +96,10 @@ def list_parties(
     """Alphabetical. `q` matches name, e-mail or phone, or an official number exactly."""
     stmt = _in_scope(select(Party), current).order_by(Party.display_name, Party.id)
     if q:
-        pattern = f"%{q.strip()}%"
         number = "".join(q.split()).upper()
         stmt = stmt.where(
             or_(
-                Party.display_name.ilike(pattern),
-                Party.email.ilike(pattern),
-                Party.phone.ilike(pattern),
+                text_matches(q, Party.display_name, Party.email, Party.phone),
                 Party.national_id == number,
                 Party.passport_no == number,
                 Party.registration_no == number,

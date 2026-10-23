@@ -11,6 +11,7 @@ from sqlalchemy.orm import Session
 from app.core.config import get_settings
 from app.core.errors import BusinessRuleError, ConflictError, NotFoundError
 from app.core.pagination import PageParams, paginate
+from app.core.search import text_matches
 from app.modules.audit import service as audit
 from app.modules.audit.actions import AuditAction, TargetType
 from app.modules.auth.dependencies import CurrentUser
@@ -214,6 +215,7 @@ def list_contracts(
     view: ContractView | None = None,
     q: str | None = None,
     type_code: str | None = None,
+    status_codes: Sequence[StatusCode] = (),
     party_id: uuid.UUID | None = None,
     property_id: uuid.UUID | None = None,
     term_from: date | None = None,
@@ -222,17 +224,17 @@ def list_contracts(
 ) -> tuple[list[Contract], int]:
     stmt = select(Contract).where(contract_in_scope(current), _view_filter(view))
     if q:
-        pattern = f"%{q.strip()}%"
         stmt = stmt.where(
             or_(
-                Contract.contract_number.ilike(pattern),
-                Contract.title.ilike(pattern),
-                Contract.parties.any(ContractParty.party.has(Party.display_name.ilike(pattern))),
-                Contract.properties.any(or_(Property.name.ilike(pattern), Property.code.ilike(pattern))),
+                text_matches(q, Contract.contract_number, Contract.title),
+                Contract.parties.any(ContractParty.party.has(text_matches(q, Party.display_name))),
+                Contract.properties.any(text_matches(q, Property.name, Property.code)),
             )
         )
     if type_code:
         stmt = stmt.where(Contract.contract_type.has(ContractType.code == type_code))
+    if status_codes:
+        stmt = stmt.where(_status_in(status_codes))
     if party_id is not None:
         stmt = stmt.where(Contract.parties.any(ContractParty.party_id == party_id))
     if property_id is not None:

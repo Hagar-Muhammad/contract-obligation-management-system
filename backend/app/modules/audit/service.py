@@ -14,6 +14,7 @@ from sqlalchemy.orm import Session
 
 from app.core.pagination import PageParams, paginate
 from app.core.request_context import current_client_ip, current_request_id
+from app.core.search import text_matches
 from app.modules.audit.actions import ActorType, AuditAction, TargetType
 from app.modules.audit.models import AuditLog
 from app.modules.users.models import User
@@ -95,12 +96,7 @@ def list_audit_logs(
         .order_by(AuditLog.occurred_at.desc(), AuditLog.id.desc())
     )
     if q:
-        pattern = f"%{q.strip()}%"
-        stmt = stmt.where(
-            or_(
-                User.full_name.ilike(pattern), User.email.ilike(pattern), AuditLog.target_label.ilike(pattern)
-            )
-        )
+        stmt = stmt.where(text_matches(q, User.full_name, User.email, AuditLog.target_label))
     if action is not None:
         stmt = stmt.where(AuditLog.action == action)
     if target_type is not None:

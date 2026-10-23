@@ -15,6 +15,7 @@ from sqlalchemy.orm import Session
 
 from app.core.errors import BusinessRuleError, ForbiddenError, NotFoundError
 from app.core.pagination import PageParams, paginate
+from app.core.search import text_matches
 from app.modules.audit import service as audit
 from app.modules.audit.actions import ActorType, AuditAction, TargetType
 from app.modules.auth.dependencies import CurrentUser
@@ -168,14 +169,11 @@ def list_obligations(
     if (condition := _view_filter(view, on)) is not None:
         stmt = stmt.where(condition)
     if q:
-        pattern = f"%{q.strip()}%"
         stmt = stmt.where(
             or_(
-                Obligation.title.ilike(pattern),
-                Obligation.contract.has(
-                    or_(Contract.contract_number.ilike(pattern), Contract.title.ilike(pattern))
-                ),
-                Obligation.responsible_party.has(Party.display_name.ilike(pattern)),
+                text_matches(q, Obligation.title),
+                Obligation.contract.has(text_matches(q, Contract.contract_number, Contract.title)),
+                Obligation.responsible_party.has(text_matches(q, Party.display_name)),
             )
         )
     if contract_id is not None:
