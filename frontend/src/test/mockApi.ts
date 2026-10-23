@@ -44,11 +44,13 @@ export function mockApi(routes: Record<string, Handler>) {
     const request = input instanceof Request ? input : new Request(String(input), init)
     const url = new URL(request.url)
     const text = request.method === 'GET' ? '' : await request.clone().text()
+    const isJson = request.headers.get('Content-Type')?.includes('json') ?? false
     calls.push({
       method: request.method,
       path: url.pathname,
       search: url.search,
-      body: text ? JSON.parse(text) : undefined,
+      // JSON bodies are parsed; others (e.g. multipart uploads) are kept as text.
+      body: text ? (isJson ? JSON.parse(text) : text) : undefined,
       authorization: request.headers.get('Authorization'),
     })
     for (const route of compiled) {
