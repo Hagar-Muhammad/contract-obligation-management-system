@@ -73,7 +73,8 @@ These are needed by the SRS functions but are not listed in 3.2. Defaults below;
 
   | Records | All-records roles | Property Manager | Employee |
   |---|---|---|---|
-  | Contracts | All | Contracts linked to an assigned property; new contracts must link one (T-27) | Contracts of their obligations (module 6); none until then |
+  | Contracts | All | Contracts linked to an assigned property (new contracts must link one, T-27), and contracts of obligations assigned to them | Contracts of the obligations assigned to them |
+  | Obligations | All | Obligations of their contracts, and obligations assigned to them | Obligations assigned to them; they update the status and add evidence, not the details (T-41) |
   | Parties | All | All (holds `party:manage`; picks parties for contracts) | Parties of the contracts they can see |
   | Properties | All | Assigned properties only | Properties of the contracts they can see |
 

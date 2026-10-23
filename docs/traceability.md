@@ -48,7 +48,7 @@ UC-03, UC-04 and UC-05 are the workflows defined in SRS 9.1–9.3; the others ar
 | FR-PARTY-02 | UC-06 | Party form: individual / organization switch with each type's fields | `party_type` CHECK + type-only identifier CHECKs; service rejects the other type's fields per field (422); type fixed after creation | TC-PARTY-02 | 3 parties-properties | ✅ |
 | FR-PARTY-03 | UC-03 | Contract form section 3 (`features/contracts/PartiesField.tsx`): search parties, role per party, quick-create; details page Parties card | `contract_parties` (party + role); parties in `GET /contracts/{id}`; `GET /contracts?party_id=` | TC-PARTY-03 (`test_TC_CON_01_*`, `test_TC_CON_04_*`, `test_TC_BR_02_*`) | 3 parties-properties / 4 contracts | ✅ |
 | FR-PROP-01 | UC-07 | Properties list + form with manager assignment; contract form: properties field | `properties`, `property_assignments`, `/properties`, `/properties/assignable-managers`; `contract_properties` set via `property_ids` on `POST/PATCH /contracts` | TC-PROP-01 | 3 parties-properties / 4 contracts | ✅ |
-| FR-PROP-02 | UC-07 | "Contracts for this property" (property page) and "All contracts for this property" (contract page) open the contract list filtered by property; obligations in module 6 | `GET /contracts?property_id=`; `/obligations?property_id=` in module 6 | TC-PROP-02 (`test_contract_list_search_and_filters`) | 3 parties-properties / 6 obligations | 🚧 contracts done; obligations in module 6 |
+| FR-PROP-02 | UC-07 | Property page: "Contracts for this property" and "Obligations for this property"; contract page: "All contracts for this property" | `GET /contracts?property_id=`, `GET /obligations?property_id=` | TC-PROP-02 (`test_contract_list_search_and_filters`, `test_TC_OBL_07_*`) | 3 parties-properties / 6 obligations | ✅ |
 | FR-CON-01 | UC-03 | New contract (`features/contracts/ContractFormPage.tsx`, design screen 5): suggested number, save as draft | `POST /contracts`, `GET /contracts/defaults` | TC-CON-01 | 4 contracts | ✅ |
 | FR-CON-02 | UC-03 | Contract details: key facts, parties, properties (documents in module 5) | `contracts` (7.2 fields incl. renewal date, D-09), `contract_parties`, `contract_properties` | TC-CON-02 (`test_TC_CON_01_contract_manager_creates_*`) | 4 contracts | ✅ |
 | FR-CON-03 | UC-03 | Contracts list (screen 3) and details page (screen 4) with activity | `GET /contracts`, `GET /contracts/{id}`, `GET /contracts/{id}/activity` (scoped) | TC-CON-03 | 4 contracts | ✅ |
@@ -60,16 +60,16 @@ UC-03, UC-04 and UC-05 are the workflows defined in SRS 9.1–9.3; the others ar
 | FR-DOC-03 | UC-08 | Click a name to open (PDF/images), download button to save; fetched with the user's token | `GET /documents/{id}/download` (scoped by contract, sandboxed attachment, no-store); downloads audited | TC-DOC-03 | 5 documents | ✅ |
 | FR-DOC-04 | UC-08 | Upload dialog: type and size checked before sending; server reason shown | Content detection (PDF/DOCX/PNG/JPG, macro Word refused) → 415; size limit → 413 (middleware + service); empty → 422 | TC-DOC-04 | 5 documents | ✅ |
 | FR-DOC-05 | UC-08 | Documents panel: name, type, size, kind, upload date | `contract_documents` metadata; `GET /contracts/{id}/documents`, `GET /documents/{id}` | TC-DOC-05 | 5 documents | ✅ |
-| FR-OBL-01 | UC-05 | Create Obligation form | `POST /contracts/{id}/obligations` | TC-OBL-01 | 6 obligations | ⏳ |
-| FR-OBL-02 | UC-05 | Obligation details | Obligation model (7.3 fields) | TC-OBL-02 | 6 obligations | ⏳ |
-| FR-OBL-03 | UC-05 | Assignment fields | Responsible party/user validation | TC-OBL-03 | 6 obligations | ⏳ |
-| FR-OBL-04 | UC-05 | Status update action | `POST /obligations/{id}/status` + audit | TC-OBL-04 | 6 obligations | ⏳ |
-| FR-OBL-05 | UC-05 | Obligation list/details (Overdue badge) | Overdue status logic + scheduled job | TC-OBL-05 | 6 obligations | ⏳ |
-| FR-OBL-06 | UC-05 | Recurrence editor | RRULE storage + occurrence job | TC-OBL-06 | 6 obligations | ⏳ |
-| FR-OBL-07 | UC-05 | Obligations list (search/filter/sort) | `GET /obligations` query params | TC-OBL-07 | 6 obligations / 7 search-filtering | ⏳ |
+| FR-OBL-01 | UC-05 | New obligation (`features/obligations/ObligationFormPage.tsx`), "Add obligation" on the contract page | `POST /obligations` (contract in scope and not archived, else 422) | TC-OBL-01 | 6 obligations | ✅ |
+| FR-OBL-02 | UC-05 | Obligation panel and form (title, description, party, owner, dates or ongoing, priority, repeats, penalty, notes) | `obligations` (7.3 fields, D-07, D-08), `GET /obligations/{id}` | TC-OBL-02 | 6 obligations | ✅ |
+| FR-OBL-03 | UC-05 | Form: party chosen from the contract's parties, owner from the user directory | Party must belong to the contract; owner must be an active user; `GET /users/directory` | TC-OBL-03 | 6 obligations | ✅ |
+| FR-OBL-04 | UC-05 | Panel: Update status + note + Save update (design screen 7) | `POST /obligations/{id}/status`, audited with the note | TC-OBL-04 | 6 obligations | ✅ |
+| FR-OBL-05 | UC-05 | Overdue chip, red due dates and "N days overdue", Overdue pills | `effective_status` derived from the due date (BR-04); daily job `mark_overdue` records `overdue_at` + system audit (`python -m app.cli run-daily-jobs`) | TC-OBL-05 / TC-BR-04 | 6 obligations | ✅ |
+| FR-OBL-06 | UC-05 | Repeats: weekly, monthly, quarterly, every 6 months, yearly or a custom RRULE | `recurrence_rule` + `series_id`; next occurrence on completion/cancellation and by the daily job (`roll_recurrences`) | TC-OBL-06 | 6 obligations | ✅ |
+| FR-OBL-07 | UC-05 | Obligations list: chips, search, contract/owner/priority/due filters, only mine, sort | `GET /obligations` query params, `GET /obligations/counts` | TC-OBL-07 | 6 obligations | ✅ |
 | FR-SEARCH-01 | UC-09 | Contracts list search box (number, title, party, property) | `GET /contracts?q=` | TC-SEARCH-01 (`test_contract_list_search_and_filters`) | 4 contracts / 7 search-filtering | ✅ contracts; top-bar search in module 7 |
 | FR-SEARCH-02 | UC-09 | Contracts list filter bar: type, party, property, term, tabs, sort | `GET /contracts` filters (`view`, `type_code`, `party_id`, `property_id`, `term_from/to`, `sort`) | TC-SEARCH-02 (`test_contract_list_search_and_filters`, `test_TC_CON_05_list_tabs_and_counts`) | 4 contracts / 7 search-filtering | ✅ |
-| FR-SEARCH-03 | UC-09 | Obligations list filter bar | `GET /obligations` filters | TC-SEARCH-03 | 7 search-filtering | ⏳ |
+| FR-SEARCH-03 | UC-09 | Obligations list filter bar | `GET /obligations` filters | TC-SEARCH-03 (`test_TC_OBL_07_*`) | 6 obligations / 7 search-filtering | ✅ |
 | FR-SEARCH-04 | UC-09 | Paginated tables (users, audit, parties, properties, contracts) | Shared pagination (`page`, `page_size`, `total`) in `app/core/pagination.py` | TC-SEARCH-04 (list tests per module) | 7 search-filtering | ✅ |
 | FR-NOTIF-01 | UC-10 | Notification bell / list | Reminder job (configured rules) | TC-NOTIF-01 | 8 notifications | ⏳ |
 | FR-NOTIF-02 | UC-10 | Notification bell / list | Overdue notification on status change | TC-NOTIF-02 | 8 notifications | ⏳ |
@@ -97,14 +97,14 @@ UC-03, UC-04 and UC-05 are the workflows defined in SRS 9.1–9.3; the others ar
 
 | Rule | Enforced in | Test case | Module | Status |
 |---|---|---|---|---|
-| BR-01 | Obligation service + `NOT NULL` FK | TC-BR-01 | 6 obligations | ⏳ |
+| BR-01 | `obligations.contract_id NOT NULL` FK; service requires a contract in scope | TC-BR-01 (`test_TC_OBL_01_*`) | 6 obligations | ✅ |
 | BR-02 | Contract service (`_parties`: ≥1, each once, must exist) + schema `min_length=1`; same transaction | TC-BR-02 | 4 contracts | ✅ |
 | BR-03 | Service check (field error on `end_date`) + DB `CHECK end_not_before_start`; form validation | TC-BR-03 | 4 contracts | ✅ |
-| BR-04 | Overdue status logic | TC-BR-04 | 6 obligations | ⏳ |
+| BR-04 | Derived overdue (`due_date < today` and open) in every query and response; daily job records it | TC-BR-04 | 6 obligations | ✅ |
 | BR-05 | Extraction confirm flow (candidates separate) | TC-BR-05 | 9 extraction | ⏳ |
-| BR-06 | `require_permission()` on every write endpoint | TC-BR-06 | 1 auth-users-rbac (+ every module) | 🚧 users, parties, properties and contracts (create, edit, archive) done; each module adds its endpoints |
+| BR-06 | `require_permission()` on every write endpoint | TC-BR-06 | 1 auth-users-rbac (+ every module) | 🚧 users, parties, properties, contracts, documents and obligations done; each module adds its endpoints |
 | BR-07 | `GET /contracts` without `view` excludes archived; Archived tab asks with `view=archived` | TC-BR-07 (`test_TC_CON_05_*`) | 4 contracts | ✅ |
-| BR-08 | RRULE validation | TC-BR-08 | 6 obligations | ⏳ |
+| BR-08 | `recurrence.normalise()`: RFC 5545 RRULE, weekly/monthly/yearly only, must repeat, needs a due date | TC-BR-08 | 6 obligations | ✅ |
 | BR-09 | `contract_documents.contract_id NOT NULL` FK; upload only through a contract in scope, not archived; new-contract files uploaded after the contract exists | TC-BR-09 | 5 documents | ✅ |
 
 ## Non-functional requirements with automated tests

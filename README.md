@@ -66,6 +66,9 @@ uvicorn app.main:app --reload
 users from **Users** in the app. People can also register themselves with **Create an account** on the login page;
 they start with the Employee role (`SELF_SIGNUP_ENABLED` / `SELF_SIGNUP_ROLE` in `.env`).
 
+Daily jobs (overdue obligations, next occurrences of recurring obligations) run with
+`python -m app.cli run-daily-jobs`; schedule it once a day (it is scheduled automatically with module 8).
+
 - API: http://localhost:8000/api/v1
 - Swagger UI: http://localhost:8000/api/docs
 - Health: http://localhost:8000/api/v1/health and `/api/v1/health/ready`

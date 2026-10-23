@@ -209,21 +209,29 @@ key. `storage_key` is UNIQUE; `contract_id` is indexed and RESTRICT. Evidence at
 | start_date | DATE | Start Date | Optional |
 | due_date | DATE | Due Date | Conditional |
 | priority | VARCHAR(10) NOT NULL | Priority (`low`, `medium`, `high`, `critical`) | Yes |
-| status | VARCHAR(20) NOT NULL | Status (`pending`, `in_progress`, `completed`, `overdue`, `cancelled`) | Yes |
+| status | VARCHAR(20) NOT NULL | Status set by people (`pending`, `in_progress`, `completed`, `cancelled`); Overdue is derived (below) | Yes |
 | recurrence_rule | VARCHAR(500) | Frequency (RFC 5545 RRULE) | Optional |
-| parent_obligation_id | UUID FK → obligations | Series link for recurring occurrences | System |
+| series_id | UUID | All occurrences of a recurring obligation share the first one's id | System |
+| overdue_at | TIMESTAMPTZ | When the daily job first saw it overdue (cleared when it is no longer) | System |
 | penalty_text | TEXT | (decision D-08) | Optional |
 | notes | TEXT | Notes | Optional |
 | completed_at / cancelled_at | TIMESTAMPTZ | | System |
-| source_document_id | UUID FK → contract_documents | (FR-EXT-06) | System |
 | created/updated metadata | | | System |
+
+`source_document_id` (FR-EXT-06) is added with module 9. Evidence files are `contract_documents` rows with
+`kind = 'evidence'` and `obligation_id` set (CHECK: evidence ⇔ obligation).
 
 Rules:
 
 - Responsible party must be one of the contract's parties.
-- `recurrence_rule` must parse as a valid RRULE when present (BR-08).
-- Overdue (BR-04): `due_date < today AND status NOT IN ('completed', 'cancelled')`. A scheduled job sets
-  `status = 'overdue'`; list queries evaluate the same condition so results are correct between job runs.
+- `recurrence_rule` must parse as a valid RRULE when present (BR-08): weekly, monthly or yearly, counted from
+  the series' first due date; a recurring obligation needs a due date (CHECK).
+- Overdue (BR-04): `due_date < today AND status IN ('pending', 'in_progress')`, evaluated in every query and
+  response, so it is always correct. The daily job only records `overdue_at` and a system audit entry (and
+  feeds notifications in module 8). It does not overwrite the status people set.
+- The next occurrence of a series is created when the latest one is completed or cancelled, or once its due
+  date has passed; not for archived or ended contracts; COUNT/UNTIL end the series.
+- CHECK `due_date >= start_date` when both are set.
 - Index on (`status`, `due_date`) and (`responsible_user_id`, `status`) for reminders and dashboards.
 
 ### Notifications — module 8 (`notifications`)
