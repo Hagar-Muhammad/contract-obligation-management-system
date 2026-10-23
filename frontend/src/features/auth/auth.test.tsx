@@ -156,10 +156,10 @@ describe('TC-AUTH-03 role-based UI (FR-AUTH-03)', () => {
 
   it('marks pages that later modules deliver', async () => {
     mockApi({ ...signedInAs(ADMIN) })
-    renderApp('/contracts')
+    renderApp('/obligations')
 
-    expect(await screen.findByText('Contracts is on its way')).toBeInTheDocument()
-    expect(screen.getByText('This page arrives with module 4 of the delivery plan.')).toBeInTheDocument()
+    expect(await screen.findByText('Obligations is on its way')).toBeInTheDocument()
+    expect(screen.getByText('This page arrives with module 6 of the delivery plan.')).toBeInTheDocument()
   })
 })
 
