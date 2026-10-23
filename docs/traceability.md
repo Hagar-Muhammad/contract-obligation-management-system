@@ -67,10 +67,10 @@ UC-03, UC-04 and UC-05 are the workflows defined in SRS 9.1–9.3; the others ar
 | FR-OBL-05 | UC-05 | Overdue chip, red due dates and "N days overdue", Overdue pills | `effective_status` derived from the due date (BR-04); daily job `mark_overdue` records `overdue_at` + system audit (`python -m app.cli run-daily-jobs`) | TC-OBL-05 / TC-BR-04 | 6 obligations | ✅ |
 | FR-OBL-06 | UC-05 | Repeats: weekly, monthly, quarterly, every 6 months, yearly or a custom RRULE | `recurrence_rule` + `series_id`; next occurrence on completion/cancellation and by the daily job (`roll_recurrences`) | TC-OBL-06 | 6 obligations | ✅ |
 | FR-OBL-07 | UC-05 | Obligations list: chips, search, contract/owner/priority/due filters, only mine, sort | `GET /obligations` query params, `GET /obligations/counts` | TC-OBL-07 | 6 obligations | ✅ |
-| FR-SEARCH-01 | UC-09 | Contracts list search box (number, title, party, property) | `GET /contracts?q=` | TC-SEARCH-01 (`test_contract_list_search_and_filters`) | 4 contracts / 7 search-filtering | ✅ contracts; top-bar search in module 7 |
-| FR-SEARCH-02 | UC-09 | Contracts list filter bar: type, party, property, term, tabs, sort | `GET /contracts` filters (`view`, `type_code`, `party_id`, `property_id`, `term_from/to`, `sort`) | TC-SEARCH-02 (`test_contract_list_search_and_filters`, `test_TC_CON_05_list_tabs_and_counts`) | 4 contracts / 7 search-filtering | ✅ |
+| FR-SEARCH-01 | UC-09 | Top-bar search (`components/TopBarSearch.tsx`) and the contracts list search box | `GET /search`, `GET /contracts?q=` (number, title, party, property); Arabic-aware matching (`app/core/search.py`, `search_normalize()`) | TC-SEARCH-01 | 4 contracts / 7 search-filtering | ✅ |
+| FR-SEARCH-02 | UC-09 | Contracts list: tabs, type, status, party, property, term, sort | `GET /contracts` filters (`view`, `type_code`, `status_code`, `party_id`, `property_id`, `term_from/to`, `sort`) | TC-SEARCH-02 | 4 contracts / 7 search-filtering | ✅ |
 | FR-SEARCH-03 | UC-09 | Obligations list filter bar | `GET /obligations` filters | TC-SEARCH-03 (`test_TC_OBL_07_*`) | 6 obligations / 7 search-filtering | ✅ |
-| FR-SEARCH-04 | UC-09 | Paginated tables (users, audit, parties, properties, contracts) | Shared pagination (`page`, `page_size`, `total`) in `app/core/pagination.py` | TC-SEARCH-04 (list tests per module) | 7 search-filtering | ✅ |
+| FR-SEARCH-04 | UC-09 | Every list is paginated on the server | `app/core/pagination.py`: `page` ≥ 1, `page_size` ≤ 100, `total` counted before paging | TC-SEARCH-04 | 7 search-filtering | ✅ |
 | FR-NOTIF-01 | UC-10 | Notification bell / list | Reminder job (configured rules) | TC-NOTIF-01 | 8 notifications | ⏳ |
 | FR-NOTIF-02 | UC-10 | Notification bell / list | Overdue notification on status change | TC-NOTIF-02 | 8 notifications | ⏳ |
 | FR-NOTIF-03 | UC-10 | Mark read/unread | `POST /notifications/{id}/read` | TC-NOTIF-03 | 8 notifications | ⏳ |
@@ -120,5 +120,5 @@ UC-03, UC-04 and UC-05 are the workflows defined in SRS 9.1–9.3; the others ar
 | NFR-SEC-04 | `test_security.py` (HSTS + Secure cookies in production, weak JWT secret refused) | ✅ |
 | NFR-MAIN-03 | `test_request_context.py` (`X-Request-ID` on every response and in every log line); `test_audit.py` (important actions recorded) | ✅ |
 | NFR-SEC-05, NFR-SEC-06 | `test_documents.py` (scope per role, no public path, sandboxed downloads; content-type detection, size limit, file-name cleaning); every form's validation tests | ✅ |
-| NFR-PERF-02 | Module 7 tests (page size cap, server-side filters) | ⏳ |
+| NFR-PERF-02 | `test_search.py::test_TC_SEARCH_04_*` (every list capped at 100 per page, filtered and counted on the server) | ✅ |
 | NFR-PERF-03, NFR-REL-03 | Module 9 tests | ⏳ |
