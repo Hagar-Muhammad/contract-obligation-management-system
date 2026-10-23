@@ -6,7 +6,7 @@ from app.api.router import API_PREFIX, api_router
 from app.core.config import Settings, get_settings
 from app.core.errors import register_error_handlers
 from app.core.logging import configure_logging
-from app.core.middleware import add_security_headers
+from app.core.middleware import BodySizeLimitMiddleware, add_security_headers
 from app.core.request_context import REQUEST_ID_HEADER, RequestContextMiddleware
 
 
@@ -21,6 +21,8 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         docs_url="/api/docs",
         redoc_url="/api/redoc",
     )
+    # Innermost of the middleware below, so even an early 413 carries CORS and security headers.
+    app.add_middleware(BodySizeLimitMiddleware, settings=settings)
     app.add_middleware(
         CORSMiddleware,
         allow_origins=settings.cors_origins,

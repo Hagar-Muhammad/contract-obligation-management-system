@@ -67,6 +67,20 @@ class BusinessRuleError(AppError):
     code = "business_rule_violation"
 
 
+class PayloadTooLargeError(AppError):
+    """An upload above the size limit (FR-DOC-04)."""
+
+    status_code = HTTPStatus.REQUEST_ENTITY_TOO_LARGE
+    code = "payload_too_large"
+
+
+class UnsupportedMediaTypeError(AppError):
+    """An upload whose content is not an allowed file type (FR-DOC-04, NFR-SEC-06)."""
+
+    status_code = HTTPStatus.UNSUPPORTED_MEDIA_TYPE
+    code = "unsupported_media_type"
+
+
 def error_body(code: str, message: str, details: Any = None) -> dict[str, Any]:
     error: dict[str, Any] = {"code": code, "message": message}
     if details is not None:

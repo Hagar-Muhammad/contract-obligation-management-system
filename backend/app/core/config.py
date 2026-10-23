@@ -42,6 +42,11 @@ class Settings(BaseSettings):
     contract_number_prefix: str = Field(default="CT", pattern=r"^[A-Z0-9]{1,10}$")
     expiring_soon_days: int = Field(default=60, ge=1, le=365)
 
+    # Contract documents (module 5, decision D-12). Originals are kept on this disk path, outside the web root.
+    storage_dir: str = "storage"
+    upload_max_bytes: int = Field(default=20 * 1024 * 1024, ge=1024)
+    upload_allowed_types: list[Literal["pdf", "docx", "png", "jpg"]] = ["pdf", "docx", "png", "jpg"]
+
     @property
     def is_production(self) -> bool:
         return self.app_env == "production"
