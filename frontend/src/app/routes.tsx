@@ -8,6 +8,9 @@ import { LoginPage } from '../features/auth/LoginPage'
 import { SignUpPage } from '../features/auth/SignUpPage'
 import { DashboardPage } from '../features/dashboard/DashboardPage'
 import { AuditLogPage } from '../features/audit/AuditLogPage'
+import { ContractDetailsPage } from '../features/contracts/ContractDetailsPage'
+import { ContractFormPage } from '../features/contracts/ContractFormPage'
+import { ContractsPage } from '../features/contracts/ContractsPage'
 import { PartiesPage } from '../features/parties/PartiesPage'
 import { PartyFormPage } from '../features/parties/PartyFormPage'
 import { ComingSoonPage } from '../features/placeholder/ComingSoonPage'
@@ -39,6 +42,10 @@ export function AppRoutes() {
         <Route path="users/new" element={adminOnly(<UserFormPage />)} />
         <Route path="users/:id" element={adminOnly(<UserFormPage />)} />
         <Route path="audit-log" element={guarded(PERMISSIONS.auditView, <AuditLogPage />)} />
+        <Route path="contracts" element={guarded(PERMISSIONS.contractView, <ContractsPage />)} />
+        <Route path="contracts/new" element={guarded(PERMISSIONS.contractCreate, <ContractFormPage />)} />
+        <Route path="contracts/:id" element={guarded(PERMISSIONS.contractView, <ContractDetailsPage />)} />
+        <Route path="contracts/:id/edit" element={guarded(PERMISSIONS.contractEdit, <ContractFormPage />)} />
         <Route path="parties" element={guarded(PERMISSIONS.contractView, <PartiesPage />)} />
         <Route path="parties/new" element={guarded(PERMISSIONS.partyManage, <PartyFormPage />)} />
         <Route path="parties/:id" element={guarded(PERMISSIONS.contractView, <PartyFormPage />)} />

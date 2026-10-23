@@ -39,7 +39,6 @@ export const NAV_SECTIONS: NavSection[] = [
         labelKey: 'nav.contracts',
         icon: <FileTextOutlined />,
         permission: PERMISSIONS.contractView,
-        module: 4,
       },
       {
         path: '/obligations',

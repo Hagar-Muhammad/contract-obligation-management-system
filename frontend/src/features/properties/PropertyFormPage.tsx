@@ -1,7 +1,7 @@
 import { App, Button, Form, Input, InputNumber, Select, Spin } from 'antd'
 import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { useNavigate, useParams } from 'react-router-dom'
+import { Link, useNavigate, useParams } from 'react-router-dom'
 import { PERMISSIONS, useAuth } from '../../auth/context'
 import { PageHeader } from '../../components/PageHeader'
 import { showServerErrors } from '../../components/showServerErrors'
@@ -96,6 +96,13 @@ export function PropertyFormPage() {
       <PageHeader
         title={existing.data ? <bdi>{existing.data.name}</bdi> : title}
         subtitle={existing.data?.code}
+        actions={
+          existing.data && (
+            <Link to={`/contracts?property=${existing.data.id}`}>
+              <Button>{t('properties.contracts')}</Button>
+            </Link>
+          )
+        }
         breadcrumb={[{ label: t('properties.title'), to: '/properties' }, { label: title }]}
       />
       <Form<PropertyFormValues>

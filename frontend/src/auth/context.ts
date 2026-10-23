@@ -25,6 +25,9 @@ export function useAuth(): AuthState {
 /** Permission codes, mirroring backend/app/modules/users/rbac.py. */
 export const PERMISSIONS = {
   contractView: 'contract:view',
+  contractCreate: 'contract:create',
+  contractEdit: 'contract:edit',
+  contractArchive: 'contract:archive',
   obligationView: 'obligation:view',
   extractionConfirm: 'extraction:confirm',
   partyManage: 'party:manage',

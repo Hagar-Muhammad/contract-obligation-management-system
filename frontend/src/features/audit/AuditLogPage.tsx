@@ -30,15 +30,21 @@ const ACTION_TONE: Record<AuditAction, Tone> = {
   'party.updated': 'blue',
   'property.created': 'green',
   'property.updated': 'blue',
+  'contract.created': 'green',
+  'contract.updated': 'blue',
+  'contract.status_changed': 'blue',
+  'contract.archived': 'grey',
+  'contract.restored': 'green',
 }
 
-const ACTION_GROUPS = ['auth', 'user', 'party', 'property'] as const
+const ACTION_GROUPS = ['auth', 'user', 'party', 'property', 'contract'] as const
 
 /** Where each kind of record opens in the app. */
 const TARGET_PATH: Record<AuditLog['target_type'], string> = {
   user: '/users',
   party: '/parties',
   property: '/properties',
+  contract: '/contracts',
 }
 
 /** Local calendar day "YYYY-MM-DD" → ISO instant at the start of that day (or of the next day). */

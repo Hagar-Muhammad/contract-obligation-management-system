@@ -623,6 +623,312 @@ p {
   font-size: 13px;
 }
 
+/* ---- Contracts (screens 3-5) ---- */
+
+.pill-blue {
+  background: var(--ct-blue-soft);
+  color: #1d4ed8;
+}
+
+.type-tag {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 6px;
+  background: #eef1f6;
+  color: #334155;
+  font-size: 12px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.contract-title {
+  color: var(--ct-blue);
+  font-weight: 700;
+}
+
+.nowrap {
+  white-space: nowrap;
+}
+
+.filter-select {
+  min-width: 160px;
+}
+
+.toolbar-end {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-inline-start: auto;
+}
+
+.panel-link {
+  display: inline-block;
+  margin-top: 12px;
+  font-weight: 600;
+}
+
+.preserve-lines {
+  white-space: pre-line;
+}
+
+/* "→" points the way the reader goes: mirrored in right-to-left layouts. */
+.arrow-forward {
+  display: inline-block;
+}
+
+[dir='rtl'] .arrow-forward {
+  transform: scaleX(-1);
+}
+
+/* New / edit contract */
+
+.form-with-aside {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 260px;
+  gap: 16px;
+  align-items: start;
+}
+
+.form-aside {
+  position: sticky;
+  top: 80px; /* below the 64px sticky top bar */
+}
+
+.progress-list {
+  display: grid;
+  gap: 12px;
+  margin: 14px 0 0;
+  padding: 0;
+  list-style: none;
+  font-size: 14px;
+}
+
+.progress-list li {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--ct-muted);
+}
+
+.progress-list li.is-done {
+  color: var(--ct-text);
+}
+
+.progress-list li.is-done .anticon {
+  color: var(--ct-green);
+}
+
+.progress-list li.is-error {
+  color: var(--ct-red);
+  font-weight: 600;
+}
+
+.progress-dot {
+  width: 14px;
+  height: 14px;
+  border: 2px solid var(--ct-border);
+  border-radius: 50%;
+}
+
+.form-footer {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 16px;
+  padding-block: 14px;
+}
+
+.form-footer-status {
+  margin-inline-end: auto;
+}
+
+.text-danger {
+  color: var(--ct-red);
+  font-weight: 600;
+}
+
+.required-star {
+  color: var(--ct-red);
+}
+
+.full-width {
+  width: 100%;
+}
+
+.value-input {
+  display: flex;
+  gap: 8px;
+}
+
+.currency-input {
+  width: 80px;
+  flex: none;
+}
+
+.parties-field {
+  display: grid;
+  gap: 10px;
+}
+
+.party-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 12px;
+  border: 1px solid var(--ct-border);
+  border-radius: 10px;
+}
+
+.party-row-name {
+  flex: 1;
+  min-width: 0;
+}
+
+/* Ant Design stretches selects inside form items to full width; the role select keeps a fixed width. */
+.party-row .party-role.ant-select {
+  flex: none;
+  width: 170px;
+}
+
+.link-button-inline.ant-btn {
+  justify-self: start;
+  padding-inline: 0;
+}
+
+/* Contract details */
+
+.contract-header {
+  margin-bottom: 20px;
+}
+
+.contract-header-top {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.contract-badges {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.contract-facts {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 16px;
+  margin: 20px 0 0;
+  padding-top: 16px;
+  border-top: 1px solid var(--ct-border);
+}
+
+.contract-facts dt {
+  color: var(--ct-muted);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.contract-facts dd {
+  margin: 4px 0 0;
+  font-weight: 700;
+}
+
+.term-progress {
+  display: grid;
+  gap: 6px;
+  max-width: 240px;
+  margin-top: 16px;
+}
+
+.term-progress-label {
+  color: var(--ct-muted);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.term-progress-bar {
+  height: 6px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: #e5e9f0;
+}
+
+.term-progress-bar span {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: var(--ct-green);
+}
+
+.details-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 320px;
+  gap: 16px;
+  align-items: start;
+}
+
+.details-aside {
+  display: grid;
+  gap: 16px;
+}
+
+.side-list {
+  display: grid;
+  gap: 14px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.activity-list {
+  display: grid;
+  gap: 14px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-size: 13px;
+}
+
+/* Coloured dot before each entry, as in the design's Activity panel. */
+.activity-item {
+  position: relative;
+  display: grid;
+  gap: 2px;
+  padding-inline-start: 16px;
+}
+
+.activity-item::before {
+  position: absolute;
+  top: 6px;
+  inset-inline-start: 0;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--audit-dot);
+  content: '';
+}
+
+@media (max-width: 1100px) {
+  .form-with-aside,
+  .details-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .form-aside {
+    position: static;
+    grid-row: 1;
+  }
+}
+
 /* ---- Forms ---- */
 
 .form-section {
