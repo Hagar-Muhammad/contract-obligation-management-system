@@ -28,6 +28,7 @@ export const PERMISSIONS = {
   obligationView: 'obligation:view',
   extractionConfirm: 'extraction:confirm',
   partyManage: 'party:manage',
+  propertyManage: 'property:manage',
   reportView: 'report:view',
   auditView: 'audit:view',
   userManage: 'user:manage',

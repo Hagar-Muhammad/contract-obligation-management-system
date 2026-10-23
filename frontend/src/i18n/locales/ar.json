@@ -3,6 +3,10 @@
     "name": "ConTrack",
     "tagline": "إدارة العقود والالتزامات"
   },
+  "common": {
+    "save": "حفظ",
+    "cancel": "إلغاء"
+  },
   "language": {
     "label": "اللغة",
     "en": "English",
@@ -166,7 +170,9 @@
     "readOnlyNote": "سجلات التدقيق للقراءة فقط. لا يمكن لأحد، بمن فيهم مديرو النظام، تعديلها أو حذفها.",
     "groups": {
       "auth": "تسجيل الدخول والجلسات",
-      "user": "المستخدمون"
+      "user": "المستخدمون",
+      "party": "الأطراف",
+      "property": "العقارات"
     },
     "actions": {
       "auth": {
@@ -182,18 +188,132 @@
         "password_reset": "إعادة تعيين كلمة المرور",
         "deactivated": "إيقاف مستخدم",
         "activated": "إعادة تفعيل مستخدم"
+      },
+      "party": {
+        "created": "إنشاء طرف",
+        "updated": "تعديل طرف"
+      },
+      "property": {
+        "created": "إنشاء عقار",
+        "updated": "تعديل عقار"
       }
     },
     "targets": {
-      "user": "مستخدم"
+      "user": "مستخدم",
+      "party": "طرف",
+      "property": "عقار"
     },
     "fields": {
       "email": "البريد الإلكتروني",
       "full_name": "الاسم الكامل",
       "preferred_language": "اللغة المفضلة",
       "roles": "الأدوار",
-      "is_active": "الحالة"
+      "is_active": "الحالة",
+      "party_type": "نوع الطرف",
+      "display_name": "الاسم",
+      "national_id": "الرقم القومي",
+      "passport_no": "رقم جواز السفر",
+      "registration_no": "رقم السجل التجاري",
+      "tax_no": "الرقم الضريبي",
+      "phone": "الهاتف",
+      "address": "العنوان",
+      "notes": "ملاحظات",
+      "code": "رمز العقار",
+      "name": "الاسم",
+      "property_type": "نوع العقار",
+      "area_sqm": "المساحة (م²)",
+      "city": "المدينة",
+      "country": "الدولة",
+      "managers": "مديرو العقار"
     }
+  },
+  "parties": {
+    "title": "الأطراف",
+    "subtitle": "الأشخاص والشركات الموقّعون على عقودك.",
+    "add": "إضافة طرف",
+    "new": "طرف جديد",
+    "edit": "تعديل طرف",
+    "view": "بيانات الطرف",
+    "search": "ابحث بالاسم أو البريد أو الهاتف أو رقم الهوية",
+    "allTypes": "الكل",
+    "individuals": "أفراد",
+    "organizations": "جهات اعتبارية",
+    "colParty": "الطرف",
+    "colContact": "التواصل",
+    "colUpdated": "آخر تحديث",
+    "empty": "لا توجد أطراف بعد.",
+    "emptyScoped": "تظهر الأطراف هنا عندما تعمل على عقود تخصّها.",
+    "regNoShort": "سجل تجاري {{value}}",
+    "taxNoShort": "رقم ضريبي {{value}}",
+    "nationalIdOnFile": "الرقم القومي مسجّل",
+    "passportOnFile": "جواز السفر مسجّل",
+    "identitySection": "بيانات الطرف",
+    "type": "نوع الطرف",
+    "fullName": "الاسم الكامل",
+    "companyName": "اسم الشركة",
+    "nationalId": "الرقم القومي",
+    "passportNo": "رقم جواز السفر",
+    "registrationNo": "رقم السجل التجاري",
+    "taxNo": "الرقم الضريبي",
+    "contactSection": "التواصل",
+    "email": "البريد الإلكتروني",
+    "phone": "الهاتف",
+    "address": "العنوان",
+    "notes": "ملاحظات",
+    "created": "تم إنشاء الطرف.",
+    "saved": "تم حفظ التغييرات."
+  },
+  "properties": {
+    "title": "العقارات",
+    "subtitle": "العقارات التي تشملها عقودك، ومن يدير كل عقار.",
+    "add": "إضافة عقار",
+    "new": "عقار جديد",
+    "edit": "تعديل عقار",
+    "view": "بيانات العقار",
+    "search": "ابحث بالرمز أو الاسم أو المدينة أو العنوان",
+    "allTypes": "كل الأنواع",
+    "typeFilter": "تصفية حسب النوع",
+    "colProperty": "العقار",
+    "colType": "النوع",
+    "colLocation": "الموقع",
+    "colArea": "المساحة",
+    "colManagers": "يديره",
+    "areaValue": "{{value}} م²",
+    "unassigned": "بلا مدير",
+    "empty": "لا توجد عقارات بعد.",
+    "emptyAssigned": "لم يُسند إليك أي عقار بعد.",
+    "emptyScoped": "تظهر العقارات هنا عندما تعمل على عقود تشملها.",
+    "detailsSection": "العقار",
+    "code": "رمز العقار",
+    "codeHelp": "مرجعك لهذا العقار، مثل WM-G14. يجب ألا يتكرر.",
+    "codeFormat": "استخدم الحروف اللاتينية والأرقام والمسافات و . _ / - فقط.",
+    "type": "نوع العقار",
+    "name": "الاسم",
+    "area": "المساحة",
+    "locationSection": "الموقع",
+    "address": "العنوان",
+    "city": "المدينة",
+    "country": "الدولة",
+    "managersSection": "الإدارة",
+    "managers": "مديرو العقار",
+    "managersHelp": "يرى مديرو العقارات العقود والالتزامات الخاصة بالعقارات المسندة إليهم.",
+    "noManagers": "لا يوجد مدير عقارات نشط مطابق.",
+    "notes": "ملاحظات",
+    "created": "تم إنشاء العقار.",
+    "saved": "تم حفظ التغييرات."
+  },
+  "partyTypes": {
+    "individual": "فرد",
+    "organization": "جهة اعتبارية"
+  },
+  "propertyTypes": {
+    "residential": "سكني",
+    "retail": "تجاري (محلات)",
+    "office": "مكاتب",
+    "industrial": "صناعي",
+    "land": "أرض",
+    "mixed_use": "متعدد الاستخدامات",
+    "other": "أخرى"
   },
   "scope": {
     "all": "كل العقود",
@@ -241,7 +361,8 @@
   "validation": {
     "required": "هذا الحقل مطلوب.",
     "email": "أدخل بريدًا إلكترونيًا صحيحًا.",
-    "passwordLength": "استخدم {{min}} أحرف على الأقل."
+    "passwordLength": "استخدم {{min}} أحرف على الأقل.",
+    "phone": "استخدم الأرقام والمسافات و + ( ) - . / فقط."
   },
   "errors": {
     "forbidden": "ليست لديك صلاحية لعرض هذه الصفحة.",

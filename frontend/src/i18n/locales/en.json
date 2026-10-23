@@ -3,6 +3,10 @@
     "name": "ConTrack",
     "tagline": "Contract & Obligation Management"
   },
+  "common": {
+    "save": "Save",
+    "cancel": "Cancel"
+  },
   "language": {
     "label": "Language",
     "en": "English",
@@ -166,7 +170,9 @@
     "readOnlyNote": "Audit records are read-only. Nobody, administrators included, can edit or delete them.",
     "groups": {
       "auth": "Sign-in & sessions",
-      "user": "Users"
+      "user": "Users",
+      "party": "Parties",
+      "property": "Properties"
     },
     "actions": {
       "auth": {
@@ -182,18 +188,132 @@
         "password_reset": "Reset password",
         "deactivated": "Deactivated user",
         "activated": "Reactivated user"
+      },
+      "party": {
+        "created": "Created party",
+        "updated": "Edited party"
+      },
+      "property": {
+        "created": "Created property",
+        "updated": "Edited property"
       }
     },
     "targets": {
-      "user": "User"
+      "user": "User",
+      "party": "Party",
+      "property": "Property"
     },
     "fields": {
       "email": "Email",
       "full_name": "Full name",
       "preferred_language": "Preferred language",
       "roles": "Roles",
-      "is_active": "Status"
+      "is_active": "Status",
+      "party_type": "Party type",
+      "display_name": "Name",
+      "national_id": "National ID",
+      "passport_no": "Passport number",
+      "registration_no": "Registration number",
+      "tax_no": "Tax number",
+      "phone": "Phone",
+      "address": "Address",
+      "notes": "Notes",
+      "code": "Property code",
+      "name": "Name",
+      "property_type": "Property type",
+      "area_sqm": "Area (m²)",
+      "city": "City",
+      "country": "Country",
+      "managers": "Property managers"
     }
+  },
+  "parties": {
+    "title": "Parties",
+    "subtitle": "The people and companies that sign your contracts.",
+    "add": "Add party",
+    "new": "New party",
+    "edit": "Edit party",
+    "view": "Party details",
+    "search": "Search by name, email, phone or ID number",
+    "allTypes": "All",
+    "individuals": "Individuals",
+    "organizations": "Organizations",
+    "colParty": "Party",
+    "colContact": "Contact",
+    "colUpdated": "Last updated",
+    "empty": "No parties yet.",
+    "emptyScoped": "Parties appear here once you work on contracts they belong to.",
+    "regNoShort": "Reg. no. {{value}}",
+    "taxNoShort": "Tax no. {{value}}",
+    "nationalIdOnFile": "National ID on file",
+    "passportOnFile": "Passport on file",
+    "identitySection": "Who they are",
+    "type": "Party type",
+    "fullName": "Full name",
+    "companyName": "Company name",
+    "nationalId": "National ID",
+    "passportNo": "Passport number",
+    "registrationNo": "Commercial registration number",
+    "taxNo": "Tax number",
+    "contactSection": "Contact",
+    "email": "Email",
+    "phone": "Phone",
+    "address": "Address",
+    "notes": "Notes",
+    "created": "Party created.",
+    "saved": "Changes saved."
+  },
+  "properties": {
+    "title": "Properties",
+    "subtitle": "The real estate your contracts cover, and who manages each property.",
+    "add": "Add property",
+    "new": "New property",
+    "edit": "Edit property",
+    "view": "Property details",
+    "search": "Search by code, name, city or address",
+    "allTypes": "All types",
+    "typeFilter": "Filter by type",
+    "colProperty": "Property",
+    "colType": "Type",
+    "colLocation": "Location",
+    "colArea": "Area",
+    "colManagers": "Managed by",
+    "areaValue": "{{value}} m²",
+    "unassigned": "No manager",
+    "empty": "No properties yet.",
+    "emptyAssigned": "No properties are assigned to you yet.",
+    "emptyScoped": "Properties appear here once you work on contracts that cover them.",
+    "detailsSection": "Property",
+    "code": "Property code",
+    "codeHelp": "Your reference for this property, e.g. WM-G14. Must be unique.",
+    "codeFormat": "Use letters, digits, spaces and . _ / - only.",
+    "type": "Property type",
+    "name": "Name",
+    "area": "Area",
+    "locationSection": "Location",
+    "address": "Address",
+    "city": "City",
+    "country": "Country",
+    "managersSection": "Management",
+    "managers": "Property managers",
+    "managersHelp": "Property Managers see the contracts and obligations of the properties assigned to them.",
+    "noManagers": "No active Property Managers match.",
+    "notes": "Notes",
+    "created": "Property created.",
+    "saved": "Changes saved."
+  },
+  "partyTypes": {
+    "individual": "Individual",
+    "organization": "Organization"
+  },
+  "propertyTypes": {
+    "residential": "Residential",
+    "retail": "Retail",
+    "office": "Office",
+    "industrial": "Industrial",
+    "land": "Land",
+    "mixed_use": "Mixed use",
+    "other": "Other"
   },
   "scope": {
     "all": "All contracts",
@@ -241,7 +361,8 @@
   "validation": {
     "required": "This field is required.",
     "email": "Enter a valid email address.",
-    "passwordLength": "Use at least {{min}} characters."
+    "passwordLength": "Use at least {{min}} characters.",
+    "phone": "Use digits, spaces and + ( ) - . / only."
   },
   "errors": {
     "forbidden": "You do not have permission to view this page.",

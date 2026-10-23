@@ -498,17 +498,39 @@ p {
   font-size: 13px;
 }
 
-/* ---- Audit log ---- */
+/* ---- Lists: toolbar with search and filters ---- */
 
-.audit-toolbar {
+.list-toolbar {
   display: flex;
   flex-wrap: wrap;
+  align-items: center;
   gap: 12px;
 }
 
-.audit-filter {
+.list-filter {
   min-width: 220px;
 }
+
+.muted {
+  color: var(--ct-subtle);
+}
+
+/* ---- Properties ---- */
+
+.manager-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 12px;
+}
+
+.manager-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  white-space: nowrap;
+}
+
+/* ---- Audit log ---- */
 
 /* Coloured dot before the action, as in the design's Activity panel. */
 .audit-action {

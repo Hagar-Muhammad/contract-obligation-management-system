@@ -1,9 +1,10 @@
 import { SearchOutlined } from '@ant-design/icons'
 import { DatePicker, Input, Select, Table, type TableProps } from 'antd'
-import { useEffect, useState, type ReactNode } from 'react'
+import { useState, type ReactNode } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Link } from 'react-router-dom'
 import { PageHeader } from '../../components/PageHeader'
+import { useListSearch } from '../../components/useListSearch'
 import { UserAvatar } from '../../components/UserAvatar'
 import { useLanguage } from '../../i18n/useLanguage'
 import { useRelativeTime } from '../../i18n/useRelativeTime'
@@ -25,9 +26,20 @@ const ACTION_TONE: Record<AuditAction, Tone> = {
   'user.password_reset': 'amber',
   'user.deactivated': 'red',
   'user.activated': 'green',
+  'party.created': 'green',
+  'party.updated': 'blue',
+  'property.created': 'green',
+  'property.updated': 'blue',
 }
 
-const ACTION_GROUPS = ['auth', 'user'] as const
+const ACTION_GROUPS = ['auth', 'user', 'party', 'property'] as const
+
+/** Where each kind of record opens in the app. */
+const TARGET_PATH: Record<AuditLog['target_type'], string> = {
+  user: '/users',
+  party: '/parties',
+  property: '/properties',
+}
 
 /** Local calendar day "YYYY-MM-DD" → ISO instant at the start of that day (or of the next day). */
 function dayStart(day: string, addDays = 0): string {
@@ -44,6 +56,9 @@ function ChangeValue({ field, value }: { field: string; value: unknown }) {
   }
   if (field === 'is_active') return <>{value ? t('users.active') : t('users.inactive')}</>
   if (field === 'preferred_language') return <>{t(`language.${String(value)}`)}</>
+  if (field === 'party_type') return <>{t(`partyTypes.${String(value)}`)}</>
+  if (field === 'property_type') return <>{t(`propertyTypes.${String(value)}`)}</>
+  if (Array.isArray(value)) return <>{value.join(', ')}</>
   return <>{String(value)}</>
 }
 
@@ -91,20 +106,10 @@ export function AuditLogPage() {
   const { t } = useTranslation()
   const { language } = useLanguage()
   const relativeTime = useRelativeTime()
-  const [page, setPage] = useState(1)
-  const [search, setSearch] = useState('')
-  const [q, setQ] = useState('')
+  const { search, setSearch, query, page, setPage } = useListSearch()
   const [action, setAction] = useState<AuditAction>()
   const [range, setRange] = useState<{ from?: string; to?: string }>({})
-  // Query the server once typing pauses, not on every keystroke.
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setQ(search.trim())
-      setPage(1)
-    }, 300)
-    return () => clearTimeout(timer)
-  }, [search])
-  const logs = useAuditLogs({ page, pageSize: PAGE_SIZE, q, action, ...range })
+  const logs = useAuditLogs({ page, pageSize: PAGE_SIZE, q: query, action, ...range })
   const dateTime = new Intl.DateTimeFormat(language, { dateStyle: 'medium', timeStyle: 'short' })
 
   const actor = (entry: AuditLog): ReactNode => {
@@ -113,7 +118,7 @@ export function AuditLogPage() {
         <span className="person">
           <UserAvatar name={entry.actor.full_name} size={28} />
           <span className="person-text">
-            <span className="person-name">{entry.actor.full_name}</span>
+            <bdi className="person-name">{entry.actor.full_name}</bdi>
             <span className="person-email">{entry.actor.email}</span>
           </span>
         </span>
@@ -130,12 +135,12 @@ export function AuditLogPage() {
     const label = entry.target_label ?? '—'
     return (
       <span className="person-text">
-        {entry.target_type === 'user' && entry.target_id ? (
-          <Link to={`/users/${entry.target_id}`} className="person-name">
-            {label}
+        {entry.target_id ? (
+          <Link to={`${TARGET_PATH[entry.target_type]}/${entry.target_id}`} className="person-name">
+            <bdi>{label}</bdi>
           </Link>
         ) : (
-          <span className="person-name">{label}</span>
+          <bdi className="person-name">{label}</bdi>
         )}
         <span className="person-email">{t(`audit.targets.${entry.target_type}`)}</span>
       </span>
@@ -169,7 +174,7 @@ export function AuditLogPage() {
     <div className="page">
       <PageHeader title={t('audit.title')} subtitle={t('audit.subtitle')} />
       <section className="panel panel-flush">
-        <div className="panel-toolbar audit-toolbar">
+        <div className="panel-toolbar list-toolbar">
           <Input
             allowClear
             prefix={<SearchOutlined />}
@@ -181,7 +186,7 @@ export function AuditLogPage() {
           />
           <Select<AuditAction>
             allowClear
-            className="audit-filter"
+            className="list-filter"
             placeholder={t('audit.allActions')}
             aria-label={t('audit.actionFilter')}
             value={action}
@@ -199,7 +204,7 @@ export function AuditLogPage() {
           />
           <DatePicker.RangePicker
             aria-label={t('audit.dateFilter')}
-            className="audit-filter"
+            className="list-filter"
             allowEmpty={[true, true]}
             onChange={(_, [from, to]) => {
               setRange({ from: from ? dayStart(from) : undefined, to: to ? dayStart(to, 1) : undefined })
