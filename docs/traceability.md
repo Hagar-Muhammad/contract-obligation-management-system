@@ -55,11 +55,11 @@ UC-03, UC-04 and UC-05 are the workflows defined in SRS 9.1–9.3; the others ar
 | FR-CON-04 | UC-03 | Edit contract page; status choices limited to allowed transitions | `PATCH /contracts/{id}`; audited as `contract.updated` / `contract.status_changed` | TC-CON-04 | 4 contracts | ✅ |
 | FR-CON-05 | UC-03 | Archive / Restore on the details page and row menu; Archived tab | `POST /contracts/{id}/archive`, `/restore`; archived contracts read-only | TC-CON-05 | 4 contracts | ✅ |
 | FR-CON-06 | UC-03 | Type and status selects from the lookup API | `contract_types`, `contract_statuses` (seeded, `is_active`), `GET /contract-types`, `GET /contract-statuses`; D-17 transitions | TC-CON-06 | 4 contracts | ✅ |
-| FR-DOC-01 | UC-08 | Document upload on contract page | `POST /contracts/{id}/documents` | TC-DOC-01 | 5 documents | ⏳ |
-| FR-DOC-02 | UC-08 | Download original | Write-once storage + SHA-256 | TC-DOC-02 | 5 documents | ⏳ |
-| FR-DOC-03 | UC-08 | View/download action | `GET /documents/{id}/download` (permission-checked) | TC-DOC-03 | 5 documents | ⏳ |
-| FR-DOC-04 | UC-08 | Upload error messages | Type (content sniffing) + size validation | TC-DOC-04 | 5 documents | ⏳ |
-| FR-DOC-05 | UC-08 | Documents table (metadata) | `contract_documents` metadata | TC-DOC-05 | 5 documents | ⏳ |
+| FR-DOC-01 | UC-08 | Documents panel → Upload (`features/documents/DocumentsPanel.tsx`); new contract section 4 (`NewContractFiles.tsx`) | `POST /contracts/{id}/documents` (`document:upload`, contract in scope, not archived) | TC-DOC-01 | 5 documents | ✅ |
+| FR-DOC-02 | UC-08 | Download / open the original | Write-once `LocalStorage` (`app/core/storage.py`), SHA-256 recorded; no update or delete endpoint | TC-DOC-02 | 5 documents | ✅ |
+| FR-DOC-03 | UC-08 | Click a name to open (PDF/images), download button to save; fetched with the user's token | `GET /documents/{id}/download` (scoped by contract, sandboxed attachment, no-store); downloads audited | TC-DOC-03 | 5 documents | ✅ |
+| FR-DOC-04 | UC-08 | Upload dialog: type and size checked before sending; server reason shown | Content detection (PDF/DOCX/PNG/JPG, macro Word refused) → 415; size limit → 413 (middleware + service); empty → 422 | TC-DOC-04 | 5 documents | ✅ |
+| FR-DOC-05 | UC-08 | Documents panel: name, type, size, kind, upload date | `contract_documents` metadata; `GET /contracts/{id}/documents`, `GET /documents/{id}` | TC-DOC-05 | 5 documents | ✅ |
 | FR-OBL-01 | UC-05 | Create Obligation form | `POST /contracts/{id}/obligations` | TC-OBL-01 | 6 obligations | ⏳ |
 | FR-OBL-02 | UC-05 | Obligation details | Obligation model (7.3 fields) | TC-OBL-02 | 6 obligations | ⏳ |
 | FR-OBL-03 | UC-05 | Assignment fields | Responsible party/user validation | TC-OBL-03 | 6 obligations | ⏳ |
@@ -105,7 +105,7 @@ UC-03, UC-04 and UC-05 are the workflows defined in SRS 9.1–9.3; the others ar
 | BR-06 | `require_permission()` on every write endpoint | TC-BR-06 | 1 auth-users-rbac (+ every module) | 🚧 users, parties, properties and contracts (create, edit, archive) done; each module adds its endpoints |
 | BR-07 | `GET /contracts` without `view` excludes archived; Archived tab asks with `view=archived` | TC-BR-07 (`test_TC_CON_05_*`) | 4 contracts | ✅ |
 | BR-08 | RRULE validation | TC-BR-08 | 6 obligations | ⏳ |
-| BR-09 | Document service + `NOT NULL` FK | TC-BR-09 | 5 documents | ⏳ |
+| BR-09 | `contract_documents.contract_id NOT NULL` FK; upload only through a contract in scope, not archived; new-contract files uploaded after the contract exists | TC-BR-09 | 5 documents | ✅ |
 
 ## Non-functional requirements with automated tests
 
@@ -119,6 +119,6 @@ UC-03, UC-04 and UC-05 are the workflows defined in SRS 9.1–9.3; the others ar
 | NFR-SEC-03 | `test_auth.py::test_passwords_are_stored_as_argon2_hashes` | ✅ |
 | NFR-SEC-04 | `test_security.py` (HSTS + Secure cookies in production, weak JWT secret refused) | ✅ |
 | NFR-MAIN-03 | `test_request_context.py` (`X-Request-ID` on every response and in every log line); `test_audit.py` (important actions recorded) | ✅ |
-| NFR-SEC-05, NFR-SEC-06 | Module 5 tests | ⏳ |
+| NFR-SEC-05, NFR-SEC-06 | `test_documents.py` (scope per role, no public path, sandboxed downloads; content-type detection, size limit, file-name cleaning); every form's validation tests | ✅ |
 | NFR-PERF-02 | Module 7 tests (page size cap, server-side filters) | ⏳ |
 | NFR-PERF-03, NFR-REL-03 | Module 9 tests | ⏳ |

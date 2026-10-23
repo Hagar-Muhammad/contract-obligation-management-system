@@ -27,7 +27,7 @@ flowchart LR
 | API | FastAPI (Python 3.12), Pydantic v2, OpenAPI generated from code | 10.2, NFR-MAIN-01 |
 | Database | PostgreSQL 16, SQLAlchemy 2, Alembic migrations | 7.1, NFR-SCALE-01 |
 | Background jobs | Celery + Redis, Celery Beat for schedules | NFR-PERF-03, FR-OBL-05, FR-NOTIF-01/02 |
-| Document storage | `StorageBackend` interface: local disk (dev), S3-compatible (prod) | FR-DOC-02, NFR-SEC-05, NFR-BACK-02 |
+| Document storage | `StorageBackend` interface (`app/core/storage.py`): local disk now (`STORAGE_DIR`); an S3-compatible backend can implement the same interface for production | FR-DOC-02, NFR-SEC-05, NFR-BACK-02 |
 | Extraction | `ExtractionProvider` interface in an isolated module | 2.5, NFR-SCALE-02, Appendix B |
 | Frontend | React + TypeScript + Vite, Ant Design, TanStack Query, react-i18next | NFR-UX-01..03, NFR-MAIN-02 |
 | Auth | Short-lived JWT access token + rotating refresh token (httpOnly cookie), Argon2 password hashing | FR-AUTH-*, NFR-SEC-01..04 |

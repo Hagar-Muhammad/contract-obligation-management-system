@@ -180,17 +180,19 @@ Constraints:
 |---|---|---|
 | id | UUID PK | |
 | contract_id | UUID FK NOT NULL | BR-09: every document belongs to a contract. |
-| obligation_id | UUID FK NULL | Set when the file is evidence for an obligation (7.3 Evidence/Attachment). |
-| kind | VARCHAR(20) NOT NULL | `contract`, `amendment`, `evidence`, `other`. |
+| kind | VARCHAR(20) NOT NULL | `contract` (the signed original), `amendment`, `annex`, `other` (CHECK). |
+| file_type | VARCHAR(10) NOT NULL | `pdf`, `docx`, `png`, `jpg`, detected from the content (D-12). |
 | original_filename | VARCHAR(255) NOT NULL | Name. |
 | mime_type | VARCHAR(100) NOT NULL | Type (detected from content). |
 | size_bytes | BIGINT NOT NULL | Size. |
 | sha256 | CHAR(64) NOT NULL | Integrity of the preserved original (FR-DOC-02). |
 | storage_key | VARCHAR(500) NOT NULL | Opaque key in the storage backend; never a public URL. |
-| uploaded_by_id | UUID FK NOT NULL | Uploader. |
+| uploaded_by_id | UUID FK NOT NULL, RESTRICT | Uploader. |
 | uploaded_at | TIMESTAMPTZ NOT NULL | Upload date. |
 
-Originals are write-once: there is no update path for file content.
+Originals are write-once: there is no update or delete path for file content, and storage refuses to overwrite a
+key. `storage_key` is UNIQUE; `contract_id` is indexed and RESTRICT. Evidence attached to an obligation
+(`obligation_id`, 7.3) is added with module 6.
 
 ### Obligations — module 6 (`obligations`)
 
